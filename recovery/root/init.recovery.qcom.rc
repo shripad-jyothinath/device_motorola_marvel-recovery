@@ -1,0 +1,90 @@
+# Copyright (C) 2026 chkndrp
+# Copyright (C) 2026 Shripad
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# Motorola Edge 70 Fusion (marvel, Qualcomm SM7635 "volcano")
+
+import init.recovery.encryption.rc
+
+on early-init
+    loglevel 7
+    write /sys/fs/selinux/enforce 0
+
+on early-init
+    # UFS tuning (same HC as amethyst - confirmed for SM7635)
+    wait /sys/bus/platform/devices/1d84000.ufshc
+    write /sys/bus/platform/devices/1d84000.ufshc/auto_hibern8 0
+    write /sys/bus/platform/devices/1d84000.ufshc/clkgate_enable 0
+    write /sys/bus/platform/devices/1d84000.ufshc/enable_wb_buf_flush 0
+
+on early-init
+    # cpusets for task profiles
+    mkdir /dev/cpuset/foreground 0775 system system
+    mkdir /dev/cpuset/background 0775 system system
+    mkdir /dev/cpuset/system-background 0775 system system
+    mkdir /dev/cpuset/top-app 0775 system system
+    mkdir /dev/cpuset/restricted 0775 system system
+
+    write /dev/cpuset/top-app/cpus 0-7
+    write /dev/cpuset/top-app/mems 0
+    write /dev/cpuset/foreground/cpus 0-7
+    write /dev/cpuset/foreground/mems 0
+    write /dev/cpuset/system-background/cpus 0-3
+    write /dev/cpuset/system-background/mems 0
+    write /dev/cpuset/background/cpus 0-3
+    write /dev/cpuset/background/mems 0
+    write /dev/cpuset/restricted/cpus 0-3
+    write /dev/cpuset/restricted/mems 0
+
+on property:twrp.modules.loaded=true && property:twrp.firmware.loaded=
+    mkdir /mnt/vendor 0775 shell system
+    mkdir /mnt/vendor/persist 0775 shell system
+
+    wait /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} 10
+    mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /vendor/firmware_mnt ro
+    wait /dev/block/bootdevice/by-name/persist 10
+    mount ext4 /dev/block/bootdevice/by-name/persist /mnt/vendor/persist ro
+
+    restorecon_recursive /vendor/firmware_mnt
+    wait /vendor/firmware_mnt/image/adsp.mdt
+
+    wait /sys/kernel/boot_adsp/boot
+    write /sys/kernel/boot_adsp/boot 1
+
+    setprop twrp.firmware.mounted true
+
+on init
+    start vendor.boot-qti
+
+on early-fs
+    wait /dev/block/platform/soc/${ro.boot.bootdevice}
+    symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
+
+    write /proc/sys/walt/sched_lib_name "recovery,magiskboot,Updater,updater,update_engine_sideload"
+    write /proc/sys/walt/sched_lib_mask_force 255
+
+on early-fs
+    # I/O tuning
+    write /sys/block/sde/queue/read_ahead_kb 2048
+    write /sys/block/sde/queue/nr_requests 256
+    write /sys/block/sde/queue/iostats 0
+
+    write /sys/block/sda/queue/read_ahead_kb 2048
+    write /sys/block/sda/queue/nr_requests 256
+    write /sys/block/sda/queue/discard_max_bytes 134217728
+    write /sys/block/sda/queue/iostats 0
+
+on boot
+    setprop sys.usb.config adb
+
+# ---------------------------------------------------------------------------
+# Motorola MMI touch stack.
+# The Goodix BRL controller driver is listed in modules.blocklist on the stock
+# ROM, so recovery has to force the chain in.
+# ---------------------------------------------------------------------------
+service recovery-touch /system/bin/touch_probe.sh
+    user root
+    group root system
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0

@@ -1,0 +1,19 @@
+# Copyright (C) 2026 chkndrp
+# Copyright (C) 2026 Shripad
+# SPDX-License-Identifier: GPL-3.0-only
+
+# Keystore / keymaster
+fbe.metadata.wrappedkey=true
+
+# Logging
+persist.sys.qseelogd=true
+persist.logd.size=8M
+
+# FUSE passthrough
+persist.sys.fuse.passthrough.enable=true
+
+# Charger suspend
+ro.charger.enable_suspend=1
+
+# ADB
+ro.adb.secure=0

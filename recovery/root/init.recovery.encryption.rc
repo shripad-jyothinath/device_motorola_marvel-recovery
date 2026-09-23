@@ -1,0 +1,76 @@
+# Copyright (C) 2026 chkndrp
+# Copyright (C) 2026 Shripad
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# Decryption bring-up for marvel.
+#
+# Stack: QTI keymint/gatekeeper (QSEE) + StrongBox/Weaver/AuthSecret.
+# The vendor tree ships both the NXP and the Thales implementations
+# (vendor/motorola/marvel/config.fs); this device uses NXP:
+#   AID_VENDOR_NXP_STRONGBOX  2910
+#   AID_VENDOR_NXP_WEAVER     2911
+#   AID_VENDOR_SSGTZD         2912
+#   AID_VENDOR_NXP_AUTHSECRET 2915
+#
+# Reference: chkndrp/device_xiaomi_amethyst-recovery (same SoC, Thales variant).
+
+# Wait for the firmware mount before starting qseecomd
+on property:twrp.firmware.mounted=true
+    start vendor.qseecomd
+
+# Runs after qseecomd registers its listeners
+on property:vendor.sys.listeners.registered=true
+    start vendor.ssgtzd
+    start vendor.keymint-qti
+    start vendor.gatekeeper-qti
+
+# Runs during post-fs-data
+on property:ro.crypto.state=encrypted && property:twrp.firmware.mounted=true
+    start vendor.keymint-strongbox
+    start vendor.weaver
+    start vendor.secure_element
+
+# Runs after decryption
+on property:twrp.all.users.decrypted=true
+    stop keystore2
+    stop vendor.secure_element
+    stop se_omapi
+    stop vendor.weaver
+    stop vendor.keymint-strongbox
+    stop vendor.keymint-qti
+    stop vendor.qseecomd
+    stop vendor.ssgtzd
+    stop vendor.gatekeeper-qti
+
+    setprop twrp.firmware.mounted false
+
+    write /sys/bus/platform/devices/1d84000.ufshc/auto_hibern8 10000
+    write /sys/bus/platform/devices/1d84000.ufshc/clkgate_enable 1
+    write /sys/bus/platform/devices/1d84000.ufshc/enable_wb_buf_flush 1
+
+# Runs after decryption, but only if the user has second space/dual apps
+on property:twrp.decrypt.done=true && property:twrp.user.999.decrypt=0
+    setprop twrp.firmware.mounted false
+
+    write /sys/bus/platform/devices/1d84000.ufshc/auto_hibern8 10000
+    write /sys/bus/platform/devices/1d84000.ufshc/clkgate_enable 1
+    write /sys/bus/platform/devices/1d84000.ufshc/enable_wb_buf_flush 1
+
+# Runs if decryption failed/was cancelled
+on property:of_decryption_failed=true
+    setprop twrp.firmware.mounted false
+
+    write /sys/bus/platform/devices/1d84000.ufshc/auto_hibern8 10000
+    write /sys/bus/platform/devices/1d84000.ufshc/clkgate_enable 1
+    write /sys/bus/platform/devices/1d84000.ufshc/enable_wb_buf_flush 1
+
+# Runs if the current boot mode is fastbootd
+on property:ro.twrp.fastbootd=1 && property:twrp.firmware.mounted=true
+    setprop twrp.firmware.mounted false
+
+# After decryption / fastbootd, unmount the firmware partitions
+on property:twrp.firmware.mounted=false && property:twrp.firmware.umounted=
+    umount /vendor/firmware_mnt
+    umount /mnt/vendor/persist
+
+    setprop twrp.firmware.umounted true
