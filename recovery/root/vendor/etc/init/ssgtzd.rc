@@ -1,0 +1,14 @@
+# Copyright (C) 2026 Shripad
+# SPDX-License-Identifier: Apache-2.0
+#
+# Secure Services Gateway (TrustZone) daemon.
+# Source: /vendor/etc/init/ssgtzd.rc
+# (copy the stock file over this one when extracting the dump)
+
+service vendor.ssgtzd /vendor/bin/ssgtzd
+    user root
+    group root system
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/system/lib64:/bin
+    seclabel u:r:recovery:s0
+    task_profiles CPUSET_SP_FOREGROUND
+    disabled

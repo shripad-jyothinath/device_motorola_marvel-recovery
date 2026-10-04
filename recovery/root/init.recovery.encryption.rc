@@ -25,10 +25,17 @@ on property:vendor.sys.listeners.registered=true
     start vendor.gatekeeper-qti
 
 # Runs during post-fs-data
+#
+# StrongBox/Weaver are SKU-gated: vendor/etc/vhw.xml exports
+# ro.boot.strongbox_support (only for specific hwids) and the "dnes" SKU declares
+#   keymint IKeyMintDevice/strongbox v3  (NXP KM300)
+#   weaver  IWeaver/default v2           (NXP)
+# See odm/etc/vintf/manifest_dnes.xml.
 on property:ro.crypto.state=encrypted && property:twrp.firmware.mounted=true
+    start vendor.secure_element
+on property:ro.crypto.state=encrypted && property:twrp.firmware.mounted=true && property:ro.boot.strongbox_support=true
     start vendor.keymint-strongbox
     start vendor.weaver
-    start vendor.secure_element
 
 # Runs after decryption
 on property:twrp.all.users.decrypted=true

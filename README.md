@@ -39,8 +39,8 @@ mka adbd recoveryimage
 | partition sizes | `recovery 134217728`, `dtbo 34603008`, `super 21474836480`, group `mot_dp_group` / `21470642176` |
 | dynamic list | **no `odm`** (marvel keeps ODM content in `vendor/odm`) |
 | touch modules | MMI chain: `mmi_annotate → mmi_info → mmi_relay → panel_event_notifier → sensors_class → touchscreen_mmi → goodix_brl_mmi` (+ `goodix_fod_mmi`, `rbs_fod_mmi`, `mmi_stow`) |
-| crypto services | **NXP** variants (`strongbox-nxp`, `weaver-service.nxp`, `authsecret-service.nxp-qti`) — amethyst uses Thales; marvel ships both and uses NXP |
-| crypto rc | `init.recovery.encryption.rc` keeps the amethyst bring-up sequence (`qseecomd → ssgtzd/keymint-qti/gatekeeper-qti → keymint-strongbox/weaver/secure_element`) |
+| crypto services | **NXP** variants (`strongbox-nxp`, `weaver-service.nxp`, `authsecret-service.nxp-qti`) — amethyst uses Thales; marvel ships both and selects NXP on the `dnes` SKU (see below) |
+| crypto rc | `init.recovery.encryption.rc` keeps the amethyst bring-up sequence (`qseecomd → ssgtzd/keymint-qti/gatekeeper-qti → keymint-strongbox/weaver/secure_element`), with the StrongBox/Weaver start gated on `ro.boot.strongbox_support` |
 | fstab | dropped `odm`; kept dual `erofs`+`ext4` for every logical partition; `/metadata` f2fs + `wrappedkey`; `/data` with `wrappedkey_v0` + `metadata_encryption` + `sysfs_path=…/1d84000.ufshc` |
 | touch probe | `runatboot.sh`'s Xiaomi `touchfeature-service` replaced by `system/bin/touch_probe.sh` (Motorola MMI) |
 | UI | `TW_FRAMERATE 120`, `TW_MAX_BRIGHTNESS 2047`, `OF_SCREEN_H 2712`, `OF_MAINTAINER Shripad` |
@@ -48,6 +48,27 @@ mka adbd recoveryimage
 The whole decryption stack is the same on both devices (QTI keymint on QSEE +
 StrongBox/Weaver/AuthSecret + `ssgtzd` + `qseecomd`), so `init.recovery.encryption.rc`
 transfers almost verbatim.
+
+### Crypto is a SKU-gated NXP StrongBox stack
+
+`odm/etc/vintf/manifest_dnes.xml` (the "dnes" SKU) declares:
+
+```
+android.hardware.security.keymint    IKeyMintDevice/strongbox  v3   (vendor/nxp/.../KM300)
+android.hardware.security.sharedsecret ISharedSecret/strongbox
+android.hardware.weaver              IWeaver/default           v2   (vendor/nxp/.../weaver/aidl_impl)
+android.hardware.secure_element      ISecureElement/SIM1,/SIM2,/eSE1
+android.se.omapi                     ISecureElementService/default
+```
+
+StrongBox is gated by `vendor/etc/vhw.xml` (`ro.boot.strongbox_support`, hwid-indexed) and
+advertised by `odm/etc/permissions/sku_dnes/android.hardware.strongbox_keystore.xml`.
+`vendor/etc/hal_uuid_map_config.xml` lists both implementations:
+NXP 2910/2911/2915 and STM/Thales 2913/2916 — marvel selects **NXP**.
+
+The always-present TZ path is `android.hardware.security.keymint-service-qti`
+(`IKeyMintDevice/default` + secureclock + sharedsecret), plus
+`android.hardware.gatekeeper-service-qti`.
 
 ## Still to add before building
 
