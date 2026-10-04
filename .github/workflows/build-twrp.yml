@@ -219,8 +219,25 @@ jobs:
             [ "$SRC_FREE" -ge "$NEED" ]
           }
 
+          # The binding constraint on a 16 GB runner is NOT disk, it is soong's
+          # Android.bp analysis: soong_build parses every project in the tree, and
+          # that live set is what pushes the machine into swap and gets the runner
+          # shut down. Evidence from run 37232604397: the bootstrap finished
+          # ("[99% 131/132] cp .../soong_build"), then two minutes of silence while
+          # soong_build analysed, then
+          #   Process completed with exit code 143.   (SIGTERM)
+          #   The runner has received a shutdown signal.
+          # remove-minimal.xml takes 990 projects to 383, which is the one lever
+          # that actually shrinks that peak. So trim whenever RAM is short, not
+          # only when the disk is.
+          MEM_GB=$(awk '/MemTotal/{print int($2/1048576)}' /proc/meminfo 2>/dev/null || true)
+          MEM_GB=${MEM_GB:-16}
           TRIM=0
-          if ! choose "$FULL_SRC" "$FULL_OUT" "$FULL_SHARED"; then
+          if [ "$MEM_GB" -lt 32 ]; then
+            echo "::warning::runner has ${MEM_GB} GB RAM (<32) - trimming the tree so soong's analysis fits"
+            TRIM=1
+            choose "$TRIM_SRC" "$TRIM_OUT" "$TRIM_SHARED" || true
+          elif ! choose "$FULL_SRC" "$FULL_OUT" "$FULL_SHARED"; then
             echo "::warning::not enough disk for the full 74 GB tree here - enabling the remove-minimal.xml overlay"
             if choose "$TRIM_SRC" "$TRIM_OUT" "$TRIM_SHARED"; then
               TRIM=1
@@ -273,7 +290,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
           echo "source=$SRC_ROOT (${SRC_FREE} bytes free, needs ${NEED})"
-          echo "out=${OUT_DIR:-<src>/out} swap=$SWAP_DIR total=${TOTAL_GB}GB trim=$TRIM"
+          echo "out=${OUT_DIR:-<src>/out} swap=$SWAP_DIR total=${TOTAL_GB}GB trim=$TRIM ram=${MEM_GB}GB"
           echo "root=$((ROOT_FREE / GB))GB mnt=$((MNT_FREE / GB))GB separate=$MNT_SEPARATE"
 
           if [ "$SRC_FREE" -lt "$NEED" ]; then
