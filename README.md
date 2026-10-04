@@ -214,10 +214,45 @@ GitHub's hardware table says "14 GB SSD" for the standard Linux runner. That is 
 | job time cap | 6 h (this workflow uses 350 min) | same |
 | runner spec, public repo | 4 vCPU / 16 GB | same |
 
-So a TWRP-16 build *does* fit on a hosted runner — ~30 GB of shallow source plus ~25–40 GB of
-build output against ~115 GB — provided the source and the output are put on **different disks**
-and the toolchains are deleted first. What is actually tight is **time** (4 cores, 6 h cap),
-not space.
+So a TWRP-16 build *does* fit on a hosted runner — but the numbers below are from the first
+real run, and the tree is a lot bigger than I first assumed.
+
+### What the first real run measured (run `37225313615`)
+
+| | |
+|---|---|
+| runner disk | `/dev/root 146G`, **121 GB free** after the cleanup step (larger than the 72–84 GB seen elsewhere) |
+| `/mnt` | **not** a separate device on that image — the dual-disk split never engaged, `OUT_DIR` stayed default |
+| source tree after `repo sync -c --depth=1` | **74 GB** (not the 30 GB I originally estimated) |
+| sync wall-clock | **14.5 min** for all 990 projects |
+| free space after the sync | 47 GB — enough for `out/`, but only just |
+| whole job | 19 min (it died in `lunch`, see below) |
+
+**The `lunch` failure was my bug, recorded in the workflow now:** an **empty but *set* `OUT_DIR`**
+resolves to the *source root* inside soong (`filepath.Clean("") == "."` in
+`build/soong/ui/build/config.go`), so `SetupOutDir()` dies on `ensureEmptyFileExists(<src>/.out-dir)`,
+the paths step never writes `out/.module_paths/AndroidProducts.mk.list`, and `product_config.mk`
+— which reads exactly that file to find device trees — reports
+`Don't have a product spec for: 'twrp_marvel'`. The workflow now only exports `OUT_DIR` when it
+actually relocates it, and unsets it otherwise.
+
+If the runner is a classic 72–84 GB one, the 74 GB tree does not fit and the guard now stops in
+the first minute instead of 15 minutes in. Two ways out:
+
+1. **Trim the sync.** The manifest ships `remove-minimal.xml` — 607 projects (cts, kernel
+   prebuilts 6.1/6.6/6.12, `device/generic/*`, 311 unused `external/*`, …). It keeps every
+   project the recovery build needs: `bash`, `nano`, `tools-lineage`, e2fsprogs, ntfs-3g,
+   exfatprogs, magisk-prebuilt, libncurses, `system/core`, `frameworks/base` and the rest of
+   the 27 I checked. Apply it as a local-manifest overlay *before* `repo sync`:
+
+   ```sh
+   mkdir -p .repo/local_manifests
+   cp .repo/manifests/remove-minimal.xml .repo/local_manifests/
+   printf '<manifest><include name="remove-minimal.xml"/></manifest>\n' \
+     > .repo/local_manifests/minimal.xml
+   ```
+
+2. **Self-hosted runner** with ≥150 GB (see below).
 
 `Choose build directories` works out the layout at run time:
 

@@ -178,9 +178,12 @@ jobs:
           fi
 
           GB=1048576
-          MIN_SRC=$((30 * GB))     # shallow AOSP-16 tree (-c --depth=1)
-          MIN_OUT=$((25 * GB))     # recoveryimage output on a cold tree
-          MIN_SHARED=$((60 * GB))  # both on one disk
+          # MEASURED, first real run: the shallow (-c --depth=1) twrp-16.0 tree is
+          # 74 GB on disk, so the original 30 GB estimate was badly wrong. A cold
+          # recoveryimage build adds ~25-40 GB of out/.
+          MIN_SRC=$((80 * GB))
+          MIN_OUT=$((25 * GB))
+          MIN_SHARED=$((105 * GB))
 
           # source goes on the disk with more room ...
           if [ "$MNT_SEPARATE" = 1 ] && [ "$MNT_FREE" -gt "$ROOT_FREE" ]; then
@@ -221,11 +224,26 @@ jobs:
             sudo chown "$(id -u):$(id -g)" "$OUT_DIR"
           fi
 
+          # IMPORTANT: only export OUT_DIR when we actually relocate it. Exporting
+          # `OUT_DIR=` (empty but *set*) breaks the build system, and it looks
+          # harmless in the env dump:
+          #   build/soong/ui/build/config.go does
+          #       if outDir, ok := ret.environ.Get("OUT_DIR"); ok {
+          #           ... filepath.Clean(outDir) ...
+          #   ok is true for an empty value, and filepath.Clean("") == ".", so
+          #   OUT_DIR resolves to the SOURCE ROOT. SetupOutDir() then fails with
+          #   "…/fox/.out-dir must not exist" and the paths step never writes
+          #   out/.module_paths/AndroidProducts.mk.list. product_config.mk reads
+          #   that file to find AndroidProducts.mk, so with it missing lunch says
+          #   "Don't have a product spec for: 'twrp_marvel'" and the device is
+          #   looked up on GitHub instead. An absolute, non-empty OUT_DIR is fine.
           {
             echo "SRC_ROOT=$SRC_ROOT"
-            echo "OUT_DIR=$OUT_DIR"
             echo "SWAP_DIR=$SWAP_DIR"
           } >> "$GITHUB_ENV"
+          if [ -n "$OUT_DIR" ]; then
+            echo "OUT_DIR=$OUT_DIR" >> "$GITHUB_ENV"
+          fi
 
           TOTAL_GB=$(( (ROOT_FREE + MNT_FREE) / GB ))
           {
@@ -247,13 +265,16 @@ jobs:
 
           if [ "$SRC_FREE" -lt "$NEED" ]; then
             echo "::error::not enough disk for an AOSP-16 recovery build: $((SRC_FREE / GB)) GB free where the"
-            echo "::error::source tree has to live, ~$((NEED / GB)) GB needed. Re-run with"
-            echo "::error::runner = [\"self-hosted\",\"linux\",\"x64\"] (see README)."
+            echo "::error::source tree has to live, ~$((NEED / GB)) GB needed (the shallow twrp-16.0 tree"
+            echo "::error::alone is 74 GB). Options, in order of preference:"
+            echo "::error::  1. re-run and hope for a larger runner image (146 GB disks have been seen)"
+            echo "::error::  2. trim the sync with the manifest's own remove-minimal.xml overlay"
+            echo "::error::  3. runner = [\"self-hosted\",\"linux\",\"x64\"] on a machine with >=150 GB"
             exit 1
           fi
-          if [ "$TOTAL_GB" -lt 90 ]; then
-            echo "::warning::${TOTAL_GB} GB usable is tight for an AOSP-16 recovery build;"
-            echo "::warning::if it runs out of disk, use runner = [\"self-hosted\",\"linux\",\"x64\"]."
+          if [ "$TOTAL_GB" -lt 110 ]; then
+            echo "::warning::${TOTAL_GB} GB usable is tight for an AOSP-16 recovery build (the source tree"
+            echo "::warning::alone is 74 GB); if it runs out of disk, see the options in the README."
           fi
 
       # ------------------------------------------------------------- swapfile
@@ -372,9 +393,14 @@ jobs:
           export ALLOW_MISSING_DEPENDENCIES=true
           ccache -M 3G >/dev/null || true
 
+          # see the OUT_DIR note in "Choose build directories" - an empty but set
+          # OUT_DIR resolves to the source root inside soong and kills the build
           if [ -n "${OUT_DIR:-}" ]; then
             export OUT_DIR
             echo "OUT_DIR=$OUT_DIR"
+          else
+            unset OUT_DIR
+            echo "OUT_DIR=<unset - AOSP will use \$SRC_ROOT/out>"
           fi
           LOG="$LOG_DIR/build.log"
           mkdir -p "$LOG_DIR"
