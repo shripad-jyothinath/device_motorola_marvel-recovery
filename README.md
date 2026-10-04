@@ -192,20 +192,56 @@ Modelled on the **working** OrangeFox workflow in
 - build loop with retries that **re-pulls the device tree** between attempts
 - flashable zip + auto-published GitHub release
 
-**One difference from the ofrp job:** that job syncs the OrangeFox **12.1** manifest, which fits
-on a hosted runner. This targets **`twrp-16.0`** (AOSP `android-16.0.0_r1`, ~990 projects —
-required for this platform's decryption), which is much larger. So this workflow adds a
-free-disk-space step, a hard disk guard, and a `runner` input to fall back to self-hosted.
+**The one difference from the ofrp job:** that job syncs the OrangeFox **12.1** manifest;
+this targets **`twrp-16.0`** (AOSP `android-16.0.0_r1`, ~990 projects — required for this
+platform's decryption), which is a much bigger tree. So this workflow adds a disk-reclaim
+step and a disk-aware build plan.
+
+### Storage — measured on real runners, not read off the docs table
+
+GitHub's hardware table says "14 GB SSD" for the standard Linux runner. That is the
+**guaranteed minimum**, and it is not the whole story:
+
+| what | measured | source |
+|---|---|---|
+| documented guarantee | 14 GB | GitHub docs, *GitHub-hosted runners reference* |
+| `/` (`/dev/root`) at job start | **72–84 GB device, 16–19 GB free** | godotengine/godot#80115 (`84G 66G 19G 79% /`), thiagokokada, HastD (`72 GB total, 19 GB available`) |
+| `/mnt` (Azure temp disk, separate device) | **74 GB device, ~66 GB free** | cilium/cilium#39726, kserve/kserve#3411 (`/dev/sda1 74G 4.1G 66G /mnt`) |
+| after deleting unused toolchains | **49–65 GB free on `/`** (30–41 GB reclaimed) | thiagokokada `free-disk-space` (16G → 65G), jlumbroso (~30 GB), insightsengineering (34 GB) |
+| **combined usable** | **~115–130 GB** | `/` after cleanup + `/mnt` |
+| cache storage per repository | 10 GB | GitHub docs, *Actions limits* |
+| artifact storage (GitHub Free) | **500 MB total** | same — that is why only logs are uploaded as artifacts and the image itself goes to a Release |
+| job time cap | 6 h (this workflow uses 350 min) | same |
+| runner spec, public repo | 4 vCPU / 16 GB | same |
+
+So a TWRP-16 build *does* fit on a hosted runner — ~30 GB of shallow source plus ~25–40 GB of
+build output against ~115 GB — provided the source and the output are put on **different disks**
+and the toolchains are deleted first. What is actually tight is **time** (4 cores, 6 h cap),
+not space.
+
+`Choose build directories` works out the layout at run time:
+
+- compares `stat -c %d /` with `stat -c %d /mnt`, so `/mnt` is only counted when it really is a
+  separate device (on some runner classes it is just a directory on `/dev/root`),
+- ignores `/mnt` entirely when it is nearly full (it has been seen 100 % full out of the box —
+  actions/runner#3968),
+- puts the source on the roomier disk and `OUT_DIR` on the other one, but keeps `out/` next to
+  the source when the second disk cannot hold it,
+- fails in the first minute, with instructions, when the space genuinely is not there.
+
+That logic was exercised offline against the eight layouts above (fresh two-disk runner, after
+cleanup, single disk, `/mnt` full, `/mnt` too small, tight root, and two must-fail cases) using
+`df`/`stat` shims — all eight decide correctly, and every shell step passes `bash -n`.
 
 | runner | vCPU | RAM | disk |
 |---|---|---|---|
-| `ubuntu-22.04` / `ubuntu-latest` (public repo) | 4 | 16 GB | **14 GB guaranteed** (~16–24 GB actual on `/`, ~66 GB on `/mnt`) |
-| same, private repo | 2 | 8 GB | 14 GB |
-| `ubuntu-slim` | 1 | 5 GB | 14 GB, 15-min cap |
-| GitHub-hosted max job time | — | — | **360 min** |
+| `ubuntu-22.04` (default) | 4 | 16 GB | 14 GB guaranteed, ~115–130 GB usable in practice |
+| `ubuntu-latest` / `ubuntu-24.04` | 4 | 16 GB | same layout (22.04 is deprecated Sep 2026 → Apr 2027, still supported today) |
+| same, private repo | 2 | 8 GB | same layout |
+| `ubuntu-slim` | 1 | 5 GB | 14 GB, **15-min job cap** — unusable for this |
 | **self-hosted (fallback)** | ≥8 | ≥16 GB | **≥150 GB** |
 
-If the `twrp-16.0` sync does not fit, re-run with
+If the build does not finish inside the 6-hour cap, re-run with
 `runner: ["self-hosted","linux","x64"]` on a machine with ≥150 GB:
 
 ```sh

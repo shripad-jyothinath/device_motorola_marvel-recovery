@@ -6,23 +6,49 @@
 #   (.github/workflows/orangefox.yml)
 #
 #   * GitHub-hosted ubuntu-22.04 runner (NOT self-hosted)
-#   * 12 GB swap file (16 GB RAM is not enough for Soong+ninja otherwise)
+#   * 12 GB swap file (16 GB RAM is not enough for Soong+ninja on its own)
 #   * actions/cache for ~/.ccache
 #   * repo launcher downloaded, `repo init --depth=1 --no-repo-verify`
 #   * `repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags`
 #   * build with a retry loop that re-pulls the device tree between attempts
 #   * package a flashable zip and publish a GitHub release
 #
-# DIFFERENCE FROM THE OFRP JOB (important):
-#   ofrp builds against the OrangeFox **12.1** manifest, whose shallow sync is
-#   small enough for a hosted runner. This one targets **twrp-16.0**
-#   (AOSP android-16.0.0_r1, ~990 projects, required for this platform's
-#   decryption). That tree is substantially bigger, so this workflow adds:
-#     - a free-disk-space step (reclaims ~30-45 GB of unused toolchains)
-#     - a hard disk guard that fails fast instead of dying mid-build
-#     - build output on /mnt when it is the larger filesystem
-#   If the sync still does not fit, switch to the self-hosted runner via the
-#   `runner` input (see README).
+# ---------------------------------------------------------------------------
+# STORAGE - measured, not taken from the docs table
+# ---------------------------------------------------------------------------
+# GitHub documents the standard runner as "14 GB SSD". That is the *guaranteed*
+# figure, not the real capacity. Measured on actual ubuntu-22.04/24.04 jobs:
+#
+#   /dev/root  mounted /     72-84 GB device, 16-19 GB free at job start
+#   /dev/sda1  mounted /mnt  74 GB device,    ~66 GB free  (Azure temp disk)
+#
+#   godotengine/godot#80115  -> "/dev/root 84G 66G 19G 79% /"
+#   cilium/cilium#39726      -> "/dev/root 72G 17G 55G 24% /" + "/dev/sda1 74G 4.1G 66G /mnt"
+#   kserve/kserve#3411       -> "/dev/sdb1 74G 4.1G 66G /mnt"
+#   thiagokokada/free-disk-space -> ubuntu-22.04: 16G free before -> 65G after
+#   jlumbroso/free-disk-space    -> ~30 GB reclaimed (Android 10, toolcache 6, dotnet 4, ...)
+#
+# So after deleting the toolchains a recovery build never touches, a hosted
+# runner really has ~50-65 GB on / AND ~66 GB on /mnt - roughly 115-130 GB.
+# A TWRP-16 shallow sync (~30 GB) plus its build output (~25-40 GB) does not fit
+# on either disk alone, but it does fit if the source goes on one and OUT_DIR on
+# the other. That is what the "Choose build directories" step does.
+#
+# Caveats handled there:
+#   * on some runner classes /mnt is NOT a separate device (it is a directory on
+#     /dev/root) - detect with `stat -c %d` and never count the space twice
+#   * /mnt has been seen 100% full out of the box (actions/runner#3968)
+#   * the 12 GB swapfile is placed on the larger disk so it does not eat the
+#     space the build needs
+#
+# What is genuinely tight on a hosted runner is TIME (4 vCPU, 6 h hard cap),
+# not space. If the build does not finish, switch to the self-hosted runner via
+# the `runner` input (see README).
+#
+# GitHub Free quotas that shape this workflow (docs.github.com/actions/reference/limits):
+#   * cache storage 10 GB per repository -> ccache capped at 3 GB
+#   * artifact storage 500 MB total      -> only logs are uploaded as artifacts,
+#                                           the image itself goes to a Release
 #
 
 name: Build TWRP
@@ -33,7 +59,7 @@ on:
       runner:
         description: "Runner labels as JSON"
         required: true
-        # default to the proven hosted runner; self-hosted is the fallback plan
+        # the proven hosted runner; self-hosted is the fallback plan
         default: '["ubuntu-22.04"]'
         type: string
       release:
@@ -48,9 +74,9 @@ on:
         default: ""
         type: string
       retries:
-        description: "build attempts (re-pulls the device tree between them)"
+        description: "build attempts (hosted runners: leave at 1, the 6 h job cap is the limit)"
         required: false
-        default: "3"
+        default: "1"
         type: string
   push:
     branches: [master]
@@ -68,17 +94,18 @@ jobs:
     name: Build TWRP by ${{ github.actor }}
     # `inputs` is empty on push events, so the fallback matters
     runs-on: ${{ fromJSON(inputs.runner || '["ubuntu-22.04"]') }}
-    # 360 is the hard ceiling for GitHub-hosted runners
-    timeout-minutes: 350
+    # 360 min is the hard ceiling for GitHub-hosted runners; leave slack so the
+    # log-collection step still gets to run after a timeout.
+    timeout-minutes: 355
 
     env:
       DEVICE: marvel
       TWRP_BRANCH: twrp-16.0
       MANIFEST: https://github.com/TWRP-Test/platform_manifest_twrp_aosp.git
       RELEASE: ${{ inputs.release || 'ap2a' }}
-      RETRIES: ${{ inputs.retries || '3' }}
+      RETRIES: ${{ inputs.retries || '1' }}
       GOMEMLIMIT: 24GiB
-      FOX: ${{ github.workspace }}/fox
+      LOG_DIR: ${{ github.workspace }}/logs
 
     steps:
       - name: Check Out
@@ -92,55 +119,178 @@ jobs:
         run: |
           echo "runner : $RUNNER_NAME ($RUNNER_OS/$RUNNER_ARCH)"
           echo "cpus   : $(nproc)"
+          echo
           free -h || true
-          df -h / /mnt 2>/dev/null || df -h /
+          echo
+          df -hT / /mnt 2>/dev/null || df -hT /
+          echo
+          lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT 2>/dev/null || true
+          echo
+          # these two numbers decide where the source and the out dir go
+          echo "/   device: $(stat -c %d /)"
+          echo "/mnt device: $(stat -c %d /mnt 2>/dev/null || echo missing)"
 
-      # AOSP 16 does not fit in the guaranteed 14 GB; reclaim toolchains first.
+      # ------------------------------------------------------- disk reclaiming
+      # The Android SDK/NDK, the hosted tool cache, .NET etc. are never used by
+      # an AOSP build. This is the biggest single lever on a hosted runner.
       - name: Free disk space
         run: |
           set -x
-          sudo rm -rf /usr/share/dotnet || true
           sudo rm -rf /usr/local/lib/android || true
-          sudo rm -rf /opt/ghc /usr/local/.ghcup || true
           sudo rm -rf /opt/hostedtoolcache || true
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf /opt/ghc /usr/local/.ghcup || true
           sudo rm -rf /usr/local/share/boost || true
           sudo rm -rf /usr/local/share/powershell /usr/local/lib/node_modules || true
           sudo rm -rf /usr/share/swift /usr/share/miniconda || true
           sudo rm -rf /opt/microsoft/msedge /opt/google/chrome /usr/local/share/chromium || true
+          sudo rm -rf /usr/lib/jvm/* || true
           sudo apt-get clean
-          df -h / /mnt 2>/dev/null || df -h /
+          df -hT / /mnt 2>/dev/null || df -hT /
 
-      - name: Disk guard
+      # ------------------------------------------------- pick the build dirs
+      # The source tree and the out dir are both huge; put them on different
+      # disks when the runner has two. Fails fast (with instructions) if there
+      # is not enough space, instead of dying 3 h into the build.
+      - name: Choose build directories
         run: |
-          AVAIL=$(df -Pk / | awk 'NR==2{print int($4/1048576)}')
-          echo "free on /: ${AVAIL} GB"
-          if [ "$AVAIL" -lt 35 ]; then
-            echo "::error::only ${AVAIL} GB free on / - an AOSP-16 shallow sync needs far more."
-            echo "::error::re-run with runner = [\"self-hosted\",\"linux\",\"x64\"] (see README)."
+          set -euo pipefail
+
+          ROOT_DEV=$(stat -c %d /)
+          MNT_SEPARATE=0
+          if [ -d /mnt ] && [ "$(stat -c %d /mnt 2>/dev/null)" != "$ROOT_DEV" ]; then
+            MNT_SEPARATE=1
+          fi
+
+          ROOT_FREE=$(df -Pk / | awk 'NR==2{print $4}')
+          MNT_FREE=0
+          if [ "$MNT_SEPARATE" = 1 ]; then
+            MNT_FREE=$(df -Pk /mnt | awk 'NR==2{print $4}')
+            # /mnt has been observed 100% full out of the box (actions/runner#3968);
+            # if it is too small to be useful, pretend it is not there at all
+            if [ "$MNT_FREE" -lt $((20 * 1048576)) ]; then
+              echo "::warning::/mnt is a separate device but only $((MNT_FREE / 1048576)) GB free - ignoring it"
+              MNT_SEPARATE=0
+              MNT_FREE=0
+            fi
+          fi
+
+          GB=1048576
+          MIN_SRC=$((30 * GB))     # shallow AOSP-16 tree (-c --depth=1)
+          MIN_OUT=$((25 * GB))     # recoveryimage output on a cold tree
+          MIN_SHARED=$((60 * GB))  # both on one disk
+
+          # source goes on the disk with more room ...
+          if [ "$MNT_SEPARATE" = 1 ] && [ "$MNT_FREE" -gt "$ROOT_FREE" ]; then
+            SRC_ROOT=/mnt/fox
+            SRC_FREE=$MNT_FREE
+            OUT_DIR=/out
+            OUT_FREE=$ROOT_FREE
+            SWAP_DIR=/mnt
+          else
+            SRC_ROOT="$GITHUB_WORKSPACE/fox"
+            SRC_FREE=$ROOT_FREE
+            OUT_DIR=/mnt/out
+            OUT_FREE=$MNT_FREE
+            SWAP_DIR=/mnt
+            if [ "$MNT_SEPARATE" = 0 ]; then
+              OUT_DIR=""
+              OUT_FREE=0
+              SWAP_DIR=/
+            fi
+          fi
+
+          # ... but if the second disk cannot hold the output on its own, keep
+          # out/ next to the source rather than filling that disk and dying
+          # three hours into the build
+          if [ -n "$OUT_DIR" ] && [ "$OUT_FREE" -lt "$MIN_OUT" ]; then
+            echo "::warning::only $((OUT_FREE / GB)) GB free where the out dir would go - keeping out/ next to the source"
+            OUT_DIR=""
+          fi
+
+          NEED=$MIN_SHARED
+          if [ -n "$OUT_DIR" ]; then NEED=$MIN_SRC; fi
+
+          # the runner user does not own /mnt or /
+          sudo mkdir -p "$SRC_ROOT"
+          sudo chown "$(id -u):$(id -g)" "$SRC_ROOT"
+          if [ -n "$OUT_DIR" ]; then
+            sudo mkdir -p "$OUT_DIR"
+            sudo chown "$(id -u):$(id -g)" "$OUT_DIR"
+          fi
+
+          {
+            echo "SRC_ROOT=$SRC_ROOT"
+            echo "OUT_DIR=$OUT_DIR"
+            echo "SWAP_DIR=$SWAP_DIR"
+          } >> "$GITHUB_ENV"
+
+          TOTAL_GB=$(( (ROOT_FREE + MNT_FREE) / GB ))
+          {
+            echo "### Build plan"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| source | \`$SRC_ROOT\` ($((SRC_FREE / GB)) GB free) |"
+            echo "| OUT_DIR | \`${OUT_DIR:-<src>/out}\` ($((OUT_FREE / GB)) GB free) |"
+            echo "| swap | \`$SWAP_DIR/swapfile\` |"
+            echo "| free on / | $((ROOT_FREE / GB)) GB |"
+            echo "| free on /mnt | $((MNT_FREE / GB)) GB (separate device: $MNT_SEPARATE) |"
+            echo "| **total usable** | **${TOTAL_GB} GB** |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "source=$SRC_ROOT (${SRC_FREE} bytes free, needs ${NEED})"
+          echo "out=${OUT_DIR:-<src>/out} swap=$SWAP_DIR total=${TOTAL_GB}GB"
+          echo "root=$((ROOT_FREE / GB))GB mnt=$((MNT_FREE / GB))GB separate=$MNT_SEPARATE"
+
+          if [ "$SRC_FREE" -lt "$NEED" ]; then
+            echo "::error::not enough disk for an AOSP-16 recovery build: $((SRC_FREE / GB)) GB free where the"
+            echo "::error::source tree has to live, ~$((NEED / GB)) GB needed. Re-run with"
+            echo "::error::runner = [\"self-hosted\",\"linux\",\"x64\"] (see README)."
             exit 1
+          fi
+          if [ "$TOTAL_GB" -lt 90 ]; then
+            echo "::warning::${TOTAL_GB} GB usable is tight for an AOSP-16 recovery build;"
+            echo "::warning::if it runs out of disk, use runner = [\"self-hosted\",\"linux\",\"x64\"]."
           fi
 
       # ------------------------------------------------------------- swapfile
       # Same purpose as pierotofy/set-swap-space, done inline so there is no
-      # unpinned third-party action in the build path.
+      # unpinned third-party action in the build path. 16 GB RAM alone OOMs
+      # during Soong/ninja.
       - name: Set Swap Space (12 GB)
         run: |
-          set -e
-          if sudo swapon --show | grep -q swapfile; then echo "already on"; exit 0; fi
-          sudo fallocate -l 12G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=12288 status=none
-          sudo chmod 600 /swapfile
-          sudo mkswap /swapfile
-          sudo swapon /swapfile
+          set -uo pipefail
+          if [ "$(swapon --show --noheadings | wc -l)" -gt 0 ]; then
+            echo "swap already active:"; swapon --show; free -h; exit 0
+          fi
+          SWAPFILE="$SWAP_DIR/swapfile"
+          sudo fallocate -l 12G "$SWAPFILE" 2>/dev/null \
+            || sudo dd if=/dev/zero of="$SWAPFILE" bs=1M count=12288 status=none
+          sudo chmod 600 "$SWAPFILE"
+          sudo mkswap "$SWAPFILE" >/dev/null
+          if ! sudo swapon "$SWAPFILE" 2>/dev/null; then
+            # e.g. tmpfs or btrfs where a swapfile is not allowed - fall back
+            echo "::warning::could not swapon $SWAPFILE, falling back to /swapfile"
+            sudo rm -f "$SWAPFILE"
+            sudo fallocate -l 12G /swapfile 2>/dev/null \
+              || sudo dd if=/dev/zero of=/swapfile bs=1M count=12288 status=none
+            sudo chmod 600 /swapfile
+            sudo mkswap /swapfile >/dev/null
+            sudo swapon /swapfile
+          fi
           swapon --show
+          free -h
 
       # --------------------------------------------------------- build deps
       - name: Prepare Build Environment
         run: |
-          sudo apt update
-          sudo apt install -y ccache git-core gnupg flex bison build-essential zip curl \
-            zlib1g-dev libc6-dev-i386 libncurses5 x11proto-core-dev libx11-dev lib32z1-dev \
-            libgl1-mesa-dev libxml2 libxml2-utils xsltproc unzip fontconfig libssl-dev bc \
-            rsync python3 rsync jq
+          sudo apt-get update -y
+          sudo apt-get install -y git-core gnupg flex bison build-essential zip unzip curl \
+            zlib1g-dev libc6-dev-i386 libx11-dev lib32z1-dev libgl1-mesa-dev \
+            libxml2 libxml2-utils xsltproc fontconfig libssl-dev bc rsync python3 jq ccache
+          # present on 22.04, dropped or renamed in 24.04 - never fatal
+          sudo apt-get install -y libncurses5 libncurses-dev x11proto-core-dev || true
 
       - name: Install OpenJDK
         uses: actions/setup-java@v4
@@ -152,12 +302,14 @@ jobs:
       - name: Install Git-Repo
         run: |
           mkdir -p ~/bin
-          curl -s https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          curl -fsSL https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
           chmod a+x ~/bin/repo
           sudo ln -sf ~/bin/repo /usr/bin/repo
           repo --version | head -1
 
       # --------------------------------------------------------- ccache cache
+      # NOTE: the repository cache quota is 10 GB total, so do not let ccache
+      # grow past a few GB or it evicts itself every run.
       - name: Setup Ccache
         uses: actions/cache@v4
         with:
@@ -169,54 +321,77 @@ jobs:
       # ------------------------------------------------------------- manifest
       - name: Initialize TWRP Manifest (SHALLOW)
         run: |
-          set -e
-          mkdir -p "$FOX" && cd "$FOX"
+          set -euo pipefail
+          mkdir -p "$SRC_ROOT" && cd "$SRC_ROOT"
           git config --global user.name  "shripad-jyothinath"
           git config --global user.email "shripad-jyothinath@users.noreply.github.com"
+          git config --global --add safe.directory '*'
           repo init --depth=1 -u "$MANIFEST" -b "$TWRP_BRANCH" --no-repo-verify
           git -C .repo/manifests log -1 --oneline
 
       - name: Sync Source (SHALLOW)
         run: |
-          cd "$FOX"
+          set -uo pipefail
+          cd "$SRC_ROOT"
           repo sync -c -j"$(nproc --all)" \
             --force-sync \
             --no-clone-bundle \
             --no-tags \
             --optimized-fetch \
             --prune
-          du -sh . | tail -1
+          echo "--- source size ---"
+          du -sh "$SRC_ROOT" | tail -1
+          df -hT / /mnt 2>/dev/null || df -hT /
 
       - name: Install Device Tree
         run: |
-          set -e
-          DEST="$FOX/device/motorola/$DEVICE"
+          set -euo pipefail
+          DEST="$SRC_ROOT/device/motorola/$DEVICE"
           rm -rf "$DEST"
           mkdir -p "$DEST"
           rsync -a --exclude '.git' --exclude '.github' device-tree/ "$DEST/"
           echo "COMMIT_ID=$(git -C device-tree rev-parse HEAD)" >> "$GITHUB_ENV"
-          echo "--- prebuilts ---"; ls -la "$DEST/prebuilt" "$DEST/prebuilt/dtb" 2>/dev/null || true
+          echo "--- prebuilts ---"
+          ls -la "$DEST/prebuilt" 2>/dev/null || true
           echo "--- recovery/root files: $(find "$DEST/recovery/root" -type f | wc -l)"
 
       # ---------------------------------------------------------------- build
       - name: Build TWRP Recovery
+        timeout-minutes: 290
         run: |
           set -o pipefail
-          cd "$FOX"
+          cd "$SRC_ROOT"
           export USE_CCACHE=1
           export CCACHE_DIR="$HOME/.ccache"
-          ccache -M 10G || true
+          export CCACHE_EXEC="$(command -v ccache)"
+          export LC_ALL=C
+          # TWRP device trees routinely reference modules the recovery product
+          # does not pull in; this is what TWRP's own build guide sets.
+          export ALLOW_MISSING_DEPENDENCIES=true
+          ccache -M 3G >/dev/null || true
+
+          if [ -n "${OUT_DIR:-}" ]; then
+            export OUT_DIR
+            echo "OUT_DIR=$OUT_DIR"
+          fi
+          LOG="$LOG_DIR/build.log"
+          mkdir -p "$LOG_DIR"
 
           JOBS="${{ inputs.jobs }}"; [ -n "$JOBS" ] || JOBS="$(nproc --all)"
+          echo "OEM_COMPILE_JOBS=$JOBS"
           ATTEMPT=1
           SUCCESS=0
           while [ "$ATTEMPT" -le "$RETRIES" ]; do
             echo "========================================================"
             echo "Attempt #$ATTEMPT / $RETRIES  (-j$JOBS)"
             echo "========================================================"
+            # shellcheck disable=SC1091
             source build/envsetup.sh
-            lunch "twrp_${DEVICE}-${RELEASE}-eng"
-            if mka adbd recoveryimage -j"$JOBS"; then
+            if ! lunch "twrp_${DEVICE}-${RELEASE}-eng"; then
+              echo "::warning::lunch twrp_${DEVICE}-${RELEASE}-eng failed, retrying without the release config"
+              lunch "twrp_${DEVICE}-eng"
+            fi
+            if mka adbd recoveryimage -j"$JOBS" 2>&1 | tee -a "$LOG"; then
               SUCCESS=1
               echo "Build finished successfully!"
               break
@@ -230,26 +405,29 @@ jobs:
               git fetch --depth=1 origin "${GITHUB_REF_NAME}" || true
               git reset --hard FETCH_HEAD || true
               rsync -a --delete --exclude '.git' --exclude '.github' \
-                "$GITHUB_WORKSPACE/device-tree/" "$FOX/device/motorola/$DEVICE/"
-              cd "$FOX"
+                "$GITHUB_WORKSPACE/device-tree/" "$SRC_ROOT/device/motorola/$DEVICE/"
+              cd "$SRC_ROOT"
             fi
           done
           [ "$SUCCESS" -eq 1 ] || { echo "::error::all $RETRIES attempts failed"; exit 1; }
 
           ccache -s | head -12 || true
+          echo "--- disk after the build ---"
+          df -hT / /mnt 2>/dev/null || df -hT /
           echo "--- outputs ---"
-          ls -la "out/target/product/$DEVICE/recovery.img" \
-                 "out/target/product/$DEVICE/ramdisk-recovery.img" 2>/dev/null || true
+          ls -la "${OUT_DIR:-$SRC_ROOT/out}/target/product/$DEVICE/recovery.img" \
+                 "${OUT_DIR:-$SRC_ROOT/out}/target/product/$DEVICE/ramdisk-recovery.img" 2>/dev/null || true
 
       # --------------------------------------------------------------- verify
       - name: Verify recovery.img
         run: |
-          cd "$FOX"
-          python3 - <<'PY'
+          set -euo pipefail
+          OUT="${OUT_DIR:-$SRC_ROOT/out}"
+          python3 - "$OUT/target/product/$DEVICE/recovery.img" <<'PY'
           import hashlib, pathlib, struct, sys
-          p = pathlib.Path("out/target/product/marvel/recovery.img")
+          p = pathlib.Path(sys.argv[1])
           if not p.is_file():
-              sys.exit("::error::recovery.img not found")
+              sys.exit(f"::error::recovery.img not found at {p}")
           d = p.read_bytes()
           assert d[:8] == b"ANDROID!", "not an Android boot image"
           ks = struct.unpack_from("<I", d, 8)[0]
@@ -260,31 +438,61 @@ jobs:
           if ks != 0:
               print("::warning::kernel_size != 0 - marvel's ABL expects a kernel-less recovery image")
           if len(d) > 134217728:
-              sys.exit("::error::image exceeds the 128 MB recovery partition")
+              sys.exit("::error::image is bigger than the 128 MB recovery partition")
           PY
+
+      # ----------------------------------------------------------- build logs
+      # Kept tiny on purpose: GitHub Free only includes 500 MB of artifact
+      # storage for the whole account, and the image itself goes to a Release.
+      - name: Collect build logs
+        if: always()
+        run: |
+          mkdir -p "$LOG_DIR"
+          if [ -f "$LOG_DIR/build.log" ]; then
+            tail -n 4000 "$LOG_DIR/build.log" > "$LOG_DIR/build.log.tail" || true
+            grep -nE "error:|Error:|FAILED:|ninja: build stopped|Killed signal|No space left|not found" \
+              "$LOG_DIR/build.log" | tail -n 300 > "$LOG_DIR/build.errors.txt" || true
+          fi
+          OUT="${OUT_DIR:-$SRC_ROOT/out}"
+          {
+            echo "--- disk ---"; df -hT / /mnt 2>/dev/null || df -hT /
+            echo "--- sizes ---"; du -sh "$SRC_ROOT" "$OUT" "$HOME/.ccache" 2>/dev/null
+          } > "$LOG_DIR/build.stats.txt" || true
+          ls -la "$LOG_DIR"
+          wc -c "$LOG_DIR"/* || true
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: twrp-${{ env.DEVICE }}-logs-${{ github.run_number }}
+          path: ${{ env.LOG_DIR }}
+          if-no-files-found: ignore
+          retention-days: 14
 
       # ----------------------------------------------------------- artifacts
       - name: Package Artifacts
         run: |
-          set -e
-          mkdir -p "$GITHUB_WORKSPACE/release_assets"
-          cp "$FOX/out/target/product/$DEVICE/recovery.img" "$GITHUB_WORKSPACE/release_assets/"
-          cp "$FOX/out/target/product/$DEVICE/ramdisk-recovery.img" "$GITHUB_WORKSPACE/release_assets/" 2>/dev/null || true
-          cp "$FOX/out/target/product/$DEVICE/recovery/root/system/etc/recovery.fstab" \
-             "$GITHUB_WORKSPACE/release_assets/recovery.fstab" 2>/dev/null || true
-          cd "$GITHUB_WORKSPACE/release_assets"
+          set -euo pipefail
+          OUT="${OUT_DIR:-$SRC_ROOT/out}"
+          P="$GITHUB_WORKSPACE/release_assets"
+          mkdir -p "$P"
+          cp "$OUT/target/product/$DEVICE/recovery.img" "$P/"
+          cp "$OUT/target/product/$DEVICE/ramdisk-recovery.img" "$P/" 2>/dev/null || true
+          cp "$OUT/target/product/$DEVICE/recovery/root/system/etc/recovery.fstab" "$P/recovery.fstab" 2>/dev/null || true
+          cd "$P"
           sha256sum recovery.img > recovery.img.sha256
           # flashable zip (fastboot image + hash), same idea as the ofrp job
           zip -9 -q twrp-marvel-recovery.zip recovery.img recovery.img.sha256 || true
           ls -lah
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: twrp-${{ env.DEVICE }}-${{ env.RELEASE }}-${{ github.run_number }}
-          path: release_assets/
-          if-no-files-found: error
-          retention-days: 30
+          {
+            echo "### Result"
+            echo ""
+            echo '```'
+            cat recovery.img.sha256
+            ls -l recovery.img | awk '{print $5" bytes"}'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish release
         uses: softprops/action-gh-release@v2
