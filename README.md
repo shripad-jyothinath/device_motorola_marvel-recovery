@@ -181,26 +181,32 @@ Notable:
 
 ## CI: `.github/workflows/build-twrp.yml`
 
-Builds `recovery.img` with a **shallow** sync (`repo init --depth=1` +
-`repo sync -c --no-tags --no-clone-bundle`), verifies the image header
-(`kernel_size` must be 0, size ≤ 128 MB) and uploads the artifact.
+Modelled on the **working** OrangeFox workflow in
+`shripad-jyothinath/android_device_motorola_avenger @ ofrp` — same method:
 
-**Runner requirements — read this before triggering it:**
+- GitHub-hosted **`ubuntu-22.04`** runner by default
+- **12 GB swapfile** (16 GB RAM is not enough for Soong+ninja on its own)
+- `actions/cache` for `~/.ccache`
+- `repo` launcher downloaded; `repo init --depth=1 --no-repo-verify`
+- `repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags`
+- build loop with retries that **re-pulls the device tree** between attempts
+- flashable zip + auto-published GitHub release
+
+**One difference from the ofrp job:** that job syncs the OrangeFox **12.1** manifest, which fits
+on a hosted runner. This targets **`twrp-16.0`** (AOSP `android-16.0.0_r1`, ~990 projects —
+required for this platform's decryption), which is much larger. So this workflow adds a
+free-disk-space step, a hard disk guard, and a `runner` input to fall back to self-hosted.
 
 | runner | vCPU | RAM | disk |
 |---|---|---|---|
-| `ubuntu-latest` (public repo) | 4 | 16 GB | **14 GB guaranteed** (~16–24 GB actual on `/`, ~66 GB on `/mnt`) |
-| `ubuntu-latest` (private repo) | 2 | 8 GB | 14 GB |
-| `ubuntu-slim` | 1 | 5 GB | 14 GB, 15-min job cap |
+| `ubuntu-22.04` / `ubuntu-latest` (public repo) | 4 | 16 GB | **14 GB guaranteed** (~16–24 GB actual on `/`, ~66 GB on `/mnt`) |
+| same, private repo | 2 | 8 GB | 14 GB |
+| `ubuntu-slim` | 1 | 5 GB | 14 GB, 15-min cap |
 | GitHub-hosted max job time | — | — | **360 min** |
-| **self-hosted (recommended)** | ≥8 | ≥16 GB | **≥150 GB** |
+| **self-hosted (fallback)** | ≥8 | ≥16 GB | **≥150 GB** |
 
-The workflow **refuses to run with less than 100 GB free** (disk guard) rather than failing
-mid-build. A GH-hosted runner can be pushed to ~50 GB on `/` by deleting unused toolchains
-(the workflow does this automatically when `runner` is an `ubuntu-*` label) but that is still
-marginal and 4 cores makes a 3-6 h build that can hit the 6 h cap.
-
-**Recommended: a self-hosted runner** — e.g. the ServerHive box:
+If the `twrp-16.0` sync does not fit, re-run with
+`runner: ["self-hosted","linux","x64"]` on a machine with ≥150 GB:
 
 ```sh
 TOKEN=$(gh api -X POST repos/OWNER/REPO/actions/runners/registration-token --jq .token)
@@ -209,13 +215,9 @@ TOKEN=$(gh api -X POST repos/OWNER/REPO/actions/runners/registration-token --jq 
 sudo ./svc.sh install && sudo ./svc.sh start
 ```
 
-Then dispatch it with `runner: ["self-hosted","linux","x64"]` (the default) and optionally an
-absolute `src_dir` (e.g. `/serverhive/shripad/twrp-src`) so the sync persists between runs and
-only the first build pays the sync cost.
-
 > **Security:** don't attach a self-hosted runner to a public repo if untrusted users can trigger
-> workflows — a fork PR would execute on your machine. This workflow is `workflow_dispatch` +
-> tag-push only, so only you can trigger it, but a private repo is still the safer home.
+> workflows — a fork PR would execute on your machine. This workflow triggers on
+> `workflow_dispatch` + push to `master`/tags only, so only you can start it.
 
 ## Status — not built yet
 
