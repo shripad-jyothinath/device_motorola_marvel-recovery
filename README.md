@@ -179,6 +179,44 @@ Notable:
   via `TW_LOAD_VENDOR_MODULES` (see `device.mk`) — so the stock `vendor` / `vendor_dlkm` partitions
   must be present on the device (they are).
 
+## CI: `.github/workflows/build-twrp.yml`
+
+Builds `recovery.img` with a **shallow** sync (`repo init --depth=1` +
+`repo sync -c --no-tags --no-clone-bundle`), verifies the image header
+(`kernel_size` must be 0, size ≤ 128 MB) and uploads the artifact.
+
+**Runner requirements — read this before triggering it:**
+
+| runner | vCPU | RAM | disk |
+|---|---|---|---|
+| `ubuntu-latest` (public repo) | 4 | 16 GB | **14 GB guaranteed** (~16–24 GB actual on `/`, ~66 GB on `/mnt`) |
+| `ubuntu-latest` (private repo) | 2 | 8 GB | 14 GB |
+| `ubuntu-slim` | 1 | 5 GB | 14 GB, 15-min job cap |
+| GitHub-hosted max job time | — | — | **360 min** |
+| **self-hosted (recommended)** | ≥8 | ≥16 GB | **≥150 GB** |
+
+The workflow **refuses to run with less than 100 GB free** (disk guard) rather than failing
+mid-build. A GH-hosted runner can be pushed to ~50 GB on `/` by deleting unused toolchains
+(the workflow does this automatically when `runner` is an `ubuntu-*` label) but that is still
+marginal and 4 cores makes a 3-6 h build that can hit the 6 h cap.
+
+**Recommended: a self-hosted runner** — e.g. the ServerHive box:
+
+```sh
+TOKEN=$(gh api -X POST repos/OWNER/REPO/actions/runners/registration-token --jq .token)
+./config.sh --url https://github.com/OWNER/REPO --token "$TOKEN" \
+            --labels self-hosted,linux,x64 --name serverhive --unattended
+sudo ./svc.sh install && sudo ./svc.sh start
+```
+
+Then dispatch it with `runner: ["self-hosted","linux","x64"]` (the default) and optionally an
+absolute `src_dir` (e.g. `/serverhive/shripad/twrp-src`) so the sync persists between runs and
+only the first build pays the sync cost.
+
+> **Security:** don't attach a self-hosted runner to a public repo if untrusted users can trigger
+> workflows — a fork PR would execute on your machine. This workflow is `workflow_dispatch` +
+> tag-push only, so only you can trigger it, but a private repo is still the safer home.
+
 ## Status — not built yet
 
 Everything in this tree is sourced from the stock dump (see the two sections above), but the tree

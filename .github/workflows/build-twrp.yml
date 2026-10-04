@@ -1,0 +1,273 @@
+#
+# Build TWRP for the Motorola Edge 70 Fusion (marvel)
+#
+# ================================ READ THIS ================================
+# GitHub-hosted runners CANNOT reliably build this.
+#
+#   ubuntu-latest (public repo) : 4 vCPU / 16 GB RAM / **14 GB guaranteed SSD**
+#   ubuntu-latest (private repo): 2 vCPU /  8 GB RAM / 14 GB
+#   ubuntu-slim                 : 1 vCPU /  5 GB RAM / 14 GB, 15-min job cap
+#   GitHub-hosted max job time  : **360 minutes**
+#
+# A shallow TWRP/AOSP-16 sync is ~25-35 GB and a full build peaks near 120 GB.
+# Even after freeing ~30-45 GB of preinstalled toolchains, a hosted runner tops
+# out around 50 GB on / plus ~66 GB on /mnt - marginal at best, and 4 cores
+# means a 3-6 h build that can hit the 6 h cap.
+#
+# Default therefore: SELF-HOSTED runner (e.g. the ServerHive box).
+#
+#   # register a runner for this repo
+#   TOKEN=$(gh api -X POST repos/$OWNER/$REPO/actions/runners/registration-token --jq .token)
+#   ./config.sh --url https://github.com/$OWNER/$REPO --token "$TOKEN" \
+#               --labels self-hosted,linux,x64 --name serverhive --unattended
+#   sudo ./svc.sh install && sudo ./svc.sh start
+#
+# SECURITY: never attach a self-hosted runner to a public repo if untrusted
+# users can trigger workflows (a fork PR would execute on your machine). This
+# workflow is workflow_dispatch + tag-push only, so only you can trigger it -
+# but a private repo is still the safer home for a self-hosted runner.
+#
+# Everything is a SHALLOW clone: repo init --depth=1 + repo sync -c --no-tags.
+# ===========================================================================
+
+name: Build TWRP
+
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: "Runner labels as JSON"
+        required: true
+        default: '["self-hosted","linux","x64"]'
+        type: string
+      release:
+        description: "AOSP release config to lunch with"
+        required: true
+        default: ap2a
+        type: choice
+        options: [ap2a, ap3a, ap4a, bp1a, bp2a]
+      src_dir:
+        description: "Source dir (blank = auto: biggest of / and /mnt)"
+        required: false
+        default: ""
+        type: string
+      jobs:
+        description: "make -j parallelism (blank = nproc)"
+        required: false
+        default: ""
+        type: string
+      attach_release:
+        description: "Attach recovery.img to a GitHub release"
+        required: false
+        default: false
+        type: boolean
+  push:
+    tags: ["v*"]
+
+concurrency:
+  group: twrp-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ${{ fromJSON(inputs.runner) }}
+    # 360 is the hard ceiling on GitHub-hosted; generous for self-hosted.
+    timeout-minutes: 350
+
+    env:
+      DEVICE: marvel
+      TWRP_BRANCH: twrp-16.0
+      MANIFEST: https://github.com/TWRP-Test/platform_manifest_twrp_aosp.git
+      RELEASE: ${{ inputs.release || 'ap2a' }}
+      GOMEMLIMIT: 24GiB
+      # SRC / CCACHE_DIR are decided by the "Choose source and ccache dirs" step
+      # and exported through $GITHUB_ENV; later steps read them as $SRC.
+
+    steps:
+      - name: Checkout device tree (shallow)
+        uses: actions/checkout@v4
+        with:
+          path: device-tree
+          fetch-depth: 1
+
+      # ------------------------------------------------- runner capabilities
+      - name: Probe runner
+        run: |
+          echo "runner name : $RUNNER_NAME"
+          echo "os          : $RUNNER_OS / $RUNNER_ARCH"
+          echo "cpus        : $(nproc)"
+          echo "memory      : $(free -h 2>/dev/null | awk 'NR==2{print $2}')"
+          echo
+          df -h / /mnt 2>/dev/null || df -h /
+          echo
+          for t in git repo python3 ccache rsync; do
+            printf '%-8s %s\n' "$t" "$(command -v $t || echo MISSING)"
+          done
+          java -version 2>&1 | head -1 || true
+
+      - name: Free disk space (hosted runners only)
+        if: contains(inputs.runner, 'ubuntu-') && !contains(inputs.runner, 'self-hosted')
+        run: |
+          set -x
+          df -h /
+          # toolchains a recovery build does not need (~30-45 GB back)
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc /usr/local/.ghcup
+          sudo rm -rf /opt/hostedtoolcache
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf /usr/local/share/powershell /usr/local/lib/node_modules
+          sudo rm -rf /usr/share/swift /usr/share/miniconda /opt/microsoft/msedge
+          sudo rm -rf /opt/google/chrome /usr/local/share/chromium
+          sudo apt-get clean
+          sudo swapoff -a || true
+          sudo rm -f /swapfile || true
+          df -h / /mnt 2>/dev/null || df -h /
+
+      - name: Choose source and ccache dirs
+        run: |
+          set -e
+          if [ -n "${{ inputs.src_dir }}" ]; then
+            SRC="${{ inputs.src_dir }}"
+          else
+            # prefer the largest writable filesystem: / (or /mnt on hosted)
+            ROOT_AVAIL=$(df -Pk / | awk 'NR==2{print $4}')
+            MNT_AVAIL=0
+            if [ -d /mnt ] && [ -w /mnt ]; then
+              MNT_AVAIL=$(df -Pk /mnt | awk 'NR==2{print $4}')
+            fi
+            if [ "$MNT_AVAIL" -gt "$ROOT_AVAIL" ]; then
+              SRC=/mnt/twrp-src
+            else
+              SRC="$GITHUB_WORKSPACE/../twrp-src"
+            fi
+          fi
+          mkdir -p "$SRC"
+          # keep it OUTSIDE the checked-out repo so it survives between runs
+          {
+            echo "SRC=$SRC"
+            echo "CCACHE_DIR=$(dirname "$SRC")/ccache"
+          } >> "$GITHUB_ENV"
+          echo "SRC=$SRC"
+          df -h "$SRC" | tail -1
+
+      - name: Disk guard
+        run: |
+          set -e
+          AVAIL=$(df -Pk "$(dirname "$SRC")" | awk 'NR==2{print int($4/1048576)}')
+          echo "free next to $SRC: ${AVAIL} GB"
+          if [ "$AVAIL" -lt 100 ]; then
+            echo "::error::recovery build needs >=100 GB free, found ${AVAIL} GB."
+            echo "::error::GitHub-hosted runners ship 14 GB - use a self-hosted runner."
+            exit 1
+          fi
+
+      # ----------------------------------------------------------------- sync
+      - name: repo init (SHALLOW, depth=1)
+        run: |
+          set -e
+          cd "$SRC"
+          repo init --depth=1 -u "$MANIFEST" -b "$TWRP_BRANCH" --no-clone-bundle
+          git -C .repo/manifests log -1 --oneline
+
+      - name: repo sync (SHALLOW, current branch, no tags)
+        run: |
+          set -eo pipefail
+          cd "$SRC"
+          repo sync -c -j"$(nproc)" \
+            --force-sync \
+            --no-clone-bundle \
+            --no-tags \
+            --optimized-fetch \
+            --prune \
+            2>&1 | tail -30
+          du -sh . | tail -1
+
+      # ----------------------------------------------------------------- tree
+      - name: Install device tree
+        run: |
+          set -e
+          DEST="$SRC/device/motorola/$DEVICE"
+          rm -rf "$DEST"
+          mkdir -p "$DEST"
+          rsync -a --exclude '.git' --exclude '.github' device-tree/ "$DEST/"
+          echo "--- prebuilts ---"; ls -la "$DEST/prebuilt" "$DEST/prebuilt/dtb" 2>/dev/null || true
+          echo "--- recovery/root files: $(find "$DEST/recovery/root" -type f | wc -l)"
+          echo "--- recovery blobs ---"; ls "$DEST/recovery/root/vendor/bin/hw" 2>/dev/null || true
+
+      # ---------------------------------------------------------------- build
+      - name: Build recoveryimage
+        run: |
+          set -o pipefail
+          cd "$SRC"
+          export USE_CCACHE=1
+          export CCACHE_EXEC="$(command -v ccache)"
+          ccache -M 75G >/dev/null 2>&1 || true
+          ccache -z >/dev/null 2>&1 || true
+          JOBS="${{ inputs.jobs }}"; [ -n "$JOBS" ] || JOBS="$(nproc)"
+          echo "building with -j$JOBS"
+          source build/envsetup.sh
+          lunch "twrp_${DEVICE}-${RELEASE}-eng"
+          mka adbd recoveryimage -j"$JOBS" 2>&1 | tail -60
+          ccache -s | head -12 || true
+          echo "--- outputs ---"
+          ls -la "out/target/product/$DEVICE/recovery.img" \
+                 "out/target/product/$DEVICE/ramdisk-recovery.img" 2>/dev/null || true
+
+      # --------------------------------------------------------------- verify
+      - name: Verify recovery.img
+        run: |
+          cd "$SRC"
+          python3 - <<'PY'
+          import hashlib, pathlib, struct, sys
+          p = pathlib.Path("out/target/product/marvel/recovery.img")
+          if not p.is_file():
+              sys.exit("::error::recovery.img not found")
+          d = p.read_bytes()
+          assert d[:8] == b"ANDROID!", "not an Android boot image"
+          ks = struct.unpack_from("<I", d, 8)[0]
+          rs = struct.unpack_from("<I", d, 12)[0]
+          hv = struct.unpack_from("<I", d, 40)[0]
+          print(f"header_version={hv} kernel_size={ks} ramdisk_size={rs} size={len(d)}")
+          print("sha256:", hashlib.sha256(d).hexdigest())
+          if ks != 0:
+              print("::warning::kernel_size != 0 - marvel's ABL expects a kernel-less recovery image")
+          if len(d) > 134217728:
+              sys.exit("::error::image exceeds the 128 MB recovery partition")
+          PY
+
+      # ------------------------------------------------------------- artifact
+      - name: Collect artifacts
+        run: |
+          set -e
+          mkdir -p out-artifacts
+          cd "$SRC/out/target/product/$DEVICE" 2>/dev/null || cd "$SRC"
+          cp recovery.img "$GITHUB_WORKSPACE/out-artifacts/" 2>/dev/null || true
+          cp ramdisk-recovery.img "$GITHUB_WORKSPACE/out-artifacts/" 2>/dev/null || true
+          cp recovery/root/system/etc/recovery.fstab \
+             "$GITHUB_WORKSPACE/out-artifacts/recovery.fstab" 2>/dev/null || true
+          cd "$GITHUB_WORKSPACE/out-artifacts"
+          [ -f recovery.img ] || { echo "::error::no recovery.img"; exit 1; }
+          sha256sum recovery.img > recovery.img.sha256
+          ls -la
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: twrp-${{ env.DEVICE }}-${{ env.RELEASE }}-${{ github.run_number }}
+          path: out-artifacts/
+          if-no-files-found: error
+          retention-days: 30
+
+      # 128 MB recovery.img + ramdisk fits comfortably in artifact storage
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.attach_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            out-artifacts/recovery.img
+            out-artifacts/recovery.img.sha256
+          generate_release_notes: true
