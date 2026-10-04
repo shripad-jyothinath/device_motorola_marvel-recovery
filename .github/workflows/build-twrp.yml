@@ -63,11 +63,21 @@ on:
         default: '["ubuntu-22.04"]'
         type: string
       release:
-        description: "AOSP release config to lunch with"
-        required: true
+        description: "AOSP release config (Android 16 trees only; ignored on twrp-14.1)"
+        required: false
         default: ap2a
         type: choice
         options: [ap2a, ap3a, ap4a, bp1a, bp2a]
+      branch:
+        description: "TWRP manifest branch (twrp-16.0 = TWRP-Test Android 16 line; twrp-14.1 = official TeamWin)"
+        required: false
+        default: twrp-16.0
+        type: string
+      manifest:
+        description: "TWRP manifest URL (blank = TWRP-Test twrp-16.0 manifest)"
+        required: false
+        default: ""
+        type: string
       jobs:
         description: "make -j (default 3; the runner has 4 vCPU / 16 GB, -j4 plus soong peaks past RAM)"
         required: false
@@ -102,8 +112,29 @@ jobs:
 
     env:
       DEVICE: marvel
-      TWRP_BRANCH: twrp-16.0
-      MANIFEST: https://github.com/TWRP-Test/platform_manifest_twrp_aosp.git
+      # Manifest: twrp-16.0 (Android 16) from the TWRP-Test org.
+      #
+      # OFFICIALNESS, checked: this is NOT an official TeamWin branch. TeamWin's
+      # newest is android-14.1 (TeamWin/android_build, TeamWin/android_bootable_recovery),
+      # and the official minimal manifest
+      # (minimal-manifest-twrp/platform_manifest_twrp_aosp) tops out at twrp-14.1.
+      # TWRP-Test is a separate org - created 2025-06, 39 repos, 18 followers, no
+      # name/blog, and its repos are NOT forks of TeamWin's (fork:false,
+      # parent:none). Its twrp-16.0 commits are authored by TWRP contributors
+      # (Col_or, lingqiqi233, YuKongA), so it is a dev-authored testing line
+      # rather than an official release line.
+      #
+      # It is used because it is the only line carrying the Android 16
+      # keymint/weaver decryption stack, which is what marvel needs. The official
+      # twrp-14.1 line stays selectable through the `branch` / `manifest` inputs
+      # (the device tree then also needs COMMON_LUNCH_CHOICES := twrp_marvel-eng).
+      #
+      # Lunch form differs: Android 16 (>= twrp-15) uses
+      # <product>-<release>-<variant>; the official 14.1 line uses
+      # <product>-<variant>. The build step picks by branch version and
+      # AndroidProducts.mk must match (currently twrp_marvel-ap2a-eng).
+      TWRP_BRANCH: ${{ inputs.branch || 'twrp-16.0' }}
+      MANIFEST: ${{ inputs.manifest || 'https://github.com/TWRP-Test/platform_manifest_twrp_aosp.git' }}
       RELEASE: ${{ inputs.release || 'ap2a' }}
       RETRIES: ${{ inputs.retries || '1' }}
       # 24GiB was carried over from the 64 GB ServerHive box and is actively
@@ -381,37 +412,58 @@ jobs:
           repo init --depth=1 -u "$MANIFEST" -b "$TWRP_BRANCH" --no-repo-verify
           git -C .repo/manifests log -1 --oneline
 
-          # Trim the sync when "Choose build directories" said the disk needs it.
-          # The manifest ships remove-minimal.xml (607 projects: cts, kernel
-          # prebuilts 6.1/6.6/6.12, device/generic/*, 311 unused external/*); it
-          # keeps every project the recovery build needs, checked against
-          # vendor/twrp/config/packages.mk. Includes resolve relative to the file
-          # that contains them, so the overlay lives in .repo/local_manifests/.
+          # Trim by syncing only the projects we need, rather than rewriting the
+          # manifest. The manifest ships remove-minimal.xml listing 607 projects to
+          # drop; `repo sync <path>...` fetches only what is named, so the tree on
+          # disk ends up trimmed without touching repo's manifest semantics.
+          #
+          # Do NOT try an <include> overlay in .repo/local_manifests/: that was run
+          # 37280474963, where `repo sync` failed instantly and the tree came out
+          # 19 MB (just .repo). The project list is computed here, sanity-checked,
+          # and then used by the sync step.
           if [ "${TRIM:-0}" = 1 ]; then
-            mkdir -p .repo/local_manifests
-            cp .repo/manifests/remove-minimal.xml .repo/local_manifests/
-            {
-              echo '<?xml version="1.0" encoding="UTF-8"?>'
-              echo '<manifest>'
-              echo '  <include name="remove-minimal.xml"/>'
-              echo '</manifest>'
-            } > .repo/local_manifests/trim.xml
-            echo "trim overlay installed:"
-            cat .repo/local_manifests/trim.xml
+            repo manifest | grep -oE 'path="[^"]+"' | sed 's/^path="//; s/"$//' | sort -u > /tmp/all-projects.txt
+            grep -oE 'path="[^"]+"' .repo/manifests/remove-minimal.xml | sed 's/^path="//; s/"$//' | sort -u > /tmp/drop-projects.txt
+            comm -23 /tmp/all-projects.txt /tmp/drop-projects.txt > /tmp/keep-projects.txt
+            ALL=$(wc -l < /tmp/all-projects.txt)
+            DROP=$(wc -l < /tmp/drop-projects.txt)
+            KEEP=$(wc -l < /tmp/keep-projects.txt)
+            echo "trim: manifest defines $ALL projects, remove-minimal.xml drops $DROP, keeping $KEEP"
+            if [ "$KEEP" -lt 200 ]; then
+              echo "::error::trim computed only $KEEP projects to keep (expected ~380) - refusing to sync a broken tree"
+              exit 1
+            fi
           else
-            echo "no trim (full 990-project tree)"
+            repo manifest | grep -cE '<project ' > /tmp/keep-projects.txt
+            echo "no trim: syncing the full tree ($(cat /tmp/keep-projects.txt) projects)"
+            rm -f /tmp/keep-projects.txt
           fi
 
       - name: Sync Source (SHALLOW)
         run: |
           set -uo pipefail
+          mkdir -p "$LOG_DIR"
           cd "$SRC_ROOT"
+
+          SYNC_ARGS=()
+          if [ "${TRIM:-0}" = 1 ] && [ -s /tmp/keep-projects.txt ]; then
+            mapfile -t SYNC_ARGS < /tmp/keep-projects.txt
+            echo "trimmed sync: $(wc -l < /tmp/keep-projects.txt) projects (rest of the manifest is never fetched)"
+          else
+            echo "full sync: no trim"
+          fi
+
+          # tee'd into the log artifact: when this step fails, the repo error is
+          # the only thing that explains it (run 37280474963 failed here and the
+          # collected logs had nothing because there was no build.log yet)
           repo sync -c -j"$(nproc --all)" \
             --force-sync \
             --no-clone-bundle \
             --no-tags \
             --optimized-fetch \
-            --prune
+            --prune \
+            "${SYNC_ARGS[@]}" 2>&1 | tee "$LOG_DIR/sync.log"
+
           echo "--- source size ---"
           du -sh "$SRC_ROOT" | tail -1
           df -hT / /mnt 2>/dev/null || df -hT /
@@ -471,9 +523,23 @@ jobs:
             # NOTE: `lunch` must NOT run in a pipeline - it sets TARGET_PRODUCT /
             # TARGET_RELEASE / TARGET_BUILD_VARIANT, and a pipeline would run it in a
             # subshell whose environment mka would never see.
-            if ! lunch "twrp_${DEVICE}-${RELEASE}-eng" >>"$LOG" 2>&1; then
-              echo "::warning::lunch twrp_${DEVICE}-${RELEASE}-eng failed, retrying without the release config"
-              lunch "twrp_${DEVICE}-eng" >>"$LOG" 2>&1 || true
+            #
+            # Lunch form depends on the manifest branch: Android 16 (>= twrp-15)
+            # takes <product>-<release>-<variant>, the official 14.1 line takes
+            # <product>-<variant>. Getting this wrong makes lunch try to fetch the
+            # device from GitHub, which is slow and writes a roomservice manifest.
+            BR_VER="${TWRP_BRANCH#twrp-}"
+            BR_MAJOR="${BR_VER%%.*}"
+            if [ "${BR_MAJOR:-0}" -ge 15 ] 2>/dev/null; then
+              LUNCH="twrp_${DEVICE}-${RELEASE}-eng"
+            else
+              LUNCH="twrp_${DEVICE}-eng"
+            fi
+            echo "lunching: $LUNCH   (branch $TWRP_BRANCH)"
+            if ! lunch "$LUNCH" >>"$LOG" 2>&1; then
+              echo "::warning::lunch $LUNCH failed, trying the other form"
+              lunch "twrp_${DEVICE}-${RELEASE}-eng" >>"$LOG" 2>&1 \
+                || lunch "twrp_${DEVICE}-eng" >>"$LOG" 2>&1 || true
             fi
             echo "resolved: TARGET_PRODUCT=$TARGET_PRODUCT TARGET_RELEASE=$TARGET_RELEASE TARGET_BUILD_VARIANT=$TARGET_BUILD_VARIANT" | tee -a "$LOG"
             if mka recoveryimage -j"$JOBS" 2>&1 | tee -a "$LOG"; then
@@ -538,6 +604,11 @@ jobs:
             tail -n 4000 "$LOG_DIR/build.log" > "$LOG_DIR/build.log.tail" || true
             grep -nE "error:|Error:|FAILED:|ninja: build stopped|Killed signal|No space left|not found|unknown target|is not a valid" \
               "$LOG_DIR/build.log" | tail -n 300 > "$LOG_DIR/build.errors.txt" || true
+          fi
+          if [ -f "$LOG_DIR/sync.log" ]; then
+            tail -n 400 "$LOG_DIR/sync.log" > "$LOG_DIR/sync.log.tail" || true
+            grep -nE "error|fatal|Traceback|not found" "$LOG_DIR/sync.log" | tail -n 100 \
+              > "$LOG_DIR/sync.errors.txt" || true
           fi
           OUT="${OUT_DIR:-$SRC_ROOT/out}"
           {

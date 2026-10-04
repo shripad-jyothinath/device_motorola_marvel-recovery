@@ -5,7 +5,8 @@
 
 PRODUCT_MAKEFILES := $(LOCAL_DIR)/twrp_marvel.mk
 
+# Android 16 (TWRP-Test twrp-16.0) uses <product>-<release>-<variant> and its
+# product_config rejects the 2-part form; the official twrp-14.1 line is the
+# opposite (it rejects the 3-part form). This line must match the manifest
+# branch you sync - see the `branch` input in .github/workflows/build-twrp.yml.
 COMMON_LUNCH_CHOICES := twrp_marvel-ap2a-eng
-# NOTE: the release tag ("ap2a") comes from the manifest you sync.
-# With TWRP-Test/platform_manifest_twrp_aosp twrp_16 the tag may differ;
-# check `lunch` output and adjust here and in the build command.
