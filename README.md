@@ -39,9 +39,10 @@ mka adbd recoveryimage
 | partition sizes | `recovery 134217728`, `dtbo 34603008`, `super 21474836480`, group `mot_dp_group` / `21470642176` |
 | dynamic list | **no `odm`** (marvel keeps ODM content in `vendor/odm`) |
 | touch modules | MMI chain: `mmi_annotate → mmi_info → mmi_relay → panel_event_notifier → sensors_class → touchscreen_mmi → goodix_brl_mmi` (+ `goodix_fod_mmi`, `rbs_fod_mmi`, `mmi_stow`) |
-| crypto services | **NXP** variants (`strongbox-nxp`, `weaver-service.nxp`, `authsecret-service.nxp-qti`) — amethyst uses Thales; marvel ships both and selects NXP on the `dnes` SKU (see below) |
-| crypto rc | `init.recovery.encryption.rc` keeps the amethyst bring-up sequence (`qseecomd → ssgtzd/keymint-qti/gatekeeper-qti → keymint-strongbox/weaver/secure_element`), with the StrongBox/Weaver start gated on `ro.boot.strongbox_support` |
-| fstab | dropped `odm`; kept dual `erofs`+`ext4` for every logical partition; `/metadata` f2fs + `wrappedkey`; `/data` with `wrappedkey_v0` + `metadata_encryption` + `sysfs_path=…/1d84000.ufshc` |
+| crypto services | **NXP** variants (`strongbox-nxp`, `weaver-service.nxp-qti`) — amethyst uses Thales; marvel ships both and selects NXP on the `dnes` SKU (see below). There is no `authsecret` service binary in the dump. |
+| crypto rc | `init.recovery.encryption.rc` drives the stock units in order: `vendor.qseecomd → vendor.ssgtzd, vendor.keymint-qti, vendor.gatekeeper_default → vendor.secure_element`, with `vendor.keymint-strongbox` / `vendor.weaver_nxp` gated on `ro.boot.strongbox_support` |
+| fstab | dropped `odm`; both `erofs`+`ext4` for every logical partition; `/metadata` f2fs + `wrappedkey` + `first_stage_mount`; `/data` **`fileencryption=ice,wrappedkey`** + `keydirectory` + `sysfs_path=…/1d84000.ufshc` (taken verbatim from the stock recovery fstab) |
+| USB | new `init.recovery.usb.rc` from stock: forces the dwc3 into peripheral mode and uses Motorola VID/PIDs (`22B8` / adb `2E81` / fastboot `2E80`); `TW_EXCLUDE_DEFAULT_USB_INIT := true` |
 | touch probe | `runatboot.sh`'s Xiaomi `touchfeature-service` replaced by `system/bin/touch_probe.sh` (Motorola MMI) |
 | UI | `TW_FRAMERATE 120`, `TW_MAX_BRIGHTNESS 2047`, `OF_SCREEN_H 2712`, `OF_MAINTAINER Shripad` |
 
@@ -163,6 +164,20 @@ Notable:
 - Kernel modules are **not** bundled: recovery loads them at runtime from `/vendor/lib/modules`
   via `TW_LOAD_VENDOR_MODULES` (see `device.mk`) — so the stock `vendor` / `vendor_dlkm` partitions
   must be present on the device (they are).
+
+## Status — not built yet
+
+Everything in this tree is sourced from the stock dump (see the two sections above), but the tree
+**has never been compiled**. Known open items before the first flash:
+
+| item | risk |
+|---|---|
+| `lunch twrp_marvel-ap2a-eng` | the release tag comes from the manifest you sync; verify with `lunch` and adjust `AndroidProducts.mk` |
+| `TARGET_CPU_VARIANT_RUNTIME := kryo300` | copied from amethyst (same SoC); ignored or an error depending on the Soong in your manifest |
+| `OF_USE_AIDL_BOOT_CONTROL := 1` | marvel's boot HAL type (AIDL vs HIDL) is unverified |
+| bundled `/vendor/**` blobs | when the real `vendor` partition is mounted over `/vendor`, the bundled copies and `vendor/etc/init/*.rc` are shadowed — stock does not bundle at all, so either path may be what actually executes |
+| SELinux | the tree runs permissive (`write /sys/fs/selinux/enforce 0`); stock is enforcing |
+| `ro.boot.strongbox_support` | if `false` on your unit, StrongBox/Weaver do not start and decryption falls back to the TZ keymint path |
 
 ## Analysis
 
