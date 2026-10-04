@@ -24,21 +24,33 @@
 /system_dlkm       ext4   /dev/block/mapper/system_dlkm   flags=display="System DLKM";slotselect;logical
 
 # --- Boot / verified boot ---------------------------------------------------
+# NOTE: /vbmeta and /vbmeta_system are deliberately BACKUP-ONLY (no flashimg).
+#
+# Stock vbmeta.img carries a hash descriptor for the `recovery` partition
+# (Image Size 19251200, Flags 0 - verified with AOSP avbtool), i.e. recovery is
+# part of verified boot on marvel. That makes an arbitrary vbmeta written from
+# inside TWRP the ONE action in this UI that can leave the device unbootable,
+# and nothing about running TWRP requires it - flashing the recovery partition
+# alone is enough, and reverting is `fastboot flash recovery <stock.img>`.
+# backup=1 is kept, so backup and restore of vbmeta still work normally.
 /boot           emmc  /dev/block/bootdevice/by-name/boot           flags=display="Boot";backup=1;flashimg=1;slotselect
 /init_boot      emmc  /dev/block/bootdevice/by-name/init_boot      flags=display="Init-Boot";backup=1;flashimg=1;slotselect
 /vendor_boot    emmc  /dev/block/bootdevice/by-name/vendor_boot    flags=display="Vendor-Boot";backup=1;flashimg=1;slotselect
 /recovery       emmc  /dev/block/bootdevice/by-name/recovery       flags=display="Recovery";backup=1;flashimg=1;slotselect
 /dtbo           emmc  /dev/block/bootdevice/by-name/dtbo           flags=display="DTBO";backup=1;flashimg=1;slotselect
-/vbmeta         emmc  /dev/block/bootdevice/by-name/vbmeta         flags=display="VBMeta";backup=1;flashimg=1;slotselect
-/vbmeta_system  emmc  /dev/block/bootdevice/by-name/vbmeta_system  flags=display="VBMeta System";backup=1;flashimg=1;slotselect
+/vbmeta         emmc  /dev/block/bootdevice/by-name/vbmeta         flags=display="VBMeta";backup=1;slotselect
+/vbmeta_system  emmc  /dev/block/bootdevice/by-name/vbmeta_system  flags=display="VBMeta System";backup=1;slotselect
 
 # --- Data / metadata --------------------------------------------------------
 /data       f2fs  /dev/block/bootdevice/by-name/userdata  flags=display="Data";backup=1;wipeingui=1;encryptable=userdata
 /metadata   f2fs  /dev/block/bootdevice/by-name/metadata  flags=display="Metadata";backup=1;wipeingui=1;fsflags="noatime,nosuid,nodev,discard,data_flush wait";wrappedkey
 
 # --- Motorola calibration / firmware ---------------------------------------
+# /persist and /persist_image hold sensor/camera calibration: restorable from a
+# TWRP backup, but a wrong image written over it is not recoverable without a
+# stock dump. Backup yes, flash no.
 /persist        ext4  /dev/block/bootdevice/by-name/persist        flags=display="Persist";backup=1;wipeingui=0;flashimg=0
-/persist_image  emmc  /dev/block/bootdevice/by-name/persist        flags=display="Persist";flashimg=1;backup=1
+/persist_image  emmc  /dev/block/bootdevice/by-name/persist        flags=display="Persist";backup=1;wipeingui=0
 /mnt/product/persist   ext4  /dev/block/bootdevice/by-name/prodpersist flags=display="Product Persist";backup=1;wipeingui=0;flashimg=0
 /mnt/product/logks     ext4  /dev/block/bootdevice/by-name/logks       flags=display="LOGKS";backup=1
 /modem          vfat  /dev/block/bootdevice/by-name/modem          flags=display="Modem/Firmware";backup=1;slotselect

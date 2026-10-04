@@ -290,6 +290,62 @@ sudo ./svc.sh install && sudo ./svc.sh start
 > workflows — a fork PR would execute on your machine. This workflow triggers on
 > `workflow_dispatch` + push to `master`/tags only, so only you can start it.
 
+## Brick safety — read this before flashing anything
+
+Parsing the stock images with AOSP's own `avbtool` gives one fact that decides everything
+about risk on this device:
+
+```
+$ python avbtool.py info_image --image vbmeta.img
+Algorithm: SHA256_RSA4096   Flags: 0
+Descriptors:
+    Chain Partition descriptor:  Partition Name: vbmeta_system
+    Hash descriptor: boot         (35659776 bytes)
+    Hash descriptor: dtbo         (598379 bytes)
+    Hash descriptor: init_boot    (2105344 bytes)
+    Hash descriptor: recovery     (19251200 bytes)   <-- recovery is verified
+    Hash descriptor: vendor_boot  (8826880 bytes)
+    Hashtree descriptor: product / system_dlkm / ...
+```
+
+**`recovery` is inside verified boot on marvel.** Unlike most TWRP devices, stock `vbmeta.img`
+carries a hash descriptor for the recovery partition (`Flags: 0` = verification enabled). So a
+modified recovery partition does not verify. That is contained, but it has three consequences:
+
+1. **Flashing TWRP changes only the `recovery` partition** — the build outputs `recovery.img`
+   and `ramdisk-recovery.img`, `BOARD_USES_RECOVERY_AS_BOOT` and
+   `BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT` are empty, `BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE`
+   is `true` (matching stock, which is kernel-less), and `TW_HAS_NO_RECOVERY_PARTITION` is **not**
+   set anywhere in the tree (TWRP treats *defined* as true, so setting it even to `false` breaks
+   recovery handling). `boot`, `init_boot`, `vendor_boot`, `dtbo`, `vbmeta` and the OS are untouched.
+2. **Never relock the bootloader while TWRP is installed.** Unlocking is required to `fastboot
+   flash` here, and an unlocked bootloader tolerates the verification failure (recovery boots with
+   the usual "device is unlocked / can't be verified" warning). A **locked** bootloader would refuse
+   to boot a partition that fails AVB, and on Motorola relocking also wipes userdata.
+3. **Do not touch vbmeta.** Specifically, do *not* run the advice that is common for other devices:
+
+   ```
+   fastboot --disable-verity --disable-verification flash vbmeta vbmeta.img   # DON'T
+   ```
+
+   It is not required (the recovery partition does not depend on it) and it modifies a signed
+   verified-boot component — that is the operation that can leave the device unbootable or force a
+   data wipe. The same reason is why `twrp.flags` lists `/vbmeta` and `/vbmeta_system` as
+   **backup-only** (`backup=1`, no `flashimg`), and why `/persist`/`/persist_image` are backup-only
+   too (sensor/camera calibration is not recoverable without a stock dump).
+
+**Reverting is a single fastboot command.** The byte-exact stock `recovery.img` is in the firmware
+dump and its MD5 matches `flashfile.xml`, so:
+
+```sh
+fastboot flash recovery stock_recovery.img     # restores the verified state
+```
+
+**`fastboot boot` cannot be used to try this recovery out.** Marvel's ABL needs a kernel-less
+recovery image, and `fastboot boot` of a kernel-less image fails with "No OS could be found"
+(booting a kernel-present image just boots the installed OS). The only way to test is to flash the
+recovery partition and enter recovery mode from the bootloader menu.
+
 ## Status — not built yet
 
 Everything in this tree is sourced from the stock dump (see the two sections above), but the tree

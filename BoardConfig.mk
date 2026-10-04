@@ -61,6 +61,20 @@ BOARD_AVB_ENABLE := true
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
 BOARD_AVB_ROLLBACK_INDEX := 1
 
+# Recovery image signing. Mirrors android_device_motorola_genevn - the closest
+# official tree in existence for this shape (Motorola + kernel-less recovery +
+# dedicated recovery partition + A/B + BOARD_AVB_ENABLE), see
+# docs/13 in the bringup repo. With BOARD_AVB_ENABLE := true and no key for the
+# recovery partition, the recoveryimage target has no AVB key to use.
+# NOTE: this does NOT make the image verify on marvel - stock vbmeta.img carries
+# its own hash descriptor for `recovery` (OEM key), so a self-built recovery
+# cannot match it. Signing with test keys is what every official tree does and
+# it only affects the image's own footer.
+BOARD_AVB_RECOVERY_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
+BOARD_AVB_RECOVERY_ALGORITHM := SHA256_RSA4096
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
+
 BOARD_AVB_VBMETA_SYSTEM := system
 BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
 BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := SHA256_RSA2048
