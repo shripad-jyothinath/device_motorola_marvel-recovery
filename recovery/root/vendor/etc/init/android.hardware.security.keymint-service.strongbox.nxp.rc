@@ -1,0 +1,16 @@
+# Copyright (c) 2021 Qualcomm Technologies, Inc.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+#
+# Derived from the stock
+# /vendor/etc/init/android.hardware.security.keymint-service.strongbox.nxp.rc
+#
+# Stock gating (reproduced in init.recovery.encryption.rc):
+#   on post-fs && property:ro.boot.strongbox_support=true
+#       start vendor.keymint-strongbox
+
+service vendor.keymint-strongbox /vendor/bin/hw/android.hardware.security.keymint-service.strongbox-nxp
+    class early_hal
+    user root
+    group root system wakelock
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/system/lib64:/bin
+    seclabel u:r:recovery:s0

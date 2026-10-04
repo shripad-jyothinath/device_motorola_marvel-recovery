@@ -1,53 +1,57 @@
-# Copyright (C) 2026 chkndrp
 # Copyright (C) 2026 Shripad
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # Decryption bring-up for marvel.
 #
-# Stack: QTI keymint/gatekeeper (QSEE) + StrongBox/Weaver/AuthSecret.
-# The vendor tree ships both the NXP and the Thales implementations
-# (vendor/motorola/marvel/config.fs); this device uses NXP:
-#   AID_VENDOR_NXP_STRONGBOX  2910
-#   AID_VENDOR_NXP_WEAVER     2911
-#   AID_VENDOR_SSGTZD         2912
-#   AID_VENDOR_NXP_AUTHSECRET 2915
+# Service names and bring-up order are taken from the STOCK .rc files extracted
+# from the vendor partition (dump WWE36V.56-32-ST3.2-390dea):
 #
-# Reference: chkndrp/device_xiaomi_amethyst-recovery (same SoC, Thales variant).
+#   vendor/etc/init/qseecomd.rc                                     -> vendor.qseecomd
+#   vendor/etc/init/ssgtzd.rc                                       -> vendor.ssgtzd
+#   vendor/etc/init/android.hardware.security.keymint-service-qti.rc -> vendor.keymint-qti
+#   vendor/etc/init/android.hardware.gatekeeper-service-qti.rc       -> vendor.gatekeeper_default
+#   vendor/etc/init/android.hardware.security.keymint-service.strongbox.nxp.rc
+#                                                                   -> vendor.keymint-strongbox
+#   vendor/etc/init/android.hardware.weaver-service.nxp.rc           -> vendor.weaver_nxp
+#   vendor/etc/init/android.hardware.secure_element-service.qti.rc   -> vendor.secure_element
+#
+# Two stock triggers matter and are reproduced here:
+#   * strongbox + weaver only run when ro.boot.strongbox_support=true
+#     (vendor/etc/vhw.xml exports it for specific hwids)
+#   * vendor.gatekeeper_default is DISABLED until
+#     vendor.gatekeeper.is_security_level_spu=0 is set - hence the `enable`.
 
 # Wait for the firmware mount before starting qseecomd
 on property:twrp.firmware.mounted=true
     start vendor.qseecomd
+    start vendor.ssgtzd
 
 # Runs after qseecomd registers its listeners
 on property:vendor.sys.listeners.registered=true
-    start vendor.ssgtzd
     start vendor.keymint-qti
-    start vendor.gatekeeper-qti
+    enable vendor.gatekeeper_default
+    start vendor.gatekeeper_default
 
-# Runs during post-fs-data
-#
-# StrongBox/Weaver are SKU-gated: vendor/etc/vhw.xml exports
-# ro.boot.strongbox_support (only for specific hwids) and the "dnes" SKU declares
-#   keymint IKeyMintDevice/strongbox v3  (NXP KM300)
-#   weaver  IWeaver/default v2           (NXP)
-# See odm/etc/vintf/manifest_dnes.xml.
+# AIDL/secure-element HALs
 on property:ro.crypto.state=encrypted && property:twrp.firmware.mounted=true
     start vendor.secure_element
+
+# SKU-gated StrongBox path (NXP). No-op on units without strongbox support.
 on property:ro.crypto.state=encrypted && property:twrp.firmware.mounted=true && property:ro.boot.strongbox_support=true
     start vendor.keymint-strongbox
-    start vendor.weaver
+    start vendor.weaver_nxp
 
 # Runs after decryption
 on property:twrp.all.users.decrypted=true
     stop keystore2
     stop vendor.secure_element
     stop se_omapi
-    stop vendor.weaver
+    stop vendor.weaver_nxp
     stop vendor.keymint-strongbox
     stop vendor.keymint-qti
+    stop vendor.gatekeeper_default
     stop vendor.qseecomd
     stop vendor.ssgtzd
-    stop vendor.gatekeeper-qti
 
     setprop twrp.firmware.mounted false
 

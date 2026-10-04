@@ -1,14 +1,23 @@
-# Copyright (C) 2026 Shripad
-# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2021 Qualcomm Technologies, Inc.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
 #
-# Source: /vendor/etc/init/android.hardware.gatekeeper-service-qti.rc
-# (copy the stock file over this one when extracting the dump)
+# Derived from the stock /vendor/etc/init/android.hardware.gatekeeper-service-qti.rc
+#
+# IMPORTANT: the stock unit is disabled and is only enabled when
+#   vendor.gatekeeper.is_security_level_spu=0
+# is set:
+#
+#   on property:vendor.gatekeeper.is_security_level_spu=0
+#       enable vendor.gatekeeper_default
+#
+# That prop is part of the stock vendor build.prop and is REQUIRED for
+# decryption. It must be present in system.prop/vendor.prop.
+# (`disabled` removed here because init.recovery.encryption.rc starts it
+#  explicitly after qseecomd is up.)
 
-service vendor.gatekeeper-qti /vendor/bin/hw/android.hardware.gatekeeper-service-qti
-    interface aidl android.hardware.gatekeeper.IGatekeeper/default
+service vendor.gatekeeper_default /vendor/bin/hw/android.hardware.gatekeeper-service-qti
+    class early_hal
     user root
     group root system
     setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/system/lib64:/bin
     seclabel u:r:recovery:s0
-    task_profiles CPUSET_SP_FOREGROUND
-    disabled

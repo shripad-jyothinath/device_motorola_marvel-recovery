@@ -1,17 +1,12 @@
-# Copyright (C) 2026 Shripad
-# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2021 Qualcomm Technologies, Inc.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
 #
-# The default (TZ-backed) KeyMint path, always present.
-# Source: /vendor/etc/init/android.hardware.security.keymint-service-qti.rc
-# (copy the stock file over this one when extracting the dump)
+# Derived from the stock /vendor/etc/init/android.hardware.security.keymint-service-qti.rc
+# (the always-present TZ-backed KeyMint path), adapted for recovery.
 
 service vendor.keymint-qti /vendor/bin/hw/android.hardware.security.keymint-service-qti
-    interface aidl android.hardware.security.keymint.IKeyMintDevice/default
-    interface aidl android.hardware.security.secureclock.ISecureClock/default
-    interface aidl android.hardware.security.sharedsecret.ISharedSecret/default
+    class early_hal
     user root
-    group root system wakelock
+    group root system drmrpc
     setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/system/lib64:/bin
     seclabel u:r:recovery:s0
-    task_profiles CPUSET_SP_FOREGROUND
-    disabled

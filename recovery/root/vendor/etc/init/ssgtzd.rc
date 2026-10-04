@@ -1,14 +1,14 @@
-# Copyright (C) 2026 Shripad
-# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2019 Qualcomm Technologies, Inc.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
 #
-# Secure Services Gateway (TrustZone) daemon.
-# Source: /vendor/etc/init/ssgtzd.rc
-# (copy the stock file over this one when extracting the dump)
+# Derived from the stock /vendor/etc/init/ssgtzd.rc, adapted for recovery.
 
 service vendor.ssgtzd /vendor/bin/ssgtzd
+    class late_start
     user root
-    group root system
+    group root system wakelock
+    capabilities WAKE_ALARM BLOCK_SUSPEND
+    socket ssgtzd stream 0660 system system
+    socket ssgtzd_opener stream 0660 system system
     setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/system/lib64:/bin
     seclabel u:r:recovery:s0
-    task_profiles CPUSET_SP_FOREGROUND
-    disabled

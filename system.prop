@@ -5,6 +5,13 @@
 # Keystore / keymaster
 fbe.metadata.wrappedkey=true
 
+# REQUIRED: enables vendor.gatekeeper_default in the stock
+# android.hardware.gatekeeper-service-qti.rc:
+#   on property:vendor.gatekeeper.is_security_level_spu=0
+#       enable vendor.gatekeeper_default
+# Without this the gatekeeper service never runs and decryption fails.
+vendor.gatekeeper.is_security_level_spu=0
+
 # Logging
 persist.sys.qseelogd=true
 persist.logd.size=8M

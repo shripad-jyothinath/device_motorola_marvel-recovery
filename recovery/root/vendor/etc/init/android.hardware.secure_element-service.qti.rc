@@ -1,17 +1,15 @@
-# Copyright (C) 2026 Shripad
-# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2021 Qualcomm Technologies, Inc.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
 #
-# Source: /vendor/etc/init/android.hardware.secure_element-service.qti.rc
-# (copy the stock file over this one when extracting the dump)
+# Derived from the stock
+# /vendor/etc/init/android.hardware.secure_element-service.qti.rc
 #
-# The dnes SKU declares ISecureElement/SIM1, /SIM2 and /eSE1
-# (see odm/etc/vintf/manifest_dnes.xml).
+# Stock gating: started on boot when ro.vendor.hw.nfc is ese_st or ese_nq.
+# In recovery we start it directly (see init.recovery.encryption.rc).
 
 service vendor.secure_element /vendor/bin/hw/android.hardware.secure_element-service.qti
-    interface aidl android.hardware.secure_element.ISecureElement/eSE1
+    class hal
     user root
-    group root system
+    group root system nfc
     setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/system/lib64:/bin
     seclabel u:r:recovery:s0
-    task_profiles CPUSET_SP_FOREGROUND
-    disabled

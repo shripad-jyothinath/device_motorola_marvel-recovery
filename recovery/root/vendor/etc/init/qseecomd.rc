@@ -1,19 +1,13 @@
-# Copyright (C) 2025 The Android Open Source Project
-# Copyright (C) 2026 chkndrp
-# Copyright (C) 2026 Shripad
-# SPDX-License-Identifier: Apache-2.0
-
-on fs
-    chmod 0660 /dev/qseecom
-    chown system drmrpc /dev/qseecom
-    chmod 0664 /dev/ion
-    chown system system /dev/ion
+# Copyright (c) 2019 Qualcomm Technologies, Inc.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+#
+# Derived from the stock /vendor/etc/init/qseecomd.rc, adapted for recovery
+# (recovery seclabel, no auto-start - init.recovery.encryption.rc drives it).
 
 service vendor.qseecomd /vendor/bin/qseecomd
+    socket notify-topology stream 660 system drmrpc
+    class core
     user root
     group root drmrpc
-    socket notify-topology stream 660 system drmrpc
     setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/system/lib64:/bin
     seclabel u:r:recovery:s0
-    task_profiles CPUSET_SP_FOREGROUND
-    disabled

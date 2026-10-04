@@ -1,0 +1,13 @@
+# Copyright (c) 2019 Qualcomm Technologies, Inc.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+#
+# Derived from the stock
+# /vendor/etc/init/vendor.qti.hardware.qseecom@1.0-service.rc
+
+service qseecom-service /vendor/bin/hw/vendor.qti.hardware.qseecom@1.0-service
+    class hal
+    user root
+    group root system drmrpc
+    interface aidl vendor.qti.hardware.qseecom
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/system/lib64:/bin
+    seclabel u:r:recovery:s0

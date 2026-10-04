@@ -1,14 +1,18 @@
-# Copyright (C) 2025 The Android Open Source Project
-# Copyright (C) 2026 chkndrp
-# Copyright (C) 2026 Shripad
-# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2021 Qualcomm Technologies, Inc.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
 #
-# marvel uses the NXP Weaver implementation (see vendor/motorola/marvel/config.fs)
+# Derived from the stock /vendor/etc/init/android.hardware.weaver-service.nxp.rc
+#
+# NOTE the stock service name is `vendor.weaver_nxp` (not `vendor.weaver`) and
+# the binary is `android.hardware.weaver-service.nxp-qti`.
+#
+# Stock gating (reproduced in init.recovery.encryption.rc):
+#   on boot && property:ro.boot.strongbox_support=true
+#       start vendor.weaver_nxp
 
-service vendor.weaver /vendor/bin/hw/android.hardware.weaver-service.nxp
+service vendor.weaver_nxp /vendor/bin/hw/android.hardware.weaver-service.nxp-qti
+    class hal
     user root
     group root drmrpc
     setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/system/lib64:/bin
     seclabel u:r:recovery:s0
-    task_profiles CPUSET_SP_FOREGROUND
-    disabled
