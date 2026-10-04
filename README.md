@@ -70,28 +70,99 @@ The always-present TZ path is `android.hardware.security.keymint-service-qti`
 (`IKeyMintDevice/default` + secureclock + sharedsecret), plus
 `android.hardware.gatekeeper-service-qti`.
 
-## Still to add before building
+## What's included
 
-This repo contains the **tree** only. You also need, under `prebuilt/`:
+**Prebuilts** (from the stock `marvel_g` build, verified against the device):
 
-- `prebuilt/kernel` — marvel's GKI image (`6.1.157-android14-11-…`)
-- `prebuilt/dtb/` — `marvel.dtb`
-- `prebuilt/dtbo.img`
-- `prebuilt/kernel-uapi-headers.tar.gz`
+| file | size | note |
+|---|---|---|
+| `prebuilt/kernel` | 33.99 MB | GKI `6.1.157-android14-11-gc7dd3fa941b3-ab15371444` |
+| `prebuilt/dtbo.img` | 33 MB | matches the real `dtbo` partition (34603008) |
+| `prebuilt/dtb/marvel.dtb` | 0.41 MB | "Qualcomm Technologies, Inc. Volcano SoC" |
+| `prebuilt/kernel-headers.tar.gz` | 1.76 MB | |
 
-and under `recovery/root/`:
+**Crypto blobs** under `recovery/root/vendor/` — extracted from the stock vendor partition
+(`DumprX` release `marvel-W2WE36.56-32-ST3.2-390dea`), 46 files:
 
-- the QTI/NXP **blobs** the crypto `.rc` files reference (`/vendor/bin/hw/...strongbox-nxp`,
-  `weaver-service.nxp`, `authsecret-service.nxp-qti`, `secure_element-service.qti`,
-  `qseecomd`, `ssgtzd`, `keymint-service-qti`, `gatekeeper@1.0-service-qti`) plus their
-  `/vendor/lib64` dependencies
-- the firmware files (`/vendor/firmware_mnt/image/adsp.mdt` …)
-- `ueventd.rc` for system / vendor / vendor-odm (carry over from amethyst, adjust
-  `external_firmware_handler` paths)
+```
+vendor/bin/hw/   7 binaries (keymint-qti, strongbox-nxp, weaver-service.nxp-qti,
+                            gatekeeper-service-qti, secure_element-service.qti,
+                            qseecom@1.0-service, keymaster@4.0-service-qti)
+vendor/bin/      qseecomd, ssgtzd
+vendor/lib64/    24 libraries + 2 under hw/
+vendor/etc/init/ 8 stock-derived service units (recovery seclabel)
+vendor/etc/vintf/manifest/ 3 XML fragments
+vendor/etc/ueventd.rc, vendor/odm/etc/ueventd.rc
+```
 
-These must be extracted from **marvel's own** firmware
-(`dumps.tadiphone.dev/dumps/motorola/marvel`, build `WWE36V.56-32-ST3.2-390dea`) —
-do not reuse amethyst's.
+See `BLOBS.md` for the full dump→tree path map.
+
+## Why USB was dead (and the fix)
+
+The stock recovery ramdisk contains the answer. Its own `init.recovery.qcom.rc`:
+
+```
+on property:ro.boot.usbcontroller=*
+    setprop sys.usb.controller ${ro.boot.usbcontroller}
+    wait /sys/bus/platform/devices/${ro.boot.usb.dwc3_msm:-a600000.ssusb}/mode
+    write /sys/bus/platform/devices/${ro.boot.usb.dwc3_msm:-a600000.ssusb}/mode peripheral
+    wait /sys/class/udc/${ro.boot.usbcontroller} 1
+```
+
+and the stock `prop.default`:
+
+```
+ro.recovery.usb.vid=22B8
+ro.recovery.usb.adb.pid=2E81
+ro.recovery.usb.fastboot.pid=2E80
+# (overriding the AOSP defaults 18D1 / D001 / 4EE0)
+```
+
+Two things were missing from every custom tree so far:
+
+1. **The QTI dwc3 must be forced into peripheral mode** — without
+   `write .../a600000.ssusb/mode peripheral` the controller never presents a gadget, so the host
+   sees nothing at all (no `adb devices`, no Device Manager entry).
+2. **Motorola's VID/PIDs must be used.** The AOSP/TWRP defaults (`18D1:D001`) have **no driver on a
+   typical Windows host**, which is exactly the "Device Manager doesn't even react" symptom.
+   `22B8:2E81`/`22B8:2E80` match the Motorola drivers that ship for this device.
+
+Both are now in the tree:
+
+- `recovery/root/init.recovery.usb.rc` — verbatim from stock (peripheral mode + VID/PIDs)
+- `system.prop` — `ro.recovery.usb.vid=22B8`, `ro.recovery.usb.adb.pid=2E81`,
+  `ro.recovery.usb.fastboot.pid=2E80`, `ro.recovery.ui.margin_height=110`
+- `BoardConfig.mk` — `TW_EXCLUDE_DEFAULT_USB_INIT := true` so TWRP's own USB init does not fight it
+
+## The stock recovery ramdisk (authoritative reference)
+
+Extracted from `marvel-boot-images.tar.zst` → `recovery.img`:
+
+```
+header_version=4  kernel_size=0  ramdisk_size=19245719   -> ramdisk-only, NO kernel
+5 lz4-legacy blocks -> 36,921,088 bytes cpio, 489 entries (449 files)
+modules in the ramdisk: 0
+```
+
+Notable:
+
+- **No kernel** → confirms `BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := true` is how marvel ships.
+- **No kernel modules either** → the modules are *not* bundled; recovery gets them from the mounted
+  vendor/vendor_boot. This is why `TW_LOAD_VENDOR_MODULES` (what amethyst uses) is the right
+  mechanism, not ramdisk bundling.
+- `system/etc/recovery.fstab` — the authoritative fstab, now copied:
+  `fileencryption=ice,wrappedkey` for `/data` (not the older `aes-256-xts` string),
+  `wrappedkey` for `/metadata`, and the `odm` line **commented out**.
+- USB config + props as above.
+
+## Still missing
+
+- `vendor/firmware_mnt/image/*` — these live on the **modem** partition (`/vendor/firmware_mnt`),
+  which `init.recovery.qcom.rc` mounts itself. The `adsp.mdt`/`adsp.b*` chain it waits for comes
+  from there.
+- Kernel modules are **not** bundled: recovery loads them at runtime from `/vendor/lib/modules`
+  via `TW_LOAD_VENDOR_MODULES` (see `device.mk`) — so the stock `vendor` / `vendor_dlkm` partitions
+  must be present on the device (they are).
 
 ## Analysis
 

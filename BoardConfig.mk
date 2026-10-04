@@ -132,6 +132,11 @@ TARGET_BOARD_INFO_FILE := $(DEVICE_PATH)/board-info.txt
 
 TARGET_USE_CUSTOM_LUN_FILE_PATH := /config/usb_gadget/g1/functions/mass_storage.0/lun.%d/file
 
+# USB: we ship the stock-derived init.recovery.usb.rc, so TWRP's default one
+# must not fight with it. The stock unit forces the QTI dwc3 into peripheral
+# mode and uses Motorola VID/PIDs (0x22B8 / 0x2E81 adb / 0x2E80 fastboot).
+TW_EXCLUDE_DEFAULT_USB_INIT := true
+
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 RECOVERY_GRAPHICS_FORCE_USE_LINELENGTH := true
 TARGET_RECOVERY_QCOM_RTC_FIX := true
