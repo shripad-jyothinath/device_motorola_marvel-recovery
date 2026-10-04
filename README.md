@@ -17,18 +17,32 @@ which is the same SoC and the same partition scheme.
 ## Build
 
 ```sh
-repo init --depth=1 -u https://github.com/TWRP-Test/platform_manifest_twrp_aosp.git -b twrp_16
+# NOTE: the branch is twrp-16.0 (NOT twrp_16 - only 'lvgl' and 'twrp-16.0' exist)
+repo init --depth=1 -u https://github.com/TWRP-Test/platform_manifest_twrp_aosp.git -b twrp-16.0
 repo sync
 
 # place this tree at device/motorola/marvel
 
 source build/envsetup.sh
-lunch twrp_marvel-ap2a-eng
+# android-16.0.0_r1 defines: ap2a ap3a ap4a bp1a bp2a (+ eng/user/userdebug)
+# aosp_current -> bp2a, so either of these works:
+lunch twrp_marvel-ap2a-eng      # (or twrp_marvel-bp2a-eng)
 mka adbd recoveryimage
 ```
 
-> `twrp_16` is required for the Android 16 decryption blobs — the Android 14.1 /
-> OrangeFox 14.1 manifests do not decrypt this platform.
+> `twrp-16.0` (AOSP `android-16.0.0_r1`) is required for the Android 16 decryption blobs — the
+> Android 14.1 / OrangeFox 14.1 manifests do not decrypt this platform.
+
+### What the manifest already provides
+
+Verified against the `twrp-16.0` manifest: `vendor/twrp`, `build/make`+`build/soong` (TWRP forks,
+base `android-16.0.0_r1`), `base.mk`, `core_64_bit_only.mk`, `to-upper`/`to-lower`,
+`external/se_omapi` (for `TW_INCLUDE_OMAPI`), `external/magisk-prebuilt` (repacktools/magiskboot),
+`external/ntfs-3g`, `external/lptools`, `external/bash`.
+
+`vendor/lineage` is **absent**, so the `-include vendor/lineage/config/BoardConfigReservedSize.mk`
+in `BoardConfig.mk` is a harmless no-op. `fox_marvel.mk` only sets `OF_*` variables, which a pure
+TWRP build ignores.
 
 ## What was changed from amethyst
 
