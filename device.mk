@@ -17,6 +17,31 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/developer_gsi_keys.mk)
 # Emulated storage
 $(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
 
+# ---------------------------------------------------------------------------
+# Android 16 (BP2A) releases crashrecovery as an uninflated module, so its APEX
+# classpath fragments live in prebuilts/module_sdk/CrashRecovery and soong
+# validates them at analysis time:
+#
+#   java/systemserver_classpath_fragment.go:189
+#     "%s in contents must also be declared in PRODUCT_APEX_SYSTEM_SERVER_JARS"
+#   java/bootclasspath_fragment.go:654
+#     "%s in contents must also be declared in PRODUCT_APEX_BOOT_JARS"
+#
+# AOSP declares both in build/make/target/product/default_art_config.mk under
+# `ifeq ($(RELEASE_CRASHRECOVERY_MODULE),true)`, but that file is only inherited
+# by the module/SDK products (module_common.mk, runtime_libart.mk, sdk.mk) - not
+# by base.mk or any minimal recovery product. Without these two lines soong_build
+# fails with:
+#   prebuilts/module_sdk/CrashRecovery/current/Android.bp:110:1: module
+#   "prebuilt_com.android.crashrecovery-systemserverclasspath-fragment" variant
+#   "android_common": [service-crashrecovery] in contents must also be declared
+#   in PRODUCT_APEX_SYSTEM_SERVER_JARS
+# ---------------------------------------------------------------------------
+PRODUCT_APEX_BOOT_JARS += \
+    com.android.crashrecovery:framework-crashrecovery
+PRODUCT_APEX_SYSTEM_SERVER_JARS += \
+    com.android.crashrecovery:service-crashrecovery
+
 # OTA assert
 TARGET_OTA_ASSERT_DEVICE := marvel,marvel_g,XT2605,XT2605-1,XT2605-2,XT2605-3,XT2605-4
 
