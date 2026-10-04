@@ -412,46 +412,25 @@ jobs:
           repo init --depth=1 -u "$MANIFEST" -b "$TWRP_BRANCH" --no-repo-verify
           git -C .repo/manifests log -1 --oneline
 
-          # Trim by syncing only the projects we need, rather than rewriting the
-          # manifest. The manifest ships remove-minimal.xml listing 607 projects to
-          # drop; `repo sync <path>...` fetches only what is named, so the tree on
-          # disk ends up trimmed without touching repo's manifest semantics.
-          #
-          # Do NOT try an <include> overlay in .repo/local_manifests/: that was run
-          # 37280474963, where `repo sync` failed instantly and the tree came out
-          # 19 MB (just .repo). The project list is computed here, sanity-checked,
-          # and then used by the sync step.
-          if [ "${TRIM:-0}" = 1 ]; then
-            repo manifest | grep -oE 'path="[^"]+"' | sed 's/^path="//; s/"$//' | sort -u > /tmp/all-projects.txt
-            grep -oE 'path="[^"]+"' .repo/manifests/remove-minimal.xml | sed 's/^path="//; s/"$//' | sort -u > /tmp/drop-projects.txt
-            comm -23 /tmp/all-projects.txt /tmp/drop-projects.txt > /tmp/keep-projects.txt
-            ALL=$(wc -l < /tmp/all-projects.txt)
-            DROP=$(wc -l < /tmp/drop-projects.txt)
-            KEEP=$(wc -l < /tmp/keep-projects.txt)
-            echo "trim: manifest defines $ALL projects, remove-minimal.xml drops $DROP, keeping $KEEP"
-            if [ "$KEEP" -lt 200 ]; then
-              echo "::error::trim computed only $KEEP projects to keep (expected ~380) - refusing to sync a broken tree"
-              exit 1
-            fi
-          else
-            repo manifest | grep -cE '<project ' > /tmp/keep-projects.txt
-            echo "no trim: syncing the full tree ($(cat /tmp/keep-projects.txt) projects)"
-            rm -f /tmp/keep-projects.txt
-          fi
+          # NOTE on trimming: two attempts to *restrict the sync* both failed and
+          # both are documented here so nobody retries them:
+          #   - an <include> overlay in .repo/local_manifests/ (run 37280474963):
+          #     `repo sync` failed instantly, tree came out 19 MB
+          #   - parsing `repo manifest` with grep 'path="..."' (run 37282570785):
+          #     repo OMITS path= when path == name, so only 387 of 990 projects were
+          #     listed, `toolchain/pgo-profiles` was never synced, and build/make
+          #     died with "toolchain/pgo-profiles/sampling/afdo_profiles.mk: No such
+          #     file or directory"
+          # The trim is therefore done AFTER the sync, by deleting directories, with
+          # assertions that the build's prerequisites survived. A wrong path there
+          # matches nothing, so the worst case is "no trim" rather than a broken tree.
+          echo "manifest projects: $(repo manifest | grep -c '<project ')"
 
       - name: Sync Source (SHALLOW)
         run: |
           set -uo pipefail
           mkdir -p "$LOG_DIR"
           cd "$SRC_ROOT"
-
-          SYNC_ARGS=()
-          if [ "${TRIM:-0}" = 1 ] && [ -s /tmp/keep-projects.txt ]; then
-            mapfile -t SYNC_ARGS < /tmp/keep-projects.txt
-            echo "trimmed sync: $(wc -l < /tmp/keep-projects.txt) projects (rest of the manifest is never fetched)"
-          else
-            echo "full sync: no trim"
-          fi
 
           # tee'd into the log artifact: when this step fails, the repo error is
           # the only thing that explains it (run 37280474963 failed here and the
@@ -461,8 +440,39 @@ jobs:
             --no-clone-bundle \
             --no-tags \
             --optimized-fetch \
-            --prune \
-            "${SYNC_ARGS[@]}" 2>&1 | tee "$LOG_DIR/sync.log"
+            --prune 2>&1 | tee "$LOG_DIR/sync.log"
+
+          # ------------------------------------------------------------------ trim
+          # Delete the projects remove-minimal.xml lists, after the sync, then prove
+          # the build's prerequisites survived. Worst case (a path that matches
+          # nothing) is simply "no trim".
+          if [ "${TRIM:-0}" = 1 ]; then
+            grep -oE 'path="[^"]+"' .repo/manifests/remove-minimal.xml \
+              | sed 's/^path="//; s/"$//' | sort -u > /tmp/drop-paths.txt
+            echo "trim: remove-minimal.xml lists $(wc -l < /tmp/drop-paths.txt) project paths"
+            DROPPED=0
+            while IFS= read -r p; do
+              if [ -n "$p" ] && [ -d "$p" ]; then
+                rm -rf -- "$p" && DROPPED=$((DROPPED + 1))
+              fi
+            done < /tmp/drop-paths.txt
+            echo "trim: deleted $DROPPED project directories"
+            # The build's own prerequisites must still be there. toolchain/pgo-profiles
+            # is the one that bit us: build/make/core/soong_config.mk includes
+            # toolchain/pgo-profiles/sampling/afdo_profiles.mk unconditionally.
+            for p in build/make build/soong bootable/recovery vendor/twrp system/core \
+                     bionic frameworks/base hardware/interfaces toolchain/pgo-profiles \
+                     prebuilts/clang/host/linux-x86 device/qcom/common device/qcom/twrp-common \
+                     system/extras system/vold system/security system/keymaster; do
+              if [ ! -d "$p" ]; then
+                echo "::error::trim removed a required project: $p"
+                exit 1
+              fi
+            done
+            echo "trim: all required projects present"
+          else
+            echo "no trim"
+          fi
 
           echo "--- source size ---"
           du -sh "$SRC_ROOT" | tail -1
