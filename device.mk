@@ -83,8 +83,11 @@ AB_OTA_POSTINSTALL_CONFIG += \
     FILESYSTEM_TYPE_vendor=erofs \
     POSTINSTALL_OPTIONAL_vendor=true
 
-PRODUCT_SOONG_NAMESPACES += \
-    vendor/qcom/opensource/commonsys-intf/display
+# NOTE: no PRODUCT_SOONG_NAMESPACES for vendor/qcom/... here. The TWRP-Test
+# twrp-16.0 manifest has no vendor/ tree at all except vendor/twrp, so a
+# namespace path pointing at vendor/qcom/opensource/... cannot be resolved.
+# Nothing in a recovery-only build comes from there - the QTI display HAL is
+# prebuilt on the vendor partition, not built from source.
 
 # ---------------------------------------------------------------------------
 # TWRP - specifics

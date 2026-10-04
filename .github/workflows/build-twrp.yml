@@ -82,9 +82,11 @@ on:
     branches: [master]
     tags: ["v*"]
 
-concurrency:
-  group: twrp-${{ github.ref }}
-  cancel-in-progress: false
+# NOTE: there is deliberately no `concurrency:` block here (the ofrp job has none
+# either). With one, a second push queues behind a running build - which cost 50
+# minutes on the first attempt because a failed job sat in its post-steps and
+# never released the slot. Iterating on a device tree needs "every push gets its
+# own run" more than it needs serialisation.
 
 permissions:
   contents: write
@@ -387,11 +389,15 @@ jobs:
             echo "========================================================"
             # shellcheck disable=SC1091
             source build/envsetup.sh
-            if ! lunch "twrp_${DEVICE}-${RELEASE}-eng"; then
+            # NOTE: `lunch` must NOT run in a pipeline - it sets TARGET_PRODUCT /
+            # TARGET_RELEASE / TARGET_BUILD_VARIANT, and a pipeline would run it in a
+            # subshell whose environment mka would never see.
+            if ! lunch "twrp_${DEVICE}-${RELEASE}-eng" >>"$LOG" 2>&1; then
               echo "::warning::lunch twrp_${DEVICE}-${RELEASE}-eng failed, retrying without the release config"
-              lunch "twrp_${DEVICE}-eng"
+              lunch "twrp_${DEVICE}-eng" >>"$LOG" 2>&1 || true
             fi
-            if mka adbd recoveryimage -j"$JOBS" 2>&1 | tee -a "$LOG"; then
+            echo "resolved: TARGET_PRODUCT=$TARGET_PRODUCT TARGET_RELEASE=$TARGET_RELEASE TARGET_BUILD_VARIANT=$TARGET_BUILD_VARIANT" | tee -a "$LOG"
+            if mka recoveryimage -j"$JOBS" 2>&1 | tee -a "$LOG"; then
               SUCCESS=1
               echo "Build finished successfully!"
               break
@@ -449,8 +455,9 @@ jobs:
         run: |
           mkdir -p "$LOG_DIR"
           if [ -f "$LOG_DIR/build.log" ]; then
+            head -n 300 "$LOG_DIR/build.log" > "$LOG_DIR/build.log.head" || true
             tail -n 4000 "$LOG_DIR/build.log" > "$LOG_DIR/build.log.tail" || true
-            grep -nE "error:|Error:|FAILED:|ninja: build stopped|Killed signal|No space left|not found" \
+            grep -nE "error:|Error:|FAILED:|ninja: build stopped|Killed signal|No space left|not found|unknown target|is not a valid" \
               "$LOG_DIR/build.log" | tail -n 300 > "$LOG_DIR/build.errors.txt" || true
           fi
           OUT="${OUT_DIR:-$SRC_ROOT/out}"
