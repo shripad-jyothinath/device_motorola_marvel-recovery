@@ -69,9 +69,9 @@ on:
         type: choice
         options: [ap2a, ap3a, ap4a, bp1a, bp2a]
       jobs:
-        description: "make -j (blank = nproc)"
+        description: "make -j (default 3; the runner has 4 vCPU / 16 GB, -j4 plus soong peaks past RAM)"
         required: false
-        default: ""
+        default: "3"
         type: string
       retries:
         description: "build attempts (hosted runners: leave at 1, the 6 h job cap is the limit)"
@@ -106,7 +106,14 @@ jobs:
       MANIFEST: https://github.com/TWRP-Test/platform_manifest_twrp_aosp.git
       RELEASE: ${{ inputs.release || 'ap2a' }}
       RETRIES: ${{ inputs.retries || '1' }}
-      GOMEMLIMIT: 24GiB
+      # 24GiB was carried over from the 64 GB ServerHive box and is actively
+      # harmful here: GOMEMLIMIT is a *soft* limit for Go's GC, so setting it
+      # above the machine's RAM tells soong_build to stop collecting garbage
+      # before it is anywhere near the ceiling. On a 16 GB runner that means the
+      # analysis pass balloons and the kernel OOM-killer takes the runner down
+      # with it - which is what "all steps concluded but the job never completes"
+      # looks like. Keep this below physical RAM.
+      GOMEMLIMIT: 6GiB
       LOG_DIR: ${{ github.workspace }}/logs
 
     steps:
@@ -181,40 +188,44 @@ jobs:
           # MEASURED, first real run: the shallow (-c --depth=1) twrp-16.0 tree is
           # 74 GB on disk, so the original 30 GB estimate was badly wrong. A cold
           # recoveryimage build adds ~25-40 GB of out/.
-          MIN_SRC=$((80 * GB))
-          MIN_OUT=$((25 * GB))
-          MIN_SHARED=$((105 * GB))
+          #
+          # The manifest also ships remove-minimal.xml, which drops 607 projects
+          # (cts, kernel prebuilts 6.1/6.6/6.12, device/generic/*, 311 unused
+          # external/*) and keeps every project the recovery build needs - checked
+          # against vendor/twrp/config/packages.mk and the module list. That gets
+          # the tree to roughly 40-50 GB, and it also shrinks soong's analysis
+          # (fewer Android.bp files to parse = less RAM on a 16 GB runner).
+          FULL_SRC=$((80 * GB));  FULL_OUT=$((25 * GB));  FULL_SHARED=$((105 * GB))
+          TRIM_SRC=$((45 * GB));  TRIM_OUT=$((25 * GB));  TRIM_SHARED=$((75 * GB))
 
-          # source goes on the disk with more room ...
-          if [ "$MNT_SEPARATE" = 1 ] && [ "$MNT_FREE" -gt "$ROOT_FREE" ]; then
-            SRC_ROOT=/mnt/fox
-            SRC_FREE=$MNT_FREE
-            OUT_DIR=/out
-            OUT_FREE=$ROOT_FREE
-            SWAP_DIR=/mnt
-          else
-            SRC_ROOT="$GITHUB_WORKSPACE/fox"
-            SRC_FREE=$ROOT_FREE
-            OUT_DIR=/mnt/out
-            OUT_FREE=$MNT_FREE
-            SWAP_DIR=/mnt
-            if [ "$MNT_SEPARATE" = 0 ]; then
-              OUT_DIR=""
-              OUT_FREE=0
-              SWAP_DIR=/
+          # choose a layout for the given requirements; returns 0 if it fits
+          choose() {
+            local min_src=$1 min_out=$2 min_shared=$3
+            if [ "$MNT_SEPARATE" = 1 ] && [ "$MNT_FREE" -gt "$ROOT_FREE" ]; then
+              SRC_ROOT=/mnt/fox; SRC_FREE=$MNT_FREE; OUT_DIR=/out
+              OUT_FREE=$ROOT_FREE; SWAP_DIR=/mnt
+            else
+              SRC_ROOT="$GITHUB_WORKSPACE/fox"; SRC_FREE=$ROOT_FREE
+              OUT_DIR=/mnt/out; OUT_FREE=$MNT_FREE; SWAP_DIR=/mnt
+              if [ "$MNT_SEPARATE" = 0 ]; then OUT_DIR=""; OUT_FREE=0; SWAP_DIR=/; fi
+            fi
+            # if the second disk cannot hold the output on its own, keep out/
+            # next to the source rather than filling that disk and dying later
+            if [ -n "$OUT_DIR" ] && [ "$OUT_FREE" -lt "$min_out" ]; then
+              OUT_DIR=""; OUT_FREE=0
+            fi
+            NEED=$min_shared
+            if [ -n "$OUT_DIR" ]; then NEED=$min_src; fi
+            [ "$SRC_FREE" -ge "$NEED" ]
+          }
+
+          TRIM=0
+          if ! choose "$FULL_SRC" "$FULL_OUT" "$FULL_SHARED"; then
+            echo "::warning::not enough disk for the full 74 GB tree here - enabling the remove-minimal.xml overlay"
+            if choose "$TRIM_SRC" "$TRIM_OUT" "$TRIM_SHARED"; then
+              TRIM=1
             fi
           fi
-
-          # ... but if the second disk cannot hold the output on its own, keep
-          # out/ next to the source rather than filling that disk and dying
-          # three hours into the build
-          if [ -n "$OUT_DIR" ] && [ "$OUT_FREE" -lt "$MIN_OUT" ]; then
-            echo "::warning::only $((OUT_FREE / GB)) GB free where the out dir would go - keeping out/ next to the source"
-            OUT_DIR=""
-          fi
-
-          NEED=$MIN_SHARED
-          if [ -n "$OUT_DIR" ]; then NEED=$MIN_SRC; fi
 
           # the runner user does not own /mnt or /
           sudo mkdir -p "$SRC_ROOT"
@@ -240,6 +251,7 @@ jobs:
           {
             echo "SRC_ROOT=$SRC_ROOT"
             echo "SWAP_DIR=$SWAP_DIR"
+            echo "TRIM=$TRIM"
           } >> "$GITHUB_ENV"
           if [ -n "$OUT_DIR" ]; then
             echo "OUT_DIR=$OUT_DIR" >> "$GITHUB_ENV"
@@ -257,24 +269,24 @@ jobs:
             echo "| free on / | $((ROOT_FREE / GB)) GB |"
             echo "| free on /mnt | $((MNT_FREE / GB)) GB (separate device: $MNT_SEPARATE) |"
             echo "| **total usable** | **${TOTAL_GB} GB** |"
+            echo "| trimmed sync | $TRIM (remove-minimal.xml overlay) |"
           } >> "$GITHUB_STEP_SUMMARY"
 
           echo "source=$SRC_ROOT (${SRC_FREE} bytes free, needs ${NEED})"
-          echo "out=${OUT_DIR:-<src>/out} swap=$SWAP_DIR total=${TOTAL_GB}GB"
+          echo "out=${OUT_DIR:-<src>/out} swap=$SWAP_DIR total=${TOTAL_GB}GB trim=$TRIM"
           echo "root=$((ROOT_FREE / GB))GB mnt=$((MNT_FREE / GB))GB separate=$MNT_SEPARATE"
 
           if [ "$SRC_FREE" -lt "$NEED" ]; then
             echo "::error::not enough disk for an AOSP-16 recovery build: $((SRC_FREE / GB)) GB free where the"
-            echo "::error::source tree has to live, ~$((NEED / GB)) GB needed (the shallow twrp-16.0 tree"
-            echo "::error::alone is 74 GB). Options, in order of preference:"
+            echo "::error::source tree has to live, ~$((NEED / GB)) GB needed even with the trimmed tree."
+            echo "::error::Options, in order of preference:"
             echo "::error::  1. re-run and hope for a larger runner image (146 GB disks have been seen)"
-            echo "::error::  2. trim the sync with the manifest's own remove-minimal.xml overlay"
-            echo "::error::  3. runner = [\"self-hosted\",\"linux\",\"x64\"] on a machine with >=150 GB"
+            echo "::error::  2. runner = [\"self-hosted\",\"linux\",\"x64\"] on a machine with >=150 GB"
             exit 1
           fi
           if [ "$TOTAL_GB" -lt 110 ]; then
-            echo "::warning::${TOTAL_GB} GB usable is tight for an AOSP-16 recovery build (the source tree"
-            echo "::warning::alone is 74 GB); if it runs out of disk, see the options in the README."
+            echo "::warning::${TOTAL_GB} GB usable is tight for an AOSP-16 recovery build; if it runs"
+            echo "::warning::out of disk, see the options in the README."
           fi
 
       # ------------------------------------------------------------- swapfile
@@ -352,6 +364,27 @@ jobs:
           repo init --depth=1 -u "$MANIFEST" -b "$TWRP_BRANCH" --no-repo-verify
           git -C .repo/manifests log -1 --oneline
 
+          # Trim the sync when "Choose build directories" said the disk needs it.
+          # The manifest ships remove-minimal.xml (607 projects: cts, kernel
+          # prebuilts 6.1/6.6/6.12, device/generic/*, 311 unused external/*); it
+          # keeps every project the recovery build needs, checked against
+          # vendor/twrp/config/packages.mk. Includes resolve relative to the file
+          # that contains them, so the overlay lives in .repo/local_manifests/.
+          if [ "${TRIM:-0}" = 1 ]; then
+            mkdir -p .repo/local_manifests
+            cp .repo/manifests/remove-minimal.xml .repo/local_manifests/
+            {
+              echo '<?xml version="1.0" encoding="UTF-8"?>'
+              echo '<manifest>'
+              echo '  <include name="remove-minimal.xml"/>'
+              echo '</manifest>'
+            } > .repo/local_manifests/trim.xml
+            echo "trim overlay installed:"
+            cat .repo/local_manifests/trim.xml
+          else
+            echo "no trim (full 990-project tree)"
+          fi
+
       - name: Sync Source (SHALLOW)
         run: |
           set -uo pipefail
@@ -407,6 +440,9 @@ jobs:
 
           JOBS="${{ inputs.jobs }}"; [ -n "$JOBS" ] || JOBS="$(nproc --all)"
           echo "OEM_COMPILE_JOBS=$JOBS"
+          echo "GOMEMLIMIT=$GOMEMLIMIT (must stay below physical RAM: it is a soft GC"
+          echo "  limit, and above RAM it stops soong_build collecting garbage)"
+          free -h || true
           ATTEMPT=1
           SUCCESS=0
           while [ "$ATTEMPT" -le "$RETRIES" ]; do
@@ -489,8 +525,15 @@ jobs:
           OUT="${OUT_DIR:-$SRC_ROOT/out}"
           {
             echo "--- disk ---"; df -hT / /mnt 2>/dev/null || df -hT /
+            echo "--- memory ---"; free -h
             echo "--- sizes ---"; du -sh "$SRC_ROOT" "$OUT" "$HOME/.ccache" 2>/dev/null
           } > "$LOG_DIR/build.stats.txt" || true
+          # OOM evidence. "All steps concluded but the job never completes" is what
+          # a runner that got killed looks like from the API, and the kernel says
+          # so here. dmesg needs root; the runner has passwordless sudo.
+          sudo dmesg 2>/dev/null | tail -n 150 > "$LOG_DIR/build.dmesg.txt" || true
+          grep -iE "out of memory|oom-kill|killed process|invoked oom" "$LOG_DIR/build.dmesg.txt" \
+            > "$LOG_DIR/build.oom.txt" 2>/dev/null || true
           ls -la "$LOG_DIR"
           wc -c "$LOG_DIR"/* || true
 
