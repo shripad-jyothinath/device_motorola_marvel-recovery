@@ -274,10 +274,41 @@ cleanup, single disk, `/mnt` full, `/mnt` too small, tight root, and two must-fa
 | `ubuntu-latest` / `ubuntu-24.04` | 4 | 16 GB | same layout (22.04 is deprecated Sep 2026 → Apr 2027, still supported today) |
 | same, private repo | 2 | 8 GB | same layout |
 | `ubuntu-slim` | 1 | 5 GB | 14 GB, **15-min job cap** — unusable for this |
-| **self-hosted (fallback)** | ≥8 | ≥16 GB | **≥150 GB** |
+| **self-hosted (needed to finish)** | ≥8 | **≥32 GB** | **≥150 GB** |
 
-If the build does not finish inside the 6-hour cap, re-run with
-`runner: ["self-hosted","linux","x64"]` on a machine with ≥150 GB:
+### RAM is the wall, not disk — measured
+
+Every hosted run gets **15.6 GB** and dies at the same place, reproducibly (runs
+37232604397, 37355587032, and the earlier pair):
+
+```
+resolved: TARGET_PRODUCT=twrp_marvel TARGET_RELEASE=ap2a TARGET_BUILD_VARIANT=eng   ← lunch is fine
+[ 99% 131/132] cp out/host/linux-x86/bin/soong_build
+   ~3 minutes of silence, then
+##[error]Process completed with exit code 143.
+##[error]The runner has received a shutdown signal.
+```
+
+Exit 143 is SIGTERM to the runner service — the machine is taken away during
+`soong_build`'s `Android.bp` analysis, which is the memory peak of the whole build.
+`build.oom.txt` is empty every time, so it is not the kernel OOM killer; it is the
+platform shutting the runner down under memory pressure. AOSP's own banner says it
+plainly:
+
+```
+You are building on a machine with 15.6GB of RAM
+The minimum required amount of free memory is around 16GB,
+and even with that, some configurations may not work.
+```
+
+`GOMEMLIMIT=6GiB` and `-j3` are already in place (they removed the earlier,
+worse failure modes), and the tree is already minimal: `repo manifest` reports
+**392 projects**, and `remove-minimal.xml` only lists projects in non-default
+groups that `repo sync` never fetches — so there is nothing left to trim.
+
+To finish the build, register a self-hosted runner with **≥32 GB RAM** (the
+96-core ServerHive box qualifies) and dispatch with
+`runner: ["self-hosted","linux","x64"]`:
 
 ```sh
 TOKEN=$(gh api -X POST repos/OWNER/REPO/actions/runners/registration-token --jq .token)
@@ -285,6 +316,9 @@ TOKEN=$(gh api -X POST repos/OWNER/REPO/actions/runners/registration-token --jq 
             --labels self-hosted,linux,x64 --name serverhive --unattended
 sudo ./svc.sh install && sudo ./svc.sh start
 ```
+
+A self-hosted runner also keeps `SRC_ROOT` between runs, which removes the
+15–21 minute sync from every subsequent build.
 
 > **Security:** don't attach a self-hosted runner to a public repo if untrusted users can trigger
 > workflows — a fork PR would execute on your machine. This workflow triggers on
