@@ -443,13 +443,32 @@ jobs:
             --prune 2>&1 | tee "$LOG_DIR/sync.log"
 
           # ------------------------------------------------------------------ trim
-          # Delete the projects remove-minimal.xml lists, after the sync, then prove
-          # the build's prerequisites survived. Worst case (a path that matches
-          # nothing) is simply "no trim".
+          # Delete the projects remove-minimal.xml lists, after the sync. This is
+          # best-effort: the assertion below only checks projects that existed
+          # BEFORE the deletion, because asserting a fixed list produced a false
+          # positive ("trim removed a required project: device/qcom/common" - that
+          # project is in the official manifest, not this one) and killed run
+          # 37352701006 after a successful 15-minute sync.
           if [ "${TRIM:-0}" = 1 ]; then
             grep -oE 'path="[^"]+"' .repo/manifests/remove-minimal.xml \
               | sed 's/^path="//; s/"$//' | sort -u > /tmp/drop-paths.txt
             echo "trim: remove-minimal.xml lists $(wc -l < /tmp/drop-paths.txt) project paths"
+            echo "trim: cwd=$(pwd)  sample checks:"
+            head -n 3 /tmp/drop-paths.txt | while IFS= read -r p; do
+              if [ -d "$p" ]; then echo "   present: $p"; else echo "   absent : $p"; fi
+            done
+            ls -d bootable/recovery system/core vendor/twrp 2>/dev/null | sed 's/^/   tree has: /' || true
+
+            printf '%s\n' build/make build/soong bootable/recovery vendor/twrp system/core \
+              bionic frameworks/base hardware/interfaces toolchain/pgo-profiles \
+              prebuilts/clang/host/linux-x86 device/qcom/common device/qcom/twrp-common \
+              system/extras system/vold system/security system/keymaster \
+              | sort -u > /tmp/required.txt
+            : > /tmp/required-before.txt
+            while IFS= read -r p; do
+              [ -d "$p" ] && echo "$p" >> /tmp/required-before.txt
+            done < /tmp/required.txt
+
             DROPPED=0
             while IFS= read -r p; do
               if [ -n "$p" ] && [ -d "$p" ]; then
@@ -457,19 +476,16 @@ jobs:
               fi
             done < /tmp/drop-paths.txt
             echo "trim: deleted $DROPPED project directories"
-            # The build's own prerequisites must still be there. toolchain/pgo-profiles
-            # is the one that bit us: build/make/core/soong_config.mk includes
-            # toolchain/pgo-profiles/sampling/afdo_profiles.mk unconditionally.
-            for p in build/make build/soong bootable/recovery vendor/twrp system/core \
-                     bionic frameworks/base hardware/interfaces toolchain/pgo-profiles \
-                     prebuilts/clang/host/linux-x86 device/qcom/common device/qcom/twrp-common \
-                     system/extras system/vold system/security system/keymaster; do
+
+            MISSING=0
+            while IFS= read -r p; do
               if [ ! -d "$p" ]; then
-                echo "::error::trim removed a required project: $p"
-                exit 1
+                echo "::error::trim removed required project $p"
+                MISSING=1
               fi
-            done
-            echo "trim: all required projects present"
+            done < /tmp/required-before.txt
+            [ "$MISSING" = 0 ] || exit 1
+            echo "trim: all $(wc -l < /tmp/required-before.txt) pre-existing required projects survived"
           else
             echo "no trim"
           fi
