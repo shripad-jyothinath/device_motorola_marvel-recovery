@@ -413,6 +413,16 @@ jobs:
           repo init --depth=1 -u "$MANIFEST" -b "$TWRP_BRANCH" --no-repo-verify
           git -C .repo/manifests log -1 --oneline
 
+          # Drop CTS: device.mk sets PLATFORM_VERSION_LAST_STABLE to the exact OS
+          # version (17), and build/make/core/tasks/cts.mk rejects any version
+          # missing from cts' platform_releases.txt whenever cts/ exists. A
+          # recovery build uses nothing from CTS. (A plain <remove-project>,
+          # unlike the <include> overlay below, works - checked on ServerHive.)
+          mkdir -p .repo/local_manifests
+          printf '%s\n' '<?xml version="1.0" encoding="UTF-8"?>' '<manifest>' \
+            '  <remove-project name="android_cts" />' '</manifest>' \
+            > .repo/local_manifests/marvel-no-cts.xml
+
           # NOTE on trimming: two attempts to *restrict the sync* both failed and
           # both are documented here so nobody retries them:
           #   - an <include> overlay in .repo/local_manifests/ (run 37280474963):

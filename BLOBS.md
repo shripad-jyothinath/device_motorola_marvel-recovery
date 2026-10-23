@@ -1,7 +1,7 @@
 # Bundled vendor blobs
 
 Everything under `recovery/root/vendor/` comes from the stock **A171WEH.36-18** firmware
-(Android 17, `marvel_g-user 17 A171WEH.36-18 ccd1da-3f1b2`, vendor `UWE34HV-A171-ST4`,
+(Android 17, `A171WEH.36-18 ccd1da-3f1b2`: the package is `marvel_g`, an XT2605-4 reports `marvel_gh`; vendor `UWE34HV-A171-ST4`,
 security patch 2026-08-01). That is the package Motorola's Rescue and Smart Assistant
 serves for XT2605 retail (cid 50), and the build the phone runs after the OTA.
 

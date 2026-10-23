@@ -8,8 +8,10 @@
 # mount whatever the installed OS actually uses.
 
 # Logical partitions
-system                                                  /system                erofs   ro                                                   wait,slotselect,avb=vbmeta_system,logical,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey:/avb/t-gsi.avbpubkey
-system                                                  /system                ext4    ro,barrier=1,discard                                 wait,slotselect,avb=vbmeta_system,logical,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey:/avb/t-gsi.avbpubkey
+# No avb_keys= here: the GSI keys it names live in the OS's first-stage ramdisk,
+# not in recovery, and the stock A171WEH.36-18 recovery.fstab has none either.
+system                                                  /system                erofs   ro                                                   wait,slotselect,avb=vbmeta_system,logical
+system                                                  /system                ext4    ro,barrier=1,discard                                 wait,slotselect,avb=vbmeta_system,logical
 system_ext                                              /system_ext            erofs   ro                                                   wait,slotselect,avb=vbmeta_system,logical
 system_ext                                              /system_ext            ext4    ro,barrier=1,discard                                 wait,slotselect,avb=vbmeta_system,logical
 product                                                 /product               erofs   ro                                                   wait,slotselect,avb=vbmeta_system,logical

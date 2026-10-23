@@ -43,7 +43,7 @@ PRODUCT_APEX_SYSTEM_SERVER_JARS += \
     com.android.crashrecovery:service-crashrecovery
 
 # OTA assert
-TARGET_OTA_ASSERT_DEVICE := marvel,marvel_g,XT2605,XT2605-1,XT2605-2,XT2605-3,XT2605-4
+TARGET_OTA_ASSERT_DEVICE := marvel,marvel_g,marvel_gh,XT2605,XT2605-1,XT2605-2,XT2605-3,XT2605-4
 
 # FastbootD support
 PRODUCT_PACKAGES += \
@@ -220,9 +220,18 @@ TARGET_RECOVERY_DEVICE_MODULES += $(MARVEL_RECOVERY_SYSTEM_LIBS)
 TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
     $(foreach lib,$(MARVEL_RECOVERY_SYSTEM_LIBS),$(TARGET_OUT_SHARED_LIBRARIES)/$(lib).so)
 
-PLATFORM_VERSION             := 99.87.36
+# Exactly the installed OS: A171WEH.36-18 is Android 17, patch 2026-08-01
+# (system and vendor). These go into the recovery image header, which the
+# bootloader hands to the KeyMint TA as the running OS version/patch level.
+# Do NOT use the usual 99.87.36 / 2127-12-31 spoof: a TA told the OS is newer
+# than the keys treats them as needing an upgrade, and an upgraded key blob
+# bound to 2127 would be rejected by Android back on 2026-08-01 (rollback),
+# locking userdata. With equal levels nothing is upgraded; after a newer OTA
+# the worst case is that decryption fails (writes nothing) until this is
+# bumped to match.
+PLATFORM_VERSION             := 17
 PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
 
-PLATFORM_SECURITY_PATCH := 2127-12-31
+PLATFORM_SECURITY_PATCH := 2026-08-01
 VENDOR_SECURITY_PATCH   := $(PLATFORM_SECURITY_PATCH)
 BOOT_SECURITY_PATCH     := $(PLATFORM_SECURITY_PATCH)

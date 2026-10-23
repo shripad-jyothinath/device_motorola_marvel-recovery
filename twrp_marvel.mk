@@ -24,10 +24,7 @@ PRODUCT_MODEL := motorola edge 70 fusion
 PRODUCT_MANUFACTURER := motorola
 PRODUCT_NAME := twrp_$(PRODUCT_DEVICE)
 
-# Target firmware: A171WEH.36-18 (Android 17, the build the blobs come from).
-# Values from that package's info.txt; the OTA for retin units may report
-# product marvel_gh instead of marvel_g - update after checking getprop.
-PRODUCT_BUILD_PROP_OVERRIDES += \
-    DeviceName=marvel \
-    BuildDesc="marvel_g-user 17 A171WEH.36-18 ccd1da-3f1b2 release-keys" \
-    BuildFingerprint=motorola/marvel_g/marvel:17/A171WEH.36-18/ccd1da-3f1b2:user/release-keys
+# No PRODUCT_BUILD_PROP_OVERRIDES (DeviceName/BuildDesc/BuildFingerprint): those
+# keys are a LineageOS build extension. In this AOSP/TWRP tree they were a
+# silent no-op, and stock recovery carries no fingerprint either. The target
+# firmware is A171WEH.36-18 (marvel_gh-user 17, ccd1da-3f1b2) - see device.mk.

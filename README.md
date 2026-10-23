@@ -25,16 +25,28 @@ Smart Assistant's "Rescue" on a phone you care about: it wipes userdata.
 ```sh
 # NOTE: the branch is twrp-16.0 (NOT twrp_16 - only 'lvgl' and 'twrp-16.0' exist)
 repo init --depth=1 -u https://github.com/TWRP-Test/platform_manifest_twrp_aosp.git -b twrp-16.0
+# drop CTS: cts.mk rejects the exact OS version (17) this tree declares, see below
+mkdir -p .repo/local_manifests
+printf '<manifest>\n  <remove-project name="android_cts" />\n</manifest>\n' > .repo/local_manifests/marvel-no-cts.xml
 repo sync
 
 # place this tree at device/motorola/marvel
 
 source build/envsetup.sh
 # android-16.0.0_r1 defines: ap2a ap3a ap4a bp1a bp2a (+ eng/user/userdebug)
-# aosp_current -> bp2a, so either of these works:
 lunch twrp_marvel-bp2a-eng      # NOT ap2a: its board API 202404 breaks vendor sepolicy (hal_hwcrypto)
 mka adbd recoveryimage
 ```
+
+> **Why no version spoof.** Most TWRP trees set `PLATFORM_VERSION := 99.87.36` and
+> `PLATFORM_SECURITY_PATCH := 2127-12-31`. Here they are the installed OS's exact values
+> (17 / 2026-08-01), because QTI KeyMint takes the OS version/patch level from the recovery
+> image header and from `ro.build.version.*`. Told the OS is newer than its keys, KeyMint
+> asks for them to be upgraded; TWRP's `vold` keeps such upgrades in memory only, but
+> `keystore2` (stock AOSP) writes them to `/data/misc/keystore`. An upgraded key bound to
+> 2127 is rejected by Android on 2026-08-01, which can lock userdata. With equal levels
+> nothing is upgraded. After an OTA with a newer patch, bump the values to match; until
+> then decryption simply fails, without writing anything.
 
 > `twrp-16.0` (AOSP `android-16.0.0_r1`) is required for the Android 16 decryption blobs — the
 > Android 14.1 / OrangeFox 14.1 manifests do not decrypt this platform.
@@ -376,15 +388,26 @@ recovery image, and `fastboot boot` of a kernel-less image fails with "No OS cou
 (booting a kernel-present image just boots the installed OS). The only way to test is to flash the
 recovery partition and enter recovery mode from the bootloader menu.
 
-## Status — not built yet
+## Status — builds, does not boot yet
 
-Everything in this tree is sourced from the stock dump (see the two sections above), but the tree
-**has never been compiled**. Known open items before the first flash:
+`mka recoveryimage` succeeds on `twrp-16.0` / `bp2a` (ServerHive, with its RBE profile). The image
+unpacks to header v4, `kernel_size=0`, `os_version=17.0.0`, `os_patch_level=2026-08`, AVB footer,
+and every tree file. **First device test (XT2605-4 on A171WEH.36-18): it does not boot.** The
+kernel starts and `init` reboots to the bootloader (`fastboot getvar reason` →
+`Reboot mode set to fastboot`), cause not yet known. Restoring stock recovery puts the phone back
+exactly as before. Two things learned from the test:
+
+- start TWRP from Android with `adb reboot recovery`. `fastboot reboot recovery` makes this
+  bootloader retry recovery on every boot, so a failing recovery loops until stock is restored;
+- stock recovery's adb gives no shell (SELinux), so it cannot be used to read the crash log.
+
+Open items:
 
 | item | risk |
 |---|---|
+| boot failure | `init` dies early; needs the failed boot's kernel log (pstore / bug report `LAST KMSG`) |
 | release config | must be `bp2a`; `ap2a` fails in `vendor_sepolicy.cil` (`hal_hwcrypto_server` not declared below board API 202504) |
-| Android 17 data on a `twrp-16.0` base | the vendor side is unchanged (still Android 14-based), but whether TWRP's Android 16 vold/keystore2 decrypt data written by Android 17 is untested |
+| Android 17 data on a `twrp-16.0` base | OS version (17) and patch (2026-08-01) match exactly, so KeyMint has no reason to upgrade keys, but vold/keystore2 are Android 16 code (SDK 36 vs the OS's 37). Whether they read Android 17's on-disk key and keystore formats is untested; a mismatch should make decryption fail, not write |
 | `TARGET_CPU_VARIANT_RUNTIME := kryo300` | copied from amethyst (same SoC); ignored or an error depending on the Soong in your manifest |
 | bundled `/vendor/**` blobs | when the real `vendor` partition is mounted over `/vendor` (TWRP does so briefly to load modules), the bundled copies are shadowed while it is mounted |
 | `TW_CUSTOM_CPU_TEMP_PATH` | `thermal_zone10` is `cpuss-0` on Android; recovery registers fewer zones, so the index may differ |
