@@ -40,8 +40,10 @@ on property:twrp.modules.loaded=true && property:twrp.firmware.loaded=
     mkdir /mnt/vendor 0775 shell system
     mkdir /mnt/vendor/persist 0775 shell system
 
+    # modem is ext4 on marvel (stock fstab.qcom), not vfat
+    mkdir /vendor/firmware_mnt 0771 system system
     wait /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} 10
-    mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /vendor/firmware_mnt ro
+    mount ext4 /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /vendor/firmware_mnt ro nosuid nodev
     wait /dev/block/bootdevice/by-name/persist 10
     mount ext4 /dev/block/bootdevice/by-name/persist /mnt/vendor/persist ro
 
@@ -53,6 +55,8 @@ on property:twrp.modules.loaded=true && property:twrp.firmware.loaded=
 
     setprop twrp.firmware.mounted true
 
+# AIDL boot control (slot switching). Service and libraries come from the stock
+# A171WEH.36-18 recovery ramdisk, see vendor/etc/init/android.hardware.boot-service.qti.rc
 on init
     start vendor.boot-qti
 
@@ -77,14 +81,5 @@ on early-fs
 on boot
     setprop sys.usb.config adb
 
-# ---------------------------------------------------------------------------
-# Motorola MMI touch stack.
-# The Goodix BRL controller driver is listed in modules.blocklist on the stock
-# ROM, so recovery has to force the chain in.
-# ---------------------------------------------------------------------------
-service recovery-touch /system/bin/touch_probe.sh
-    user root
-    group root system
-    disabled
-    oneshot
-    seclabel u:r:recovery:s0
+# The Motorola MMI touch stack (goodix_brl_mmi, blocklisted on stock) is loaded
+# by TWRP itself through TW_LOAD_VENDOR_MODULES - see device.mk.

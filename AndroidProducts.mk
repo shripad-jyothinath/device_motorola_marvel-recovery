@@ -9,4 +9,9 @@ PRODUCT_MAKEFILES := $(LOCAL_DIR)/twrp_marvel.mk
 # product_config rejects the 2-part form; the official twrp-14.1 line is the
 # opposite (it rejects the 3-part form). This line must match the manifest
 # branch you sync - see the `branch` input in .github/workflows/build-twrp.yml.
-COMMON_LUNCH_CHOICES := twrp_marvel-ap2a-eng
+#
+# Release must be bp2a (RELEASE_BOARD_API_LEVEL 202504). ap2a (202404) cannot
+# build this tree: system/sepolicy/vendor/hal_hwcrypto_default.te uses
+# hal_hwcrypto unconditionally, but public/attributes only declares it
+# starting_at_board_api(202504), so checkpolicy fails on vendor_sepolicy.cil.
+COMMON_LUNCH_CHOICES := twrp_marvel-bp2a-eng

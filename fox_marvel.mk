@@ -9,8 +9,8 @@
 # Maintainer
 OF_MAINTAINER := Shripad
 
-# Screen settings (1220x2712 panel)
-OF_SCREEN_H := 2712
+# Screen settings (1272x2772 panel)
+OF_SCREEN_H := 2772
 OF_STATUS_H := 96
 OF_STATUS_INDENT_LEFT := 48
 OF_STATUS_INDENT_RIGHT := 48

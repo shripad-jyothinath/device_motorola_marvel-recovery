@@ -43,17 +43,19 @@
 
 # --- Data / metadata --------------------------------------------------------
 /data       f2fs  /dev/block/bootdevice/by-name/userdata  flags=display="Data";backup=1;wipeingui=1;encryptable=userdata
-/metadata   f2fs  /dev/block/bootdevice/by-name/metadata  flags=display="Metadata";backup=1;wipeingui=1;fsflags="noatime,nosuid,nodev,discard,data_flush wait";wrappedkey
+/metadata   f2fs  /dev/block/bootdevice/by-name/metadata  flags=display="Metadata";backup=1;wipeingui=1;fsflags="noatime,nosuid,nodev,discard"
 
 # --- Motorola calibration / firmware ---------------------------------------
 # /persist and /persist_image hold sensor/camera calibration: restorable from a
 # TWRP backup, but a wrong image written over it is not recoverable without a
 # stock dump. Backup yes, flash no.
 /persist        ext4  /dev/block/bootdevice/by-name/persist        flags=display="Persist";backup=1;wipeingui=0;flashimg=0
-/persist_image  emmc  /dev/block/bootdevice/by-name/persist        flags=display="Persist";backup=1;wipeingui=0
+/persist_image  emmc  /dev/block/bootdevice/by-name/persist        flags=display="Persist Image";backup=1;wipeingui=0
 /mnt/product/persist   ext4  /dev/block/bootdevice/by-name/prodpersist flags=display="Product Persist";backup=1;wipeingui=0;flashimg=0
 /mnt/product/logks     ext4  /dev/block/bootdevice/by-name/logks       flags=display="LOGKS";backup=1
-/modem          vfat  /dev/block/bootdevice/by-name/modem          flags=display="Modem/Firmware";backup=1;slotselect
+# modem is ext4 and init mounts it read-only at /vendor/firmware_mnt for the
+# crypto stack, so TWRP handles it as a raw image instead of mounting it again.
+/modem          emmc  /dev/block/bootdevice/by-name/modem          flags=display="Modem/Firmware";backup=1;slotselect
 /dsp            ext4  /dev/block/bootdevice/by-name/dsp            flags=display="DSP";backup=1;slotselect
 /bluetooth      ext4  /dev/block/bootdevice/by-name/bluetooth      flags=display="Bluetooth";backup=1;slotselect
 /fsg            ext4  /dev/block/bootdevice/by-name/fsg            flags=display="FSG";backup=1

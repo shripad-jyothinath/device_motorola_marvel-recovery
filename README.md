@@ -11,8 +11,14 @@ which is the same SoC and the same partition scheme.
 | Board | `volcano` | `volcano` |
 | CPU | 1x2.5 GHz A720 + 3x2.4 GHz A720 + 4x1.8 GHz A520 | same |
 | GPU | Adreno 810 | Adreno 810 |
-| Shipped Android | 16 | 14 |
+| Shipped Android | 16 (vendor frozen at 14, board API 34) | 14 |
 | Recovery layout | dynamic `super`, A/B, **dedicated recovery partition, no kernel** | same |
+| Display | 1272×2772 @ 450 dpi | 1220×2712 @ 440 |
+
+**Target firmware: A171WEH.36-18** (Android 17, vendor `UWE34HV-A171-ST4`, 2026-08-01 patch).
+Every blob, the fstab, the init triggers and the prebuilts come from that build. Update the
+phone to it with the normal OTA before flashing this recovery. Do **not** use Rescue and
+Smart Assistant's "Rescue" on a phone you care about: it wipes userdata.
 
 ## Build
 
@@ -26,7 +32,7 @@ repo sync
 source build/envsetup.sh
 # android-16.0.0_r1 defines: ap2a ap3a ap4a bp1a bp2a (+ eng/user/userdebug)
 # aosp_current -> bp2a, so either of these works:
-lunch twrp_marvel-ap2a-eng      # (or twrp_marvel-bp2a-eng)
+lunch twrp_marvel-bp2a-eng      # NOT ap2a: its board API 202404 breaks vendor sepolicy (hal_hwcrypto)
 mka adbd recoveryimage
 ```
 
@@ -40,9 +46,8 @@ base `android-16.0.0_r1`), `base.mk`, `core_64_bit_only.mk`, `to-upper`/`to-lowe
 `external/se_omapi` (for `TW_INCLUDE_OMAPI`), `external/magisk-prebuilt` (repacktools/magiskboot),
 `external/ntfs-3g`, `external/lptools`, `external/bash`.
 
-`vendor/lineage` is **absent**, so the `-include vendor/lineage/config/BoardConfigReservedSize.mk`
-in `BoardConfig.mk` is a harmless no-op. `fox_marvel.mk` only sets `OF_*` variables, which a pure
-TWRP build ignores.
+`vendor/lineage` is **absent**; the `-include` lines for optional sepolicy in `BoardConfig.mk`
+are harmless no-ops. `fox_marvel.mk` only sets `OF_*` variables, which a pure TWRP build ignores.
 
 ## What was changed from amethyst
 
@@ -52,17 +57,16 @@ TWRP build ignores.
 | `board-info.txt` | `require board=marvel\|volcano` |
 | partition sizes | `recovery 134217728`, `dtbo 34603008`, `super 21474836480`, group `mot_dp_group` / `21470642176` |
 | dynamic list | **no `odm`** (marvel keeps ODM content in `vendor/odm`) |
-| touch modules | MMI chain: `mmi_annotate → mmi_info → mmi_relay → panel_event_notifier → sensors_class → touchscreen_mmi → goodix_brl_mmi` (+ `goodix_fod_mmi`, `rbs_fod_mmi`, `mmi_stow`) |
-| crypto services | **NXP** variants (`strongbox-nxp`, `weaver-service.nxp-qti`) — amethyst uses Thales; marvel ships both and selects NXP on the `dnes` SKU (see below). There is no `authsecret` service binary in the dump. |
-| crypto rc | `init.recovery.encryption.rc` drives the stock units in order: `vendor.qseecomd → vendor.ssgtzd, vendor.keymint-qti, vendor.gatekeeper_default → vendor.secure_element`, with `vendor.keymint-strongbox` / `vendor.weaver_nxp` gated on `ro.boot.strongbox_support` |
-| fstab | dropped `odm`; both `erofs`+`ext4` for every logical partition; `/metadata` f2fs + `wrappedkey` + `first_stage_mount`; `/data` **`fileencryption=ice,wrappedkey`** + `keydirectory` + `sysfs_path=…/1d84000.ufshc` (taken verbatim from the stock recovery fstab) |
-| USB | new `init.recovery.usb.rc` from stock: forces the dwc3 into peripheral mode and uses Motorola VID/PIDs (`22B8` / adb `2E81` / fastboot `2E80`); `TW_EXCLUDE_DEFAULT_USB_INIT := true` |
-| touch probe | `runatboot.sh`'s Xiaomi `touchfeature-service` replaced by `system/bin/touch_probe.sh` (Motorola MMI) |
-| UI | `TW_FRAMERATE 120`, `TW_MAX_BRIGHTNESS 2047`, `OF_SCREEN_H 2712`, `OF_MAINTAINER Shripad` |
+| kernel modules | one unquoted `TW_LOAD_VENDOR_MODULES` list: `goodix_brl_mmi` (+ `goodix_fod_mmi`, `rbs_fod_mmi`; all three are blocklisted on stock), `smcinvoke_dlkm` + `qseecom_proxy` (QSEECom, needed for decryption and not in vendor_boot's `modules.load.recovery`), `qti_battery_charger`, `adsp_loader_dlkm`. libmodprobe resolves the MMI chain (`touchscreen_mmi`, `mmi_*`, `panel_event_notifier`, `sensors_class`) from `modules.dep`. |
+| crypto services | QTI stack on every unit: `qseecomd`, `qseecom-service`, `ssgtzd`, `keymint-qti`, `gatekeeper_default`. **NXP** StrongBox/weaver/secure_element only on `dnes` SKUs, gated on `ro.boot.strongbox_support`. Blobs are the full dependency closure from A171WEH.36-18 (see `BLOBS.md`). |
+| crypto rc | `init.recovery.encryption.rc`: firmware mounted → `vendor.qseecomd`, `qseecom-service`, `vendor.ssgtzd`; listeners registered → `vendor.keymint-qti`, `vendor.gatekeeper_default`; StrongBox SKUs additionally `vendor.secure_element`, `vendor.keymint-strongbox`, `vendor.weaver_nxp` |
+| fstab | dropped `odm`; both `erofs`+`ext4` for every logical partition; `/metadata` and `/data` exactly as the OS's `vendor/etc/fstab.qcom`: **`fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized+wrappedkey_v0`**, **`metadata_encryption=aes-256-xts:wrappedkey_v0`**, `inlinecrypt` mount option; `modem` is **ext4** |
+| USB | `init.recovery.usb.rc` from stock: forces the dwc3 into peripheral mode and uses Motorola VID/PIDs (`22B8` / adb `2E81` / fastboot `2E80`), plus MTP handlers this tree adds (`mtp` `2E82`, `mtp,adb` `2E76`, from stock `init.mmi.usb.rc`); `TW_EXCLUDE_DEFAULT_USB_INIT := true` |
+| boot control | stock recovery's AIDL `android.hardware.boot-service.qti.recovery` + `libboot_control_qti`, bundled under `/vendor` |
+| UI | `TW_FRAMERATE 120`, `TW_MAX_BRIGHTNESS 2047`, 1272×2772 @ 450, `OF_SCREEN_H 2772`, `OF_MAINTAINER Shripad` |
 
-The whole decryption stack is the same on both devices (QTI keymint on QSEE +
-StrongBox/Weaver/AuthSecret + `ssgtzd` + `qseecomd`), so `init.recovery.encryption.rc`
-transfers almost verbatim.
+The QTI part of the decryption stack (keymint + gatekeeper on QSEE, `qseecomd`, `ssgtzd`)
+is the same on both devices, so `init.recovery.encryption.rc` transfers almost verbatim.
 
 ### Crypto is a SKU-gated NXP StrongBox stack
 
@@ -83,34 +87,25 @@ NXP 2910/2911/2915 and STM/Thales 2913/2916 — marvel selects **NXP**.
 
 The always-present TZ path is `android.hardware.security.keymint-service-qti`
 (`IKeyMintDevice/default` + secureclock + sharedsecret), plus
-`android.hardware.gatekeeper-service-qti`.
+`android.hardware.gatekeeper-service-qti`. **The XT2605-4 ("dn" SKU) has no StrongBox:**
+`ro.vendor.hw.strongbox=false`, no `ro.boot.strongbox_support`, and no weaver registered on
+a running phone — on it, decryption is the TZ path alone.
 
 ## What's included
 
-**Prebuilts** (from the stock `marvel_g` build, verified against the device):
+**Prebuilts** (from A171WEH.36-18). Recovery is built without a kernel, so these only feed
+the build plumbing; the device boots recovery with the kernel from its `boot` partition.
 
 | file | size | note |
 |---|---|---|
-| `prebuilt/kernel` | 33.99 MB | GKI `6.1.157-android14-11-gc7dd3fa941b3-ab15371444` |
-| `prebuilt/dtbo.img` | 33 MB | matches the real `dtbo` partition (34603008) |
-| `prebuilt/dtb/marvel.dtb` | 0.41 MB | "Qualcomm Technologies, Inc. Volcano SoC" |
-| `prebuilt/kernel-headers.tar.gz` | 1.76 MB | |
+| `prebuilt/kernel` | 33.99 MB | GKI `6.1.157-android14-11-ga8b0b542991e-ab15601211` (from `boot.img`) |
+| `prebuilt/dtbo.img` | 33 MB | the package's `dtbo.img` (34603008 = partition size) |
+| `prebuilt/dtb/marvel.dtb` | 0.41 MB | the dtb section of the package's `vendor_boot.img` |
+| `prebuilt/kernel-headers.tar.gz` | 1.76 MB | from the earlier 6.1.157 build |
 
-**Crypto blobs** under `recovery/root/vendor/` — extracted from the stock vendor partition
-(`DumprX` release `marvel-W2WE36.56-32-ST3.2-390dea`), 46 files:
-
-```
-vendor/bin/hw/   7 binaries (keymint-qti, strongbox-nxp, weaver-service.nxp-qti,
-                            gatekeeper-service-qti, secure_element-service.qti,
-                            qseecom@1.0-service, keymaster@4.0-service-qti)
-vendor/bin/      qseecomd, ssgtzd
-vendor/lib64/    24 libraries + 2 under hw/
-vendor/etc/init/ 8 stock-derived service units (recovery seclabel)
-vendor/etc/vintf/manifest/ 3 XML fragments
-vendor/etc/ueventd.rc, vendor/odm/etc/ueventd.rc
-```
-
-See `BLOBS.md` for the full dump→tree path map.
+**Vendor blobs** under `recovery/root/vendor/`: 79 binaries and libraries (7.9 MB), the full
+dependency closure of the decryption services plus the boot-control HAL, all from
+A171WEH.36-18. `BLOBS.md` lists how the set was derived and what `/system` must provide.
 
 ## Why USB was dead (and the fix)
 
@@ -149,14 +144,15 @@ Both are now in the tree:
   `ro.recovery.usb.fastboot.pid=2E80`, `ro.recovery.ui.margin_height=110`
 - `BoardConfig.mk` — `TW_EXCLUDE_DEFAULT_USB_INIT := true` so TWRP's own USB init does not fight it
 
-## The stock recovery ramdisk (authoritative reference)
+## The stock recovery ramdisk (reference for layout, NOT for decryption)
 
-Extracted from `marvel-boot-images.tar.zst` → `recovery.img`:
+`recovery.img` of A171WEH.36-18 (the earlier Android 16 image had the same shape):
 
 ```
-header_version=4  kernel_size=0  ramdisk_size=19245719   -> ramdisk-only, NO kernel
-5 lz4-legacy blocks -> 36,921,088 bytes cpio, 489 entries (449 files)
-modules in the ramdisk: 0
+header_version=4  kernel_size=0  ramdisk_size=19245698   -> ramdisk-only, NO kernel
+488 cpio entries, no kernel modules
+ships: android.hardware.boot-service.qti.recovery (+ libboot_control_qti),
+       android.hardware.health-service.qti_recovery, fastbootd
 ```
 
 Notable:
@@ -165,19 +161,19 @@ Notable:
 - **No kernel modules either** → the modules are *not* bundled; recovery gets them from the mounted
   vendor/vendor_boot. This is why `TW_LOAD_VENDOR_MODULES` (what amethyst uses) is the right
   mechanism, not ramdisk bundling.
-- `system/etc/recovery.fstab` — the authoritative fstab, now copied:
-  `fileencryption=ice,wrappedkey` for `/data` (not the older `aes-256-xts` string),
-  `wrappedkey` for `/metadata`, and the `odm` line **commented out**.
+- Its `system/etc/recovery.fstab` says `fileencryption=ice,wrappedkey` for `/data`. That is
+  **not** what the data is encrypted with — stock recovery never decrypts, so nothing checks
+  it. This tree's fstab follows the OS's `vendor/etc/fstab.qcom` instead (v2 policy,
+  `wrappedkey_v0`, metadata encryption with `wrappedkey_v0`).
 - USB config + props as above.
 
-## Still missing
+## Not bundled, on purpose
 
-- `vendor/firmware_mnt/image/*` — these live on the **modem** partition (`/vendor/firmware_mnt`),
-  which `init.recovery.qcom.rc` mounts itself. The `adsp.mdt`/`adsp.b*` chain it waits for comes
-  from there.
-- Kernel modules are **not** bundled: recovery loads them at runtime from `/vendor/lib/modules`
-  via `TW_LOAD_VENDOR_MODULES` (see `device.mk`) — so the stock `vendor` / `vendor_dlkm` partitions
-  must be present on the device (they are).
+- `vendor/firmware_mnt/image/*` — these live on the **modem** partition (ext4,
+  `/vendor/firmware_mnt`), which `init.recovery.qcom.rc` mounts itself. The `adsp.mdt`/`adsp.b*`
+  chain it waits for comes from there.
+- Kernel modules: recovery loads them at runtime from `vendor_dlkm` via
+  `TW_LOAD_VENDOR_MODULES` (see `device.mk`), so they always match the installed firmware.
 
 ## CI: `.github/workflows/build-twrp.yml`
 
@@ -387,12 +383,14 @@ Everything in this tree is sourced from the stock dump (see the two sections abo
 
 | item | risk |
 |---|---|
-| `lunch twrp_marvel-ap2a-eng` | the release tag comes from the manifest you sync; verify with `lunch` and adjust `AndroidProducts.mk` |
+| release config | must be `bp2a`; `ap2a` fails in `vendor_sepolicy.cil` (`hal_hwcrypto_server` not declared below board API 202504) |
+| Android 17 data on a `twrp-16.0` base | the vendor side is unchanged (still Android 14-based), but whether TWRP's Android 16 vold/keystore2 decrypt data written by Android 17 is untested |
 | `TARGET_CPU_VARIANT_RUNTIME := kryo300` | copied from amethyst (same SoC); ignored or an error depending on the Soong in your manifest |
-| `OF_USE_AIDL_BOOT_CONTROL := 1` | marvel's boot HAL type (AIDL vs HIDL) is unverified |
-| bundled `/vendor/**` blobs | when the real `vendor` partition is mounted over `/vendor`, the bundled copies and `vendor/etc/init/*.rc` are shadowed — stock does not bundle at all, so either path may be what actually executes |
+| bundled `/vendor/**` blobs | when the real `vendor` partition is mounted over `/vendor` (TWRP does so briefly to load modules), the bundled copies are shadowed while it is mounted |
+| `TW_CUSTOM_CPU_TEMP_PATH` | `thermal_zone10` is `cpuss-0` on Android; recovery registers fewer zones, so the index may differ |
+| MTP | handlers written for TWRP from stock PIDs; untested on device |
+| StrongBox SKUs (`dnes`) | blobs, vintf and gating are in place, but only the non-StrongBox path matches a phone that was actually inspected |
 | SELinux | the tree runs permissive (`write /sys/fs/selinux/enforce 0`); stock is enforcing |
-| `ro.boot.strongbox_support` | if `false` on your unit, StrongBox/Weaver do not start and decryption falls back to the TZ keymint path |
 
 ## Analysis
 

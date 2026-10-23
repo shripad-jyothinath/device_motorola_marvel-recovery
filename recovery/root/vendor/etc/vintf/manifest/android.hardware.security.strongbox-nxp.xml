@@ -1,0 +1,27 @@
+<!--
+    StrongBox SKUs only (stock: vendor/odm/etc/vintf/manifest_dnes.xml). The services
+    behind these entries start only when ro.boot.strongbox_support=true (see
+    init.recovery.encryption.rc); on other SKUs (e.g. XT2605-4 "dn") they stay
+    declared but unregistered, which is harmless.
+-->
+<manifest version="1.0" type="device">
+    <hal format="aidl">
+        <name>android.hardware.security.keymint</name>
+        <version>3</version>
+        <fqname>IKeyMintDevice/strongbox</fqname>
+        <fqname>IRemotelyProvisionedComponent/strongbox</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>android.hardware.security.sharedsecret</name>
+        <fqname>ISharedSecret/strongbox</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>android.hardware.weaver</name>
+        <version>2</version>
+        <fqname>IWeaver/default</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>android.hardware.secure_element</name>
+        <fqname>ISecureElement/eSE1</fqname>
+    </hal>
+</manifest>

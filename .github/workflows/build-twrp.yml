@@ -65,7 +65,8 @@ on:
       release:
         description: "AOSP release config (Android 16 trees only; ignored on twrp-14.1)"
         required: false
-        default: ap2a
+        # bp2a: ap2a's board API 202404 breaks vendor sepolicy (hal_hwcrypto)
+        default: bp2a
         type: choice
         options: [ap2a, ap3a, ap4a, bp1a, bp2a]
       branch:
@@ -132,10 +133,10 @@ jobs:
       # Lunch form differs: Android 16 (>= twrp-15) uses
       # <product>-<release>-<variant>; the official 14.1 line uses
       # <product>-<variant>. The build step picks by branch version and
-      # AndroidProducts.mk must match (currently twrp_marvel-ap2a-eng).
+      # AndroidProducts.mk must match (currently twrp_marvel-bp2a-eng).
       TWRP_BRANCH: ${{ inputs.branch || 'twrp-16.0' }}
       MANIFEST: ${{ inputs.manifest || 'https://github.com/TWRP-Test/platform_manifest_twrp_aosp.git' }}
-      RELEASE: ${{ inputs.release || 'ap2a' }}
+      RELEASE: ${{ inputs.release || 'bp2a' }}
       RETRIES: ${{ inputs.retries || '1' }}
       # 24GiB was carried over from the 64 GB ServerHive box and is actively
       # harmful here: GOMEMLIMIT is a *soft* limit for Go's GC, so setting it
@@ -694,6 +695,8 @@ jobs:
             release_assets/ramdisk-recovery.img
           name: TWRP for Moto Edge 70 Fusion (${{ env.RELEASE }} #${{ github.run_number }})
           tag_name: twrp-${{ github.run_id }}
+          # every push builds; none of these has been tested on a device yet
+          prerelease: true
           body: |
             TWRP recovery for **Motorola Edge 70 Fusion** (`marvel`, XT2605)
 

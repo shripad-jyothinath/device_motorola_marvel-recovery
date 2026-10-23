@@ -66,10 +66,11 @@ PRODUCT_PACKAGES += \
 # Motorola keeps ODM content inside vendor/odm
 TARGET_COPY_OUT_ODM := vendor/odm
 
-# API - stock marvel shipped Android 16
+# API - marvel shipped Android 16 (ro.product.first_api_level=36) on a vendor
+# frozen at Android 14 (ro.board.first_api_level=34, ro.vndk.version=34)
 PRODUCT_SHIPPING_API_LEVEL  := 36
 PRODUCT_TARGET_VNDK_VERSION := 36
-BOARD_SHIPPING_API_LEVEL    := 36
+BOARD_SHIPPING_API_LEVEL    := 34
 SHIPPING_API_LEVEL          := 36
 
 # Dynamic partitions
@@ -78,6 +79,17 @@ PRODUCT_BUILD_SUPER_PARTITION  := false
 
 # No micro SD card
 PRODUCT_CHARACTERISTICS := nosdcard
+
+# Recovery USB identity, from the stock recovery prop.default. The AOSP
+# defaults (18D1 / D001 / 4EE0) have no driver on a typical Windows host.
+# These must be VENDOR properties: base_vendor.mk sets them as optional
+# (`?=`) vendor properties, and only a value in the same partition replaces
+# those. Set in system.prop they landed earlier in the recovery prop.default
+# and init's last-definition-wins rule turned them back into 18D1.
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.recovery.usb.vid=22B8 \
+    ro.recovery.usb.adb.pid=2E81 \
+    ro.recovery.usb.fastboot.pid=2E80
 
 # Virtual A/B
 AB_OTA_UPDATER := true
@@ -142,44 +154,71 @@ TW_EXCLUDE_TWRPAPP      := true
 # ---------------------------------------------------------------------------
 # TWRP - kernel modules loaded at runtime from /vendor/lib/modules
 #
-# Dependency order from the marvel firmware dump modules.dep:
-#   mmi_annotate -> mmi_info -> mmi_relay -> panel_event_notifier -> sensors_class
-#     -> touchscreen_mmi -> goodix_brl_mmi
+# TWRP loads these through libmodprobe, so modules.dep pulls in the
+# dependencies (A171WEH.36-18 vendor_dlkm):
+#   goodix_brl_mmi -> touchscreen_mmi mmi_relay mmi_info mmi_annotate
+#                     panel_event_notifier sensors_class
+#   smcinvoke_dlkm -> qseecom_proxy + gunyah/mem_buf deps   (QSEECom: decryption)
+#   adsp_loader_dlkm -> q6/pdr/glink chain                  (ADSP boot)
 #
-# goodix_brl_mmi / goodix_fod_mmi / rbs_fod_mmi are listed in modules.blocklist
-# on the stock ROM, so they must be pulled in explicitly.
+# goodix_brl_mmi / goodix_fod_mmi / rbs_fod_mmi are in the stock
+# modules.blocklist, so they must be named here explicitly.
+# smcinvoke_dlkm / qseecom_proxy are not in vendor_boot's modules.load.recovery,
+# so nothing else loads them in recovery.
+#
+# Keep this ONE unquoted list: TWRP passes a value that starts and ends with a
+# quote through verbatim, so several "quoted" chunks would concatenate into one
+# C string and glue neighbouring module names together.
 # ---------------------------------------------------------------------------
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 TW_LOAD_VENDOR_BOOT_MODULES := true
-TW_LOAD_VENDOR_MODULES += \
-    "mmi_annotate.ko mmi_info.ko mmi_relay.ko panel_event_notifier.ko"
-TW_LOAD_VENDOR_MODULES += \
-    "sensors_class.ko touchscreen_mmi.ko goodix_brl_mmi.ko"
-TW_LOAD_VENDOR_MODULES += \
-    "goodix_fod_mmi.ko rbs_fod_mmi.ko mmi_stow.ko"
-TW_LOAD_VENDOR_MODULES += \
-    "qti_battery_charger.ko camera.ko adsp_loader_dlkm.ko"
+TW_LOAD_VENDOR_MODULES := \
+    goodix_brl_mmi.ko goodix_fod_mmi.ko rbs_fod_mmi.ko \
+    smcinvoke_dlkm.ko qseecom_proxy.ko \
+    qti_battery_charger.ko adsp_loader_dlkm.ko
 
 # ---------------------------------------------------------------------------
 # TWRP - paths
 # ---------------------------------------------------------------------------
-TW_CUSTOM_CPU_TEMP_PATH := "/sys/class/thermal/thermal_zone0/temp"
+# thermal_zone0 is pmxr2230-bcl-lvl0 (battery current limit, always 0);
+# zone 10 is cpuss-0. Zone numbering follows tsens registration - re-check
+# /sys/class/thermal/thermal_zone*/type in recovery if the reading looks wrong.
+TW_CUSTOM_CPU_TEMP_PATH := "/sys/class/thermal/thermal_zone10/temp"
 TW_BRIGHTNESS_PATH      := "/sys/class/backlight/panel0-backlight/brightness"
 
 # ---------------------------------------------------------------------------
 # TWRP - crypto / decryption
 #
-# marvel: QTI keymint/gatekeeper (QSEE) + StrongBox/Weaver/AuthSecret.
-# The vendor tree ships both NXP and Thales implementations; this device uses NXP.
-# (vendor/motorola/marvel/config.fs owns:
-#    AID_VENDOR_NXP_STRONGBOX / AID_VENDOR_NXP_WEAVER / AID_VENDOR_NXP_AUTHSECRET
-#    AID_VENDOR_SSGTZD)
+# Running on stock (XT2605-4): qseecomd, ssgtzd, qseecom@1.0-service,
+# keymint-service-qti, gatekeeper-service-qti. StrongBox SKUs ("dnes") add the
+# NXP keymint/weaver on the eSE, gated on ro.boot.strongbox_support.
+# The blobs under recovery/root/vendor are the full dependency closure of those
+# services, extracted from A171WEH.36-18 (see BLOBS.md).
 # ---------------------------------------------------------------------------
 TW_INCLUDE_CRYPTO               := true
 TW_INCLUDE_CRYPTO_FBE           := true
 TW_INCLUDE_FBE_METADATA_DECRYPT := true
 TW_INCLUDE_OMAPI                := true
 BOARD_USES_QCOM_FBE_DECRYPTION  := true
+
+# System-side libraries the vendor blobs link against that TWRP does not
+# already relink into the ramdisk with TW_INCLUDE_CRYPTO (libhardware,
+# libgatekeeper, libhardware_legacy and libxml2 it does).
+#   android.hardware.common-V2-ndk <- vendor.qti.hardware.qseecom-V1-ndk
+#   libdmabufheap                  <- qseecomd, libQSEEComAPI, qseecom service
+#   libnetutils, libssl            <- ssgtzd's dsi_netctrl/nicm chain
+#   libion                         <- libkeymasterdeviceutils, librecovery_updater
+#   libjsoncpp                     <- ssgtzd, libtaautoload
+MARVEL_RECOVERY_SYSTEM_LIBS := \
+    android.hardware.common-V2-ndk \
+    libdmabufheap \
+    libion \
+    libjsoncpp \
+    libnetutils \
+    libssl
+TARGET_RECOVERY_DEVICE_MODULES += $(MARVEL_RECOVERY_SYSTEM_LIBS)
+TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
+    $(foreach lib,$(MARVEL_RECOVERY_SYSTEM_LIBS),$(TARGET_OUT_SHARED_LIBRARIES)/$(lib).so)
 
 PLATFORM_VERSION             := 99.87.36
 PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)

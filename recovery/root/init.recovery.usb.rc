@@ -31,6 +31,7 @@ on init
     write /config/usb_gadget/g1/strings/0x409/product ${ro.product.model}
     mkdir /config/usb_gadget/g1/functions/ffs.adb
     mkdir /config/usb_gadget/g1/functions/ffs.fastboot
+    mkdir /config/usb_gadget/g1/functions/ffs.mtp
     write /config/usb_gadget/g1/os_desc/use 1
     write /config/usb_gadget/g1/os_desc/b_vendor_code 0x1
     write /config/usb_gadget/g1/os_desc/qw_sign "MSFT100"
@@ -66,5 +67,50 @@ on property:sys.usb.config=fastboot && property:sys.usb.ffs.ready=1 && property:
     write /config/usb_gadget/g1/idVendor 0x22b8
     write /config/usb_gadget/g1/idProduct 0x2e80
     symlink /config/usb_gadget/g1/functions/ffs.fastboot /config/usb_gadget/g1/configs/b.1/f1
+    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+    setprop sys.usb.state ${sys.usb.config}
+
+# ---------------------------------------------------------------------------
+# MTP. Not in the stock recovery (it has no MTP); added for TWRP, whose MTP
+# server talks to /dev/usb-ffs/mtp and sets sys.usb.ffs.mtp.ready=1 once its
+# descriptors are written. TWRP switches sys.usb.config none -> mtp,adb when
+# MTP is enabled and back to adb when it is disabled (TW_EXCLUDE_DEFAULT_USB_INIT
+# removes TWRP's own handlers, which only drive the legacy android_usb gadget).
+# Mount options and PIDs follow stock vendor/etc/init/hw/init.mmi.usb.rc:
+#   mtp 0x2e82, mtp,adb 0x2e76 (vid 0x22b8)
+# ---------------------------------------------------------------------------
+on fs
+    mkdir /dev/usb-ffs/mtp 0770 mtp mtp
+    mount functionfs mtp /dev/usb-ffs/mtp rmode=0770,fmode=0660,uid=1024,gid=1024,no_disconnect=1
+
+on property:sys.usb.config=none && property:sys.usb.configfs=1
+    write /config/usb_gadget/g1/UDC "none"
+    rm /config/usb_gadget/g1/configs/b.1/f1
+    rm /config/usb_gadget/g1/configs/b.1/f2
+    rm /config/usb_gadget/g1/configs/b.1/f3
+    setprop sys.usb.state ${sys.usb.config}
+
+on property:sys.usb.config=mtp,adb && property:sys.usb.ffs.mtp.ready=1 && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
+    write /config/usb_gadget/g1/UDC "none"
+    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "Motorola Recovery MTP+ADB"
+    rm /config/usb_gadget/g1/configs/b.1/f1
+    rm /config/usb_gadget/g1/configs/b.1/f2
+    rm /config/usb_gadget/g1/configs/b.1/f3
+    write /config/usb_gadget/g1/idVendor 0x22b8
+    write /config/usb_gadget/g1/idProduct 0x2e76
+    symlink /config/usb_gadget/g1/functions/ffs.mtp /config/usb_gadget/g1/configs/b.1/f1
+    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f2
+    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+    setprop sys.usb.state ${sys.usb.config}
+
+on property:sys.usb.config=mtp && property:sys.usb.ffs.mtp.ready=1 && property:sys.usb.configfs=1
+    write /config/usb_gadget/g1/UDC "none"
+    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "Motorola Recovery MTP"
+    rm /config/usb_gadget/g1/configs/b.1/f1
+    rm /config/usb_gadget/g1/configs/b.1/f2
+    rm /config/usb_gadget/g1/configs/b.1/f3
+    write /config/usb_gadget/g1/idVendor 0x22b8
+    write /config/usb_gadget/g1/idProduct 0x2e82
+    symlink /config/usb_gadget/g1/functions/ffs.mtp /config/usb_gadget/g1/configs/b.1/f1
     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
     setprop sys.usb.state ${sys.usb.config}

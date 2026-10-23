@@ -1,0 +1,17 @@
+# Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+#
+# Derived from the stock recovery ramdisk of A171WEH.36-18
+# (system/etc/init/android.hardware.boot-service.qti.recovery.rc).
+# The binary and its libraries (libboot_control_qti, librecovery_updater,
+# android.hardware.boot@1.x / boot-V1-ndk) are bundled under /vendor so they
+# cannot collide with anything TWRP builds into /system. The binary dlopen()s
+# libboot_control_qti.so by name, hence the LD_LIBRARY_PATH.
+
+service vendor.boot-qti /vendor/bin/hw/android.hardware.boot-service.qti.recovery
+    class early_hal
+    user root
+    group root
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/system/lib64
+    seclabel u:r:recovery:s0
+    interface aidl android.hardware.boot.IBootControl/default

@@ -1,98 +1,70 @@
-# Blobs to copy from the stock dump
+# Bundled vendor blobs
 
-Extracted and verified against the stock vendor partition
-(`DumprX` release `marvel-W2WE36.56-32-ST3.2-390dea`, asset `marvel-vendor.tar.zst`).
+Everything under `recovery/root/vendor/` comes from the stock **A171WEH.36-18** firmware
+(Android 17, `marvel_g-user 17 A171WEH.36-18 ccd1da-3f1b2`, vendor `UWE34HV-A171-ST4`,
+security patch 2026-08-01). That is the package Motorola's Rescue and Smart Assistant
+serves for XT2605 retail (cid 50), and the build the phone runs after the OTA.
 
-## Where they go
+The previous set (46 files from `W2WE36.56-32-ST3.2`) was replaced wholesale: it was
+from an older TrustZone build and was missing most of the libraries the services
+actually link against.
 
-In this tree everything lives under `recovery/root/`, mirroring the device layout:
+## How the set was chosen
 
-| dump path | tree path |
+The list is the **dependency closure** (`DT_NEEDED`, followed recursively inside
+`/vendor`) of the services stock runs for decryption, plus the libraries those
+services `dlopen()` by name:
+
+| service | binary | needed on |
+|---|---|---|
+| `vendor.qseecomd` | `bin/qseecomd` (+ dlopen: librpmb, libssd, libdrmfs, libdrmtime, libgpt, libops, libqisl, libspl, libGPreqcancel, libtaautoload) | every unit |
+| `qseecom-service` | `bin/hw/vendor.qti.hardware.qseecom@1.0-service` | every unit |
+| `vendor.ssgtzd` | `bin/ssgtzd` | every unit |
+| `vendor.keymint-qti` | `bin/hw/android.hardware.security.keymint-service-qti` | every unit |
+| `vendor.gatekeeper_default` | `bin/hw/android.hardware.gatekeeper-service-qti` (+ dlopen `hw/libqtigatekeeper.so`) | every unit |
+| `vendor.keymint-strongbox` | `bin/hw/android.hardware.security.keymint-service.strongbox-nxp` | StrongBox SKUs only |
+| `vendor.weaver_nxp` | `bin/hw/android.hardware.weaver-service.nxp-qti` | StrongBox SKUs only |
+| `vendor.secure_element` | `bin/hw/android.hardware.secure_element-service.qti` | StrongBox SKUs only |
+| `vendor.boot-qti` | `bin/hw/android.hardware.boot-service.qti.recovery` (+ dlopen `libboot_control_qti.so`) | every unit (A/B slot control) |
+
+The boot-control HAL and its five libraries come from the **stock recovery ramdisk**
+of the same package (`system/bin/hw/…`, `system/lib64/…`), relocated under `/vendor`
+so they cannot collide with anything TWRP builds into `/system`.
+
+On a running XT2605-4 ("dn" SKU), `ps -A` shows exactly qseecomd, ssgtzd,
+qseecom@1.0-service, keymint-service-qti, gatekeeper-service-qti and boot-service.qti;
+`ro.vendor.hw.strongbox=false` and no weaver is registered.
+
+## What /system must provide
+
+After bundling, every remaining `DT_NEEDED` entry is a system library:
+
+- already in TWRP's ramdisk: libc, libm, libdl, libc++, libbase, libutils, libcutils,
+  liblog, libbinder, libbinder_ndk, libhidlbase, libcrypto, libz
+- relinked by TWRP itself with `TW_INCLUDE_CRYPTO`: libhardware, libgatekeeper,
+  libhardware_legacy, libxml2
+- added by this tree (`MARVEL_RECOVERY_SYSTEM_LIBS` in `device.mk`):
+  android.hardware.common-V2-ndk, libdmabufheap, libion, libjsoncpp, libnetutils, libssl
+
+## VINTF
+
+| fragment | source |
 |---|---|
-| `vendor/bin/...` | `recovery/root/vendor/bin/...` |
-| `vendor/lib64/...` | `recovery/root/vendor/lib64/...` |
-| `vendor/etc/init/*.rc` | `recovery/root/vendor/etc/init/*.rc` |
-| `vendor/etc/vintf/manifest/*.xml` | `recovery/root/vendor/etc/vintf/manifest/*.xml` |
-| `vendor/etc/ueventd.rc` | `recovery/root/vendor/etc/ueventd.rc` |
-| `vendor/odm/etc/ueventd.rc` | `recovery/root/vendor/odm/etc/ueventd.rc` |
+| `android.hardware.security.keymint-service-qti.xml` | stock `vendor/etc/vintf/manifest/` |
+| `vendor.qti.hardware.qseecom@1.0-service.xml` | stock `vendor/etc/vintf/manifest/` |
+| `android.hardware.secure_element.xml` (SIM1/SIM2) | stock `vendor/etc/vintf/manifest/` |
+| `android.hardware.gatekeeper-service-qti.xml` | written here from the `IGatekeeper/default` entry in stock `manifest_volcano.xml` |
+| `android.hardware.security.strongbox-nxp.xml` | written here from stock `vendor/odm/etc/vintf/manifest_dnes.xml` |
+| `android.hardware.boot-service.qti.xml` | stock recovery ramdisk `system/etc/vintf/manifest/boot-service.qti.xml` |
 
-## Crypto stack (verified present in the dump)
+## Other files
 
-### `vendor/bin/hw/`
-```
-android.hardware.security.keymint-service-qti              45616   TZ keymint (always present)
-android.hardware.security.keymint-service.strongbox-nxp    37728   NXP KM300 keymint (SKU-gated)
-android.hardware.weaver-service.nxp-qti                    29304   NXP weaver      (SKU-gated)
-android.hardware.gatekeeper-service-qti                    15056
-android.hardware.secure_element-service.qti                66928
-vendor.qti.hardware.qseecom@1.0-service                    36808
-android.hardware.keymaster@4.0-service-qti                 32288   legacy
-```
-
-### `vendor/bin/`
-```
-qseecomd                                                   45776
-ssgtzd                                                    172192
-```
-
-### `vendor/lib64/`
-```
-libjc_keymint-nxp.so                    386216   NXP keymint backend
-libjc_keymint_transport_nxp.so          109440
-ese_weaver.so                            57664
-libkeymint.so                           147752
-libkeymint_crypto.so                    102400
-lib_android_keymaster_keymint_utils.so   24968
-libqtikeymint.so                        304464
-libQSEEComAPI.so                         70568
-vendor.qti.hardware.qseecom@1.0.so      166344
-vendor.qti.hardware.qseecom-V1-ndk.so    93504
-hw/vendor.qti.hardware.qseecom@1.0-impl.so  70800
-hw/libqtigatekeeper.so                   70720
-android.hardware.security.keymint-V1-ndk.so  128472
-android.hardware.security.keymint-V2-ndk.so  136920
-android.hardware.security.keymint-V3-ndk.so  136920
-android.hardware.weaver-V2-ndk.so        50592
-android.hardware.gatekeeper-V1-ndk.so    50720
-android.hardware.gatekeeper@1.0.so      123424
-android.hardware.secure_element-V1-ndk.so  72256
-android.hardware.secure_element@1.0.so  195904
-android.hardware.authsecret@1.0.so      109128
-android.hardware.keymaster@3.0.so       186440
-android.hardware.keymaster@4.0.so       214000
-android.hardware.keymaster@4.1.so       151192
-android.hardware.keymaster-V3-ndk.so     19712
-android.hardware.keymaster-V4-ndk.so     19712
-```
-
-### `vendor/etc/vintf/manifest/`
-```
-android.hardware.security.keymint-service-qti.xml
-android.hardware.secure_element.xml
-vendor.qti.hardware.qseecom@1.0-service.xml
-```
-
-## Other
-
-- `vendor/etc/ueventd.rc` (35645 B) and `vendor/odm/etc/ueventd.rc` (5334 B) — required for the QTI
-  device nodes and `firmware_directories`.
-- `vendor/firmware_mnt/image/*` — **not in the vendor tar** (it is the modem partition mounted at
-  `/vendor/firmware_mnt`). The recovery init mounts `modem` itself; the `adsp.mdt`/`adsp.b*` files
-  it waits for come from there.
-- `system_dlkm/lib/modules/*` and `vendor_dlkm/lib/modules/*` — the kernel modules. Recovery loads
-  them at runtime via `TW_LOAD_VENDOR_MODULES` (see `device.mk`), so nothing needs bundling.
-
-## Found by extraction (summary)
-
-`dump_assets/vendor_extract/` after running the extractor:
-
-```
-bin/hw/  (7 binaries)
-bin/     (qseecomd, ssgtzd)
-lib64/   (26 libraries + 2 under hw/)
-etc/init/ (8 .rc files — all service definitions used by init.recovery.encryption.rc)
-etc/vintf/manifest/ (3 xml)
-etc/ueventd.rc, odm/etc/ueventd.rc
-```
-
-**46 files, 3.56 MB.**
+- `vendor/etc/ueventd.rc`, `vendor/odm/etc/ueventd.rc`: stock, for the QTI device
+  nodes and `firmware_directories`.
+- `vendor/firmware/*goodix*`: the touch controller's firmware/config for all three
+  panel vendors (boe/csot/tm), so the Goodix driver finds them while `/vendor` is not
+  mounted.
+- `vendor/firmware_mnt/image/*` is **not** bundled: it is the `modem` partition (ext4),
+  which `init.recovery.qcom.rc` mounts itself.
+- Kernel modules are **not** bundled: TWRP loads them from `vendor_dlkm` at runtime
+  (`TW_LOAD_VENDOR_MODULES` in `device.mk`).

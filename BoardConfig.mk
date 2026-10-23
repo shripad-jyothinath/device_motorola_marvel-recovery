@@ -74,12 +74,8 @@ BOARD_AVB_RECOVERY_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
 BOARD_AVB_RECOVERY_ALGORITHM := SHA256_RSA4096
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
-
-BOARD_AVB_VBMETA_SYSTEM := system
-BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
-BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := SHA256_RSA2048
-BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
-BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 1
+# No vbmeta_system chain here: a recovery-only build never produces it, and it
+# would claim rollback index location 1 as well, colliding with recovery's.
 
 # Build errors we knowingly accept
 ALLOW_MISSING_DEPENDENCIES := true
@@ -118,16 +114,14 @@ $(foreach p, $(BOARD_PARTITION_LIST), $(eval BOARD_$(p)IMAGE_FILE_SYSTEM_TYPE ?=
 $(foreach p, $(BOARD_PARTITION_LIST), $(eval TARGET_COPY_OUT_$(p) := $(call to-lower, $(p))))
 $(foreach p, $(filter-out SYSTEM, $(BOARD_PARTITION_LIST)), $(eval BOARD_USES_$(p)IMAGE := true))
 
-# Marvel's shipped layout uses ext4 for product/vendor_dlkm/system_dlkm
-BOARD_PRODUCTIMAGE_FILE_SYSTEM_TYPE     := ext4
-BOARD_VENDOR_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
-BOARD_SYSTEM_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
+# Every logical partition on stock is erofs (checked in the A171WEH.36-18 super
+# image and on a running phone), so the erofs default above already matches.
 TARGET_COPY_OUT_ODM := vendor/odm
 
-# Display (same 1220x2712 panel family as amethyst)
-TARGET_SCREEN_HEIGHT  := 2712
-TARGET_SCREEN_WIDTH   := 1220
-TARGET_SCREEN_DENSITY := 440
+# Display: 1272x2772 @ 450 dpi (`wm size` / `wm density` on the device)
+TARGET_SCREEN_HEIGHT  := 2772
+TARGET_SCREEN_WIDTH   := 1272
+TARGET_SCREEN_DENSITY := 450
 
 # Filesystems
 TARGET_USERIMAGES_USE_EXT4    := true
@@ -136,19 +130,16 @@ TARGET_USES_MKE2FS            := true
 
 # Recovery
 TARGET_SYSTEM_PROP := $(DEVICE_PATH)/system.prop
-TARGET_ODM_PROP    += $(DEVICE_PATH)/odm.prop
-TARGET_PRODUCT_PROP += $(DEVICE_PATH)/product.prop
-TARGET_VENDOR_PROP += $(DEVICE_PATH)/vendor.prop
-TARGET_SYSTEM_EXT_PROP += $(DEVICE_PATH)/system_ext.prop
 
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab
 TARGET_BOARD_INFO_FILE := $(DEVICE_PATH)/board-info.txt
 
 TARGET_USE_CUSTOM_LUN_FILE_PATH := /config/usb_gadget/g1/functions/mass_storage.0/lun.%d/file
 
-# USB: we ship the stock-derived init.recovery.usb.rc, so TWRP's default one
-# must not fight with it. The stock unit forces the QTI dwc3 into peripheral
-# mode and uses Motorola VID/PIDs (0x22B8 / 0x2E81 adb / 0x2E80 fastboot).
+# USB: we ship our own configfs init.recovery.usb.rc (stock-derived, plus MTP).
+# TWRP's default one only drives the legacy android_usb gadget, which this
+# kernel does not have. The stock unit forces the QTI dwc3 into peripheral mode
+# and uses Motorola VID/PIDs (0x22B8 / 0x2E81 adb / 0x2E80 fastboot).
 TW_EXCLUDE_DEFAULT_USB_INIT := true
 
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
@@ -167,4 +158,3 @@ TARGET_USES_LOGD := true
 -include device/qcom/sepolicy_vndr/SEPolicy.mk
 -include device/lineage/sepolicy/libperfmgr/sepolicy.mk
 -include hardware/motorola/sepolicy/qti/SEPolicy.mk
-BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/vendor

@@ -24,7 +24,10 @@ PRODUCT_MODEL := motorola edge 70 fusion
 PRODUCT_MANUFACTURER := motorola
 PRODUCT_NAME := twrp_$(PRODUCT_DEVICE)
 
+# Target firmware: A171WEH.36-18 (Android 17, the build the blobs come from).
+# Values from that package's info.txt; the OTA for retin units may report
+# product marvel_gh instead of marvel_g - update after checking getprop.
 PRODUCT_BUILD_PROP_OVERRIDES += \
     DeviceName=marvel \
-    BuildDesc="marvel-user 16 W2WE6.56-98-19 421c6f release-keys" \
-    BuildFingerprint=motorola/marvel_gh/marvel:16/W2WE6.56-98-19/421c6f-2d7396:user/release-keys
+    BuildDesc="marvel_g-user 17 A171WEH.36-18 ccd1da-3f1b2 release-keys" \
+    BuildFingerprint=motorola/marvel_g/marvel:17/A171WEH.36-18/ccd1da-3f1b2:user/release-keys
