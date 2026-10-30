@@ -10,12 +10,11 @@ on early-init
     loglevel 7
     write /sys/fs/selinux/enforce 0
 
-on early-init
-    # UFS tuning (same HC as amethyst - confirmed for SM7635)
-    wait /sys/bus/platform/devices/1d84000.ufshc
-    write /sys/bus/platform/devices/1d84000.ufshc/auto_hibern8 0
-    write /sys/bus/platform/devices/1d84000.ufshc/clkgate_enable 0
-    write /sys/bus/platform/devices/1d84000.ufshc/enable_wb_buf_flush 0
+# NOTE: do NOT write 1d84000.ufshc/auto_hibern8 (or the clkgate /
+# wb_buf_flush nodes). On marvel's 6.1.157 kernel the store handler oopses in
+# ufshcd_auto_hibern8_update -> auto_hibern8_store, and panic_on_oops turns
+# that into a fatal exception and an Apps watchdog reset. Stock recovery does
+# not touch these nodes.
 
 on early-init
     # cpusets for task profiles
