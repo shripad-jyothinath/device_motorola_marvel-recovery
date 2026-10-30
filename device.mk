@@ -135,8 +135,10 @@ TW_USE_TOOLBOX          := true
 TW_INCLUDE_NTFS_3G      := true
 TW_INCLUDE_RESETPROP    := true
 TW_INCLUDE_LIBRESETPROP := true
-TW_MAX_BRIGHTNESS       := 2047
-TW_DEFAULT_BRIGHTNESS   := 1200
+# panel0-backlight max_brightness=16153 on marvel (read from the running
+# kernel in recovery). 2047 is not the hardware max and caps TWRP at ~12%.
+TW_MAX_BRIGHTNESS       := 16153
+TW_DEFAULT_BRIGHTNESS   := 8000
 TW_EXTRA_LANGUAGES      := true
 TW_EXCLUDE_APEX         := true
 TW_INCLUDE_FASTBOOTD    := true
@@ -220,7 +222,7 @@ TARGET_RECOVERY_DEVICE_MODULES += $(MARVEL_RECOVERY_SYSTEM_LIBS)
 TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
     $(foreach lib,$(MARVEL_RECOVERY_SYSTEM_LIBS),$(TARGET_OUT_SHARED_LIBRARIES)/$(lib).so)
 
-# Exactly the installed OS: A171WEH.36-18 is Android 17, patch 2026-08-01
+# Exactly the installed OS: A171WEH.36-31 is Android 17, patch 2026-09-01
 # (system and vendor). These go into the recovery image header, which the
 # bootloader hands to the KeyMint TA as the running OS version/patch level.
 # Do NOT use the usual 99.87.36 / 2127-12-31 spoof: a TA told the OS is newer
@@ -232,6 +234,6 @@ TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
 PLATFORM_VERSION             := 17
 PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
 
-PLATFORM_SECURITY_PATCH := 2026-08-01
+PLATFORM_SECURITY_PATCH := 2026-09-01
 VENDOR_SECURITY_PATCH   := $(PLATFORM_SECURITY_PATCH)
 BOOT_SECURITY_PATCH     := $(PLATFORM_SECURITY_PATCH)

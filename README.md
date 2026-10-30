@@ -15,7 +15,7 @@ which is the same SoC and the same partition scheme.
 | Recovery layout | dynamic `super`, A/B, **dedicated recovery partition, no kernel** | same |
 | Display | 1272×2772 @ 450 dpi | 1220×2712 @ 440 |
 
-**Target firmware: A171WEH.36-18** (Android 17, vendor `UWE34HV-A171-ST4`, 2026-08-01 patch).
+**Target firmware: A171WEH.36-31** (Android 17, vendor `UWE34HV-A171-ST4`, 2026-09-01 patch).
 Every blob, the fstab, the init triggers and the prebuilts come from that build. Update the
 phone to it with the normal OTA before flashing this recovery. Do **not** use Rescue and
 Smart Assistant's "Rescue" on a phone you care about: it wipes userdata.
@@ -40,11 +40,11 @@ mka adbd recoveryimage
 
 > **Why no version spoof.** Most TWRP trees set `PLATFORM_VERSION := 99.87.36` and
 > `PLATFORM_SECURITY_PATCH := 2127-12-31`. Here they are the installed OS's exact values
-> (17 / 2026-08-01), because QTI KeyMint takes the OS version/patch level from the recovery
+> (17 / 2026-09-01), because QTI KeyMint takes the OS version/patch level from the recovery
 > image header and from `ro.build.version.*`. Told the OS is newer than its keys, KeyMint
 > asks for them to be upgraded; TWRP's `vold` keeps such upgrades in memory only, but
 > `keystore2` (stock AOSP) writes them to `/data/misc/keystore`. An upgraded key bound to
-> 2127 is rejected by Android on 2026-08-01, which can lock userdata. With equal levels
+> 2127 is rejected by Android on 2026-09-01, which can lock userdata. With equal levels
 > nothing is upgraded. After an OTA with a newer patch, bump the values to match; until
 > then decryption simply fails, without writing anything.
 
@@ -70,12 +70,12 @@ are harmless no-ops. `fox_marvel.mk` only sets `OF_*` variables, which a pure TW
 | partition sizes | `recovery 134217728`, `dtbo 34603008`, `super 21474836480`, group `mot_dp_group` / `21470642176` |
 | dynamic list | **no `odm`** (marvel keeps ODM content in `vendor/odm`) |
 | kernel modules | one unquoted `TW_LOAD_VENDOR_MODULES` list: `goodix_brl_mmi` (+ `goodix_fod_mmi`, `rbs_fod_mmi`; all three are blocklisted on stock), `smcinvoke_dlkm` + `qseecom_proxy` (QSEECom, needed for decryption and not in vendor_boot's `modules.load.recovery`), `qti_battery_charger`, `adsp_loader_dlkm`. libmodprobe resolves the MMI chain (`touchscreen_mmi`, `mmi_*`, `panel_event_notifier`, `sensors_class`) from `modules.dep`. |
-| crypto services | QTI stack on every unit: `qseecomd`, `qseecom-service`, `ssgtzd`, `keymint-qti`, `gatekeeper_default`. **NXP** StrongBox/weaver/secure_element only on `dnes` SKUs, gated on `ro.boot.strongbox_support`. Blobs are the full dependency closure from A171WEH.36-18 (see `BLOBS.md`). |
+| crypto services | QTI stack on every unit: `qseecomd`, `qseecom-service`, `ssgtzd`, `keymint-qti`, `gatekeeper_default`. **NXP** StrongBox/weaver/secure_element only on `dnes` SKUs, gated on `ro.boot.strongbox_support`. Blobs are the full dependency closure from A171WEH.36-18 (see `BLOBS.md`); the crypto VINTF manifests are from 36-31. |
 | crypto rc | `init.recovery.encryption.rc`: firmware mounted → `vendor.qseecomd`, `qseecom-service`, `vendor.ssgtzd`; listeners registered → `vendor.keymint-qti`, `vendor.gatekeeper_default`; StrongBox SKUs additionally `vendor.secure_element`, `vendor.keymint-strongbox`, `vendor.weaver_nxp` |
 | fstab | dropped `odm`; both `erofs`+`ext4` for every logical partition; `/metadata` and `/data` exactly as the OS's `vendor/etc/fstab.qcom`: **`fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized+wrappedkey_v0`**, **`metadata_encryption=aes-256-xts:wrappedkey_v0`**, `inlinecrypt` mount option; `modem` is **ext4** |
 | USB | `init.recovery.usb.rc` from stock: forces the dwc3 into peripheral mode and uses Motorola VID/PIDs (`22B8` / adb `2E81` / fastboot `2E80`), plus MTP handlers this tree adds (`mtp` `2E82`, `mtp,adb` `2E76`, from stock `init.mmi.usb.rc`); `TW_EXCLUDE_DEFAULT_USB_INIT := true` |
 | boot control | stock recovery's AIDL `android.hardware.boot-service.qti.recovery` + `libboot_control_qti`, bundled under `/vendor` |
-| UI | `TW_FRAMERATE 120`, `TW_MAX_BRIGHTNESS 2047`, 1272×2772 @ 450, `OF_SCREEN_H 2772`, `OF_MAINTAINER Shripad` |
+| UI | `TW_FRAMERATE 120`, `TW_MAX_BRIGHTNESS 16153`, 1272×2772 @ 450, `OF_SCREEN_H 2772`, `OF_MAINTAINER Shripad` |
 
 The QTI part of the decryption stack (keymint + gatekeeper on QSEE, `qseecomd`, `ssgtzd`)
 is the same on both devices, so `init.recovery.encryption.rc` transfers almost verbatim.
@@ -105,7 +105,7 @@ a running phone — on it, decryption is the TZ path alone.
 
 ## What's included
 
-**Prebuilts** (from A171WEH.36-18). Recovery is built without a kernel, so these only feed
+**Prebuilts** (kernel and vendor blobs from A171WEH.36-18; dtbo/dtb from 36-31). Recovery is built without a kernel, so these only feed
 the build plumbing; the device boots recovery with the kernel from its `boot` partition.
 
 | file | size | note |
@@ -158,7 +158,7 @@ Both are now in the tree:
 
 ## The stock recovery ramdisk (reference for layout, NOT for decryption)
 
-`recovery.img` of A171WEH.36-18 (the earlier Android 16 image had the same shape):
+`recovery.img` of A171WEH.36-31 (the earlier Android 16 image had the same shape):
 
 ```
 header_version=4  kernel_size=0  ramdisk_size=19245698   -> ramdisk-only, NO kernel
@@ -388,14 +388,14 @@ recovery image, and `fastboot boot` of a kernel-less image fails with "No OS cou
 (booting a kernel-present image just boots the installed OS). The only way to test is to flash the
 recovery partition and enter recovery mode from the bootloader menu.
 
-## Status — builds, does not boot yet
+## Status — boots; decryption still fails
 
 `mka recoveryimage` succeeds on `twrp-16.0` / `bp2a` (ServerHive, with its RBE profile). The image
-unpacks to header v4, `kernel_size=0`, `os_version=17.0.0`, `os_patch_level=2026-08`, AVB footer,
-and every tree file. **First device test (XT2605-4 on A171WEH.36-18): it does not boot.** The
-kernel starts and `init` reboots to the bootloader (`fastboot getvar reason` →
-`Reboot mode set to fastboot`), cause not yet known. Restoring stock recovery puts the phone back
-exactly as before. Two things learned from the test:
+unpacks to header v4, `kernel_size=0`, `os_version=17.0.0`, `os_patch_level=2026-09`, AVB footer,
+and every tree file. **TWRP now boots after removing the early-init UFS writes.** The first
+attempts reset after the TWRP logo; kpan showed `ufshcd_auto_hibern8_update()` panicking and the
+watchdog reset (see the UFS note in `init.recovery.qcom.rc`). Decryption still fails: see
+`DECRYPTION_REPORT.md`. Two things learned from the test:
 
 - start TWRP from Android with `adb reboot recovery`. `fastboot reboot recovery` makes this
   bootloader retry recovery on every boot, so a failing recovery loops until stock is restored;
@@ -405,9 +405,10 @@ Open items:
 
 | item | risk |
 |---|---|
-| boot failure | `init` dies early; needs the failed boot's kernel log (pstore / bug report `LAST KMSG`) |
+| boot failure | **resolved**: the early-init UFS `auto_hibern8`/`clkgate` writes panic in `ufshcd_auto_hibern8_update`; removed from `init.recovery.qcom.rc` and `init.recovery.encryption.rc`. |
+| decryption | TWRP prompts for the credential but metadata decryption fails; gatekeeper/qseecom SIGABRT; see `DECRYPTION_REPORT.md`. |
 | release config | must be `bp2a`; `ap2a` fails in `vendor_sepolicy.cil` (`hal_hwcrypto_server` not declared below board API 202504) |
-| Android 17 data on a `twrp-16.0` base | OS version (17) and patch (2026-08-01) match exactly, so KeyMint has no reason to upgrade keys, but vold/keystore2 are Android 16 code (SDK 36 vs the OS's 37). Whether they read Android 17's on-disk key and keystore formats is untested; a mismatch should make decryption fail, not write |
+| Android 17 data on a `twrp-16.0` base | OS version (17) and patch (2026-09-01) match, but vold/keystore2 are Android 16 (SDK 36 vs 37). Tested with a PIN; decryption still fails (keymaster/metadata); see `DECRYPTION_REPORT.md`. |
 | `TARGET_CPU_VARIANT_RUNTIME := kryo300` | copied from amethyst (same SoC); ignored or an error depending on the Soong in your manifest |
 | bundled `/vendor/**` blobs | when the real `vendor` partition is mounted over `/vendor` (TWRP does so briefly to load modules), the bundled copies are shadowed while it is mounted |
 | `TW_CUSTOM_CPU_TEMP_PATH` | `thermal_zone10` is `cpuss-0` on Android; recovery registers fewer zones, so the index may differ |
