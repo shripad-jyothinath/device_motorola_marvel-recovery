@@ -62,7 +62,7 @@ BOARD_PREBUILT_DTBOIMAGE     := $(DEVICE_PATH)/prebuilt/dtbo.img
 # AVB
 BOARD_AVB_ENABLE := true
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
-BOARD_AVB_ROLLBACK_INDEX := 1
+BOARD_AVB_ROLLBACK_INDEX := 9
 
 # Recovery image signing. Mirrors android_device_motorola_genevn - the closest
 # official tree in existence for this shape (Motorola + kernel-less recovery +
