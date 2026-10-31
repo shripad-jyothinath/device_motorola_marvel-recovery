@@ -28,6 +28,7 @@ BOARD_USES_QCOM_HARDWARE      := true
 # Kernel / recovery image
 TARGET_PREBUILT_KERNEL        := $(DEVICE_PATH)/prebuilt/kernel
 TARGET_PREBUILT_KERNEL_HEADERS := $(DEVICE_PATH)/prebuilt/kernel-headers.tar.gz
+TARGET_KERNEL_VERSION         := 6.1
 TARGET_KERNEL_ARCH            := $(TARGET_ARCH)
 TARGET_KERNEL_HEADER_ARCH     := $(TARGET_ARCH)
 
