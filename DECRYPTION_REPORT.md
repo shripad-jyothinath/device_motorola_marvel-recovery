@@ -2,9 +2,51 @@
 
 ## Summary
 
-Custom TWRP 3.7.1_16-0 boots on a Motorola "Marvel" (A171WEH, Android 17, patch 2026-09-01), but cannot decrypt userdata. Baseline/full-VINTF logs show `keymaster_ver` empty and `Unable to decrypt metadata encryption`; the QTI gatekeeper/qseecom services abort because their VINTF entries are missing. The latest minimal-manifest image (fixed4) reaches the **Decrypt Data password prompt** (`keymaster_ver=4.x`, set from the `keymaster_ver` prop because the manifest lookup fails), but decryption still fails for both a pattern and a temporary PIN: `Unable to decrypt metadata encryption`, and gatekeeper/qseecom remain in `restarting`. Runtime `/vendor/etc/vintf` contains only `manifest/` and `manifest.xml`, while `ro.board.platform=volcano`; `manifest_volcano.xml` is missing and the servicemanager does not use `manifest.xml`.
+**Resolved.** The fixed9 recovery decrypts userdata with the device PIN. The blocker was the **recovery VINTF manifest path**, not KeyMint and not the 36-18 blobs. Recovery's `servicemanager` uses `android::vintf::VintfObjectRecovery`, which reads **`/system/etc/vintf/manifest.xml`** (and `/vendor/etc/vintf/manifest.xml`), not the platform `manifest_volcano.xml` under `/vendor`. With no `/system/etc/vintf/manifest.xml`, `qseecom-service`, `vendor.gatekeeper_default`, `vendor.keymint-qti` and `vendor.boot-qti` abort in servicemanager, so the credential and metadata keys cannot be used.
 
-The device is **KeyMint-only** (`android.hardware.security.keymint-service-qti` AIDL v3, no `android.hardware.keymaster` service). TWRP's version lookup only searches for `android.hardware.keymaster`.
+The working image ships the stock **A171WEH.36-31** `manifest_volcano.xml` plus the crypto HALs as **both** `/system/etc/vintf/manifest.xml` and `/vendor/etc/vintf/{manifest.xml,manifest_volcano.xml}`, with the stock `compatibility_matrix.xml`, and uses a private `adb_recovery` USB config. It does **not** bind `/tmp/vintf` over `/vendor/etc/vintf`, and it does not need a real keymaster service: `keymaster_ver=4.x` is set from the prop and the TZ KeyMint path decrypts the metadata key.
+
+Evidence from `fixed9_success.log`:
+
+```
+User 0 Decrypted Successfully!
+Data successfully decrypted
+New storage path after decryption: /data/media/0
+```
+
+`/data` mounts as `/dev/block/dm-12` (f2fs); `/metadata` mounts as `/dev/block/sde9`.
+
+The device is **KeyMint-only** (`android.hardware.security.keymint-service-qti` AIDL v3, no `android.hardware.keymaster` service). TWRP's version lookup only searches for `android.hardware.keymaster`, which is why `keymaster_ver` falls back to the prop; that fallback is sufficient once the crypto services are registered.
+
+## Final working configuration (fixed9)
+
+- `/system/etc/vintf/manifest.xml` — merged stock 36-31 platform manifest + `vendor.qti.hardware.qseecom`, `android.hardware.security.keymint`, `android.hardware.security.sharedsecret`, `android.hardware.security.secureclock`, `android.hardware.boot`, `android.hardware.keymaster` 4.0 (4799 bytes).
+- `/vendor/etc/vintf/manifest.xml` and `/vendor/etc/vintf/manifest_volcano.xml` — same 4799-byte manifest.
+- `/vendor/etc/vintf/compatibility_matrix.xml` — stock 36-31 (2071 bytes).
+- `init.recovery.qcom.rc` — no `/tmp/vintf` copy or bind; `setprop twrp.firmware.mounted true` after firmware/modules load.
+- `init.recovery.usb.rc` / `init.recovery.qcom.rc` — private `adb_recovery` USB config, which stops system `init.rc` from fighting over `adb`.
+- `keymaster_ver=4.x` from `prop.default`.
+- No fake keymaster service, no full stock VINTF set, no `/vendor` bind.
+
+Runtime proof:
+
+```
+init.svc.qseecom-service=running
+init.svc.vendor.gatekeeper_default=running
+init.svc.vendor.keymint-qti=running
+init.svc.vendor.boot-qti=running
+```
+
+```
+servicemanager: Found android.hardware.boot.IBootControl/default in recovery VINTF manifest.
+servicemanager: Found android.hardware.gatekeeper.IGatekeeper/default in recovery VINTF manifest.
+servicemanager: Found android.hardware.security.keymint.IKeyMintDevice/default in recovery VINTF manifest.
+servicemanager: Found android.hardware.security.secureclock.ISecureClock/default in recovery VINTF manifest.
+servicemanager: Found android.hardware.security.sharedsecret.ISharedSecret/default in recovery VINTF manifest.
+servicemanager: Found android.system.keystore2.IKeystoreService/default in recovery VINTF manifest.
+```
+
+This document keeps the earlier failure history below for reference; the configuration above is the one that works.
 
 ## Device / firmware
 

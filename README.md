@@ -388,14 +388,17 @@ recovery image, and `fastboot boot` of a kernel-less image fails with "No OS cou
 (booting a kernel-present image just boots the installed OS). The only way to test is to flash the
 recovery partition and enter recovery mode from the bootloader menu.
 
-## Status — boots; decryption still fails
+## Status — boots; data decryption works
 
 `mka recoveryimage` succeeds on `twrp-16.0` / `bp2a` (ServerHive, with its RBE profile). The image
 unpacks to header v4, `kernel_size=0`, `os_version=17.0.0`, `os_patch_level=2026-09`, AVB footer,
-and every tree file. **TWRP now boots after removing the early-init UFS writes.** The first
-attempts reset after the TWRP logo; kpan showed `ufshcd_auto_hibern8_update()` panicking and the
-watchdog reset (see the UFS note in `init.recovery.qcom.rc`). Decryption still fails: see
-`DECRYPTION_REPORT.md`. Two things learned from the test:
+and every tree file. **TWRP boots after removing the early-init UFS writes**, and the fixed9
+ramdisk **decrypts userdata with the device PIN**. The fix is the recovery VINTF path: recovery's
+`servicemanager` reads `/system/etc/vintf/manifest.xml` (not the platform manifest under
+`/vendor`). The image now ships the merged stock 36-31 manifest there and in
+`/vendor/etc/vintf/{manifest.xml,manifest_volcano.xml}`, plus `compatibility_matrix.xml`; the
+QTI qseecom/gatekeeper/keymint/boot services stay running and `/data` mounts. See
+`DECRYPTION_REPORT.md` for the before/after logs. Two things learned from the test:
 
 - start TWRP from Android with `adb reboot recovery`. `fastboot reboot recovery` makes this
   bootloader retry recovery on every boot, so a failing recovery loops until stock is restored;
@@ -406,9 +409,11 @@ Open items:
 | item | risk |
 |---|---|
 | boot failure | **resolved**: the early-init UFS `auto_hibern8`/`clkgate` writes panic in `ufshcd_auto_hibern8_update`; removed from `init.recovery.qcom.rc` and `init.recovery.encryption.rc`. |
-| decryption | TWRP prompts for the credential but metadata decryption fails; gatekeeper/qseecom SIGABRT; see `DECRYPTION_REPORT.md`. |
+| decryption | **resolved**: the missing `/system/etc/vintf/manifest.xml` made servicemanager reject the QTI crypto services. Shipping the merged manifest there (and under `/vendor`) lets the PIN decrypt userdata; see `DECRYPTION_REPORT.md`. |
 | release config | must be `bp2a`; `ap2a` fails in `vendor_sepolicy.cil` (`hal_hwcrypto_server` not declared below board API 202504) |
-| Android 17 data on a `twrp-16.0` base | OS version (17) and patch (2026-09-01) match, but vold/keystore2 are Android 16 (SDK 36 vs 37). Tested with a PIN; decryption still fails (keymaster/metadata); see `DECRYPTION_REPORT.md`. |
+| Android 17 data on a `twrp-16.0` base | OS version (17) and patch (2026-09-01) match; the Android 16 vold/keystore2 decrypted the Android 17 userdata with a PIN once the recovery VINTF manifest was fixed. |
+| brightness | `TW_MAX_BRIGHTNESS` is 16153 in the tree; a prebuilt TWRP binary still carries the old 2047 value until the next full `recoveryimage` build. |
+| keymaster fallback | `keymaster_ver` still falls back to `4.x` from the prop because TWRP looks for `android.hardware.keymaster`; decryption works, but a KeyMint-aware lookup would be cleaner. |
 | `TARGET_CPU_VARIANT_RUNTIME := kryo300` | copied from amethyst (same SoC); ignored or an error depending on the Soong in your manifest |
 | bundled `/vendor/**` blobs | when the real `vendor` partition is mounted over `/vendor` (TWRP does so briefly to load modules), the bundled copies are shadowed while it is mounted |
 | `TW_CUSTOM_CPU_TEMP_PATH` | `thermal_zone10` is `cpuss-0` on Android; recovery registers fewer zones, so the index may differ |

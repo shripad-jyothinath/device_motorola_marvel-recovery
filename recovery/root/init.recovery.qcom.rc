@@ -78,7 +78,8 @@ on early-fs
     write /sys/block/sda/queue/iostats 0
 
 on boot
-    setprop sys.usb.config adb
+    setprop sys.usb.config adb_recovery
 
 # The Motorola MMI touch stack (goodix_brl_mmi, blocklisted on stock) is loaded
 # by TWRP itself through TW_LOAD_VENDOR_MODULES - see device.mk.
+
