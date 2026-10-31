@@ -19,6 +19,8 @@ TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/rom/fstab.qcom
 
 # Device-specific sepolicy and service UIDs.
 BOARD_VENDOR_SEPOLICY_DIRS += device/lineage/sepolicy/common/public
+BOARD_VENDOR_SEPOLICY_DIRS += device/lineage/sepolicy/common/dynamic
+BOARD_VENDOR_SEPOLICY_DIRS += device/lineage/sepolicy/common/vendor
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/rom/sepolicy/vendor
 TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/rom/config.fs
 
