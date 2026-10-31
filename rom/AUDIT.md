@@ -92,6 +92,11 @@ product intentionally uses the stock vendor and vendor_dlkm partitions. Do not
 enable `MARVEL_BUILD_VENDOR_IMAGE` until the vendor tree is rebuilt from the
 stock `/vendor` files.
 
+A full stock `/vendor` tar was also pulled over ADB: **1.95 GB**, with 3,643
+regular files and 3,415 symlinks. Windows cannot materialize those symlinks, so
+the vendor repository was not overwritten with a broken tree. The tar is kept
+locally for a Linux-server rebuild if a full vendor image is wanted later.
+
 ## Fstab and modules
 
 Donor fstab vs stock 36-31 fstab:

@@ -17,6 +17,10 @@ The stock-vs-repo `/vendor` comparison is still negative: 1,029 exact matches,
 512 different files, 12 repo-only, and 2,102 stock-only. Do not build a full
 vendor image from this tree; the ROM uses the stock vendor partition.
 
+A full 1.95 GB stock `/vendor` tar was pulled over ADB (3,643 regular files,
+3,415 symlinks). Windows cannot materialize the symlinks, so it is kept for a
+Linux-server rebuild rather than committed as a broken tree.
+
 ## Audit first
 
 `rom/tools/audit_vendor.js` parses every copy rule and checks source existence,

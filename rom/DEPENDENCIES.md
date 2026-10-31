@@ -38,6 +38,11 @@ The default ROM product uses the **stock vendor and vendor_dlkm partitions**, so
 this does not block an Evolution X system-only build. A full vendor image would
 require rebuilding the vendor tree from the stock `/vendor` contents first.
 
+I pulled the full stock `/vendor` tar over ADB: **1.95 GB**, 3,643 regular files
+and 3,415 symlinks. Windows cannot create those symlinks, so it is kept locally
+rather than committed as a broken tree. On the build server I can extract it and
+regenerate the vendor tree if you want full vendor-image support.
+
 ## No longer needed
 
 - ADB: used to pull the stock vendor_dlkm modules and the `/vendor` SHA-256
