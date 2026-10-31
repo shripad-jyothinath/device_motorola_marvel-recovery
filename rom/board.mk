@@ -25,7 +25,8 @@ TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/rom/config.fs
 # a prebuilt kernel. EXPORT_TO_SOONG only passes it when Lineage's
 # BoardConfigKernel.mk detects the standard relative out dir, so pin it here
 # after the vendor board config has been processed.
-KERNEL_BUILD_OUT_PREFIX := $(BUILD_TOP)/
+KERNEL_BUILD_OUT_PREFIX := $(CURDIR)/
+TARGET_PREBUILT_KERNEL_HEADERS := $(CURDIR)/device/motorola/marvel/prebuilt/kernel-headers.tar.gz
 
 # Kernel modules are supplied by the stock vendor_dlkm partition in the default
 # build. The rom-ready vendor branch also contains the 292 stock .ko files and
