@@ -102,9 +102,6 @@
         <transport>hwbinder</transport>
         <fqname>@1.1::IImsFactory/default</fqname>
     </hal>
-    <sepolicy>
-        <version>34.0</version>
-    </sepolicy>
 <hal format="aidl">
        <name>vendor.qti.hardware.qseecom</name>
        <version>1</version>
