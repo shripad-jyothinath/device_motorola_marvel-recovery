@@ -21,6 +21,12 @@ TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/rom/fstab.qcom
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/rom/sepolicy/vendor
 TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/rom/config.fs
 
+# Lineage's Soong kernel generators reference KERNEL_BUILD_OUT_PREFIX even for
+# a prebuilt kernel. EXPORT_TO_SOONG only passes it when Lineage's
+# BoardConfigKernel.mk detects the standard relative out dir, so pin it here
+# after the vendor board config has been processed.
+KERNEL_BUILD_OUT_PREFIX := $(BUILD_TOP)/
+
 # Kernel modules are supplied by the stock vendor_dlkm partition in the default
 # build. The rom-ready vendor branch also contains the 292 stock .ko files and
 # their copy rules for an optional full vendor image.
