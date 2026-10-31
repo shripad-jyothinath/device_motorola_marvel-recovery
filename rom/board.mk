@@ -18,6 +18,8 @@ TARGET_SYSTEM_PROP := $(DEVICE_PATH)/rom/system.prop
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/rom/fstab.qcom
 
 # Device-specific sepolicy and service UIDs.
+SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += device/lineage/sepolicy/mosey/system_ext/public
+SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += device/lineage/sepolicy/mosey/system_ext/private
 BOARD_VENDOR_SEPOLICY_DIRS += device/lineage/sepolicy/common/public
 BOARD_VENDOR_SEPOLICY_DIRS += device/lineage/sepolicy/common/dynamic
 BOARD_VENDOR_SEPOLICY_DIRS += device/lineage/sepolicy/common/vendor
