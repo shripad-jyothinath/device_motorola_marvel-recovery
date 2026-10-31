@@ -1,9 +1,9 @@
 {
   "summary": {
-    "generatedAt": "2026-10-31T02:31:56.766Z",
+    "generatedAt": "2026-10-31T02:50:48.645Z",
     "vendorMakefile": "vendor/motorola/marvel/marvel-vendor.mk",
-    "makefileLines": 2266,
-    "copyRules": 2200,
+    "makefileLines": 2568,
+    "copyRules": 2498,
     "malformedRuleLines": 0,
     "missingSources": 0,
     "nonRegularSources": 0,
@@ -14,18 +14,19 @@
       "TARGET_COPY_OUT_PRODUCT": 3,
       "TARGET_COPY_OUT_VENDOR": 1516,
       "TARGET_COPY_OUT_SYSTEM_EXT": 675,
-      "TARGET_COPY_OUT_ODM": 6
+      "TARGET_COPY_OUT_ODM": 6,
+      "TARGET_COPY_OUT_VENDOR_DLKM": 298
     },
-    "elfRules": 1203,
-    "elf64": 1177,
-    "elfAarch64": 1177,
+    "elfRules": 1495,
+    "elf64": 1469,
+    "elfAarch64": 1469,
     "zipRules": 132,
     "apkRules": 25,
     "jarRules": 107,
     "xmlRules": 412,
     "donorListEntries": 2219,
     "donorOnlyEntries": 0,
-    "vendorOnlyEntries": 4,
+    "vendorOnlyEntries": 302,
     "stockPropCount": 437,
     "donorPropCount": 106,
     "donorPropChanged": 6,
@@ -37,7 +38,7 @@
     "donorModulesListed": 310,
     "donorModulesMissingFromVendorBoot": 149,
     "stockLoadMissingFromDonor": 0,
-    "vendorKo": 0,
+    "vendorKo": 292,
     "vendorVintfTopLevelFiles": 3,
     "vendorVintfFragments": 58,
     "systemExtVintfFragments": 6,
@@ -55,10 +56,56 @@
       "vendor/etc/fstab.qcom",
       "vendor/etc/vintf/compatibility_matrix.xml",
       "vendor/etc/vintf/manifest.xml",
-      "vendor/etc/vintf/manifest_volcano.xml"
+      "vendor/etc/vintf/manifest_volcano.xml",
+      "vendor_dlkm/lib/modules/adsp_loader_dlkm.ko",
+      "vendor_dlkm/lib/modules/adsp_sleepmon.ko",
+      "vendor_dlkm/lib/modules/altmode-glink.ko",
+      "vendor_dlkm/lib/modules/at803x.ko",
+      "vendor_dlkm/lib/modules/audio_pkt_dlkm.ko",
+      "vendor_dlkm/lib/modules/audio_prm_dlkm.ko",
+      "vendor_dlkm/lib/modules/audpkt_ion_dlkm.ko",
+      "vendor_dlkm/lib/modules/aw882xx_dlkm.ko",
+      "vendor_dlkm/lib/modules/aw_haptic_hv_v1_10.ko",
+      "vendor_dlkm/lib/modules/awinic_sar.ko",
+      "vendor_dlkm/lib/modules/bam_dma.ko",
+      "vendor_dlkm/lib/modules/bcl_soc.ko",
+      "vendor_dlkm/lib/modules/bhs-irq-controller.ko",
+      "vendor_dlkm/lib/modules/bm_adsp_ulog.ko",
+      "vendor_dlkm/lib/modules/boot_stats.ko",
+      "vendor_dlkm/lib/modules/bt_fm_slim.ko",
+      "vendor_dlkm/lib/modules/bt_fm_swr.ko",
+      "vendor_dlkm/lib/modules/btfmcodec.ko",
+      "vendor_dlkm/lib/modules/btpower.ko",
+      "vendor_dlkm/lib/modules/bwmon.ko",
+      "vendor_dlkm/lib/modules/bwprof.ko",
+      "vendor_dlkm/lib/modules/c1dcvs_scmi_v2.ko",
+      "vendor_dlkm/lib/modules/cam_aw37004.ko",
+      "vendor_dlkm/lib/modules/cam_aw37004_2nd.ko",
+      "vendor_dlkm/lib/modules/camcc-volcano.ko",
+      "vendor_dlkm/lib/modules/camera.ko",
+      "vendor_dlkm/lib/modules/cdsp-loader.ko",
+      "vendor_dlkm/lib/modules/cdsprm.ko",
+      "vendor_dlkm/lib/modules/cfg80211.ko",
+      "vendor_dlkm/lib/modules/charger-ulog-glink.ko",
+      "vendor_dlkm/lib/modules/cnss_nl.ko",
+      "vendor_dlkm/lib/modules/cnss_plat_ipc_qmi_svc.ko",
+      "vendor_dlkm/lib/modules/cnss_prealloc.ko",
+      "vendor_dlkm/lib/modules/cnss_utils.ko",
+      "vendor_dlkm/lib/modules/con_dfpar.ko",
+      "vendor_dlkm/lib/modules/core_hang_detect.ko",
+      "vendor_dlkm/lib/modules/coresight-csr.ko",
+      "vendor_dlkm/lib/modules/coresight-cti.ko",
+      "vendor_dlkm/lib/modules/coresight-dummy.ko",
+      "vendor_dlkm/lib/modules/coresight-funnel.ko",
+      "vendor_dlkm/lib/modules/coresight-hwevent.ko",
+      "vendor_dlkm/lib/modules/coresight-remote-etm.ko",
+      "vendor_dlkm/lib/modules/coresight-replicator.ko",
+      "vendor_dlkm/lib/modules/coresight-stm.ko",
+      "vendor_dlkm/lib/modules/coresight-tgu.ko",
+      "vendor_dlkm/lib/modules/coresight-tmc-sec.ko"
     ],
     "donorOnlyCount": 0,
-    "vendorOnlyCount": 4
+    "vendorOnlyCount": 302
   },
   "props": {
     "changed": [
@@ -300,7 +347,7 @@
     "missingFromVendorBootCount": 149,
     "stockLoadMissingFromDonor": [],
     "stockLoadMissingFromDonorCount": 0,
-    "vendorRepoKoCount": 0
+    "vendorRepoKoCount": 292
   },
   "vintf": {
     "topLevelFiles": [
@@ -28237,6 +28284,4160 @@
       "symlink": false,
       "ext": ".qcom",
       "elf": null,
+      "zip": false
+    },
+    {
+      "line": 2270,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/adsp_loader_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/adsp_loader_dlkm.ko",
+      "exists": true,
+      "size": 25136,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2271,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/adsp_sleepmon.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/adsp_sleepmon.ko",
+      "exists": true,
+      "size": 79184,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2272,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/altmode-glink.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/altmode-glink.ko",
+      "exists": true,
+      "size": 34096,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2273,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/at803x.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/at803x.ko",
+      "exists": true,
+      "size": 86976,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2274,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/audio_pkt_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/audio_pkt_dlkm.ko",
+      "exists": true,
+      "size": 42296,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2275,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/audio_prm_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/audio_prm_dlkm.ko",
+      "exists": true,
+      "size": 27256,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2276,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/audpkt_ion_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/audpkt_ion_dlkm.ko",
+      "exists": true,
+      "size": 36696,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2277,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/aw882xx_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/aw882xx_dlkm.ko",
+      "exists": true,
+      "size": 361560,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2278,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/aw_haptic_hv_v1_10.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/aw_haptic_hv_v1_10.ko",
+      "exists": true,
+      "size": 596480,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2279,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/awinic_sar.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/awinic_sar.ko",
+      "exists": true,
+      "size": 166576,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2280,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/bam_dma.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/bam_dma.ko",
+      "exists": true,
+      "size": 59616,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2281,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/bcl_soc.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/bcl_soc.ko",
+      "exists": true,
+      "size": 21136,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2282,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/bhs-irq-controller.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/bhs-irq-controller.ko",
+      "exists": true,
+      "size": 17096,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2283,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/bm_adsp_ulog.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/bm_adsp_ulog.ko",
+      "exists": true,
+      "size": 48312,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2284,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/boot_stats.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/boot_stats.ko",
+      "exists": true,
+      "size": 14344,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2285,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/bt_fm_slim.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/bt_fm_slim.ko",
+      "exists": true,
+      "size": 47856,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2286,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/bt_fm_swr.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/bt_fm_swr.ko",
+      "exists": true,
+      "size": 37136,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2287,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/btfmcodec.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/btfmcodec.ko",
+      "exists": true,
+      "size": 90296,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2288,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/btpower.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/btpower.ko",
+      "exists": true,
+      "size": 127896,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2289,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/bwmon.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/bwmon.ko",
+      "exists": true,
+      "size": 74896,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2290,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/bwprof.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/bwprof.ko",
+      "exists": true,
+      "size": 30376,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2291,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/c1dcvs_scmi_v2.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/c1dcvs_scmi_v2.ko",
+      "exists": true,
+      "size": 29240,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2292,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/cam_aw37004.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/cam_aw37004.ko",
+      "exists": true,
+      "size": 30552,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2293,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/cam_aw37004_2nd.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/cam_aw37004_2nd.ko",
+      "exists": true,
+      "size": 30552,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2294,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/camcc-volcano.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/camcc-volcano.ko",
+      "exists": true,
+      "size": 85896,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2295,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/camera.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/camera.ko",
+      "exists": true,
+      "size": 6722064,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2296,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/cdsp-loader.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/cdsp-loader.ko",
+      "exists": true,
+      "size": 18816,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2297,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/cdsprm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/cdsprm.ko",
+      "exists": true,
+      "size": 94832,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2298,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/cfg80211.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/cfg80211.ko",
+      "exists": true,
+      "size": 2076200,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2299,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/charger-ulog-glink.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/charger-ulog-glink.ko",
+      "exists": true,
+      "size": 30472,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2300,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/cnss_nl.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/cnss_nl.ko",
+      "exists": true,
+      "size": 15832,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2301,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/cnss_plat_ipc_qmi_svc.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/cnss_plat_ipc_qmi_svc.ko",
+      "exists": true,
+      "size": 49448,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2302,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/cnss_prealloc.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/cnss_prealloc.ko",
+      "exists": true,
+      "size": 24432,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2303,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/cnss_utils.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/cnss_utils.ko",
+      "exists": true,
+      "size": 33288,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2304,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/con_dfpar.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/con_dfpar.ko",
+      "exists": true,
+      "size": 60072,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2305,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/core_hang_detect.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/core_hang_detect.ko",
+      "exists": true,
+      "size": 25120,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2306,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight-csr.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight-csr.ko",
+      "exists": true,
+      "size": 47464,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2307,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight-cti.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight-cti.ko",
+      "exists": true,
+      "size": 89344,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2308,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight-dummy.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight-dummy.ko",
+      "exists": true,
+      "size": 21592,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2309,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight-funnel.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight-funnel.ko",
+      "exists": true,
+      "size": 31320,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2310,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight-hwevent.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight-hwevent.ko",
+      "exists": true,
+      "size": 25064,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2311,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight-remote-etm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight-remote-etm.ko",
+      "exists": true,
+      "size": 32160,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2312,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight-replicator.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight-replicator.ko",
+      "exists": true,
+      "size": 30264,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2313,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight-stm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight-stm.ko",
+      "exists": true,
+      "size": 40944,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2314,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight-tgu.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight-tgu.ko",
+      "exists": true,
+      "size": 25232,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2315,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight-tmc-sec.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight-tmc-sec.ko",
+      "exists": true,
+      "size": 38104,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2316,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight-tmc.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight-tmc.ko",
+      "exists": true,
+      "size": 120016,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2317,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight-tpda.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight-tpda.ko",
+      "exists": true,
+      "size": 34928,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2318,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight-tpdm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight-tpdm.ko",
+      "exists": true,
+      "size": 130600,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2319,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight-trace-noc.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight-trace-noc.ko",
+      "exists": true,
+      "size": 26832,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2320,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/coresight.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/coresight.ko",
+      "exists": true,
+      "size": 157464,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2321,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/cpu_voltage_cooling.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/cpu_voltage_cooling.ko",
+      "exists": true,
+      "size": 26208,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2322,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/cpucp_log.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/cpucp_log.ko",
+      "exists": true,
+      "size": 27968,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2323,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/cpufreq_stats_scmi_v2.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/cpufreq_stats_scmi_v2.ko",
+      "exists": true,
+      "size": 21448,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2324,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/crc-itu-t.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/crc-itu-t.ko",
+      "exists": true,
+      "size": 39960,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2325,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/ddr_cdev.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/ddr_cdev.ko",
+      "exists": true,
+      "size": 16392,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2326,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/debugcc-cliffs.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/debugcc-cliffs.ko",
+      "exists": true,
+      "size": 52008,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2327,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/debugcc-pineapple.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/debugcc-pineapple.ko",
+      "exists": true,
+      "size": 44928,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2328,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/debugcc-volcano.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/debugcc-volcano.ko",
+      "exists": true,
+      "size": 53792,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2329,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/dmesg_dumper.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/dmesg_dumper.ko",
+      "exists": true,
+      "size": 35496,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2330,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/drm_display_helper.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/drm_display_helper.ko",
+      "exists": true,
+      "size": 257696,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2331,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/drm_dp_aux_bus.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/drm_dp_aux_bus.ko",
+      "exists": true,
+      "size": 24040,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2332,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/dwc3-msm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/dwc3-msm.ko",
+      "exists": true,
+      "size": 229136,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2333,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/dynpf_scmi.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/dynpf_scmi.ko",
+      "exists": true,
+      "size": 16912,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2334,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/eud.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/eud.ko",
+      "exists": true,
+      "size": 36192,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2335,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/f_fs_ipc_log.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/f_fs_ipc_log.ko",
+      "exists": true,
+      "size": 78504,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2336,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/frpc-adsprpc.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/frpc-adsprpc.ko",
+      "exists": true,
+      "size": 703608,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2337,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/fsa4480-i2c.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/fsa4480-i2c.ko",
+      "exists": true,
+      "size": 25912,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2338,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/gh_ctrl.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/gh_ctrl.ko",
+      "exists": true,
+      "size": 25248,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2339,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/gh_irq_lend.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/gh_irq_lend.ko",
+      "exists": true,
+      "size": 27168,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2340,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/gh_panic_notifier.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/gh_panic_notifier.ko",
+      "exists": true,
+      "size": 36280,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2341,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/gh_rm_booster.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/gh_rm_booster.ko",
+      "exists": true,
+      "size": 23648,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2342,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/gh_tlmm_vm_mem_access.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/gh_tlmm_vm_mem_access.ko",
+      "exists": true,
+      "size": 24512,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2343,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/glink_pkt.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/glink_pkt.ko",
+      "exists": true,
+      "size": 82576,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2344,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/glink_probe.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/glink_probe.ko",
+      "exists": true,
+      "size": 23656,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2345,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/goodix_brl_mmi.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/goodix_brl_mmi.ko",
+      "exists": true,
+      "size": 441832,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2346,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/goodix_fod_mmi.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/goodix_fod_mmi.ko",
+      "exists": true,
+      "size": 87664,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2347,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/gpr_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/gpr_dlkm.ko",
+      "exists": true,
+      "size": 41416,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2348,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/gpu_dump_skip_cdev.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/gpu_dump_skip_cdev.ko",
+      "exists": true,
+      "size": 15696,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2349,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/gpucc-cliffs.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/gpucc-cliffs.ko",
+      "exists": true,
+      "size": 36272,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2350,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/gpucc-volcano.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/gpucc-volcano.ko",
+      "exists": true,
+      "size": 35016,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2351,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/gsim.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/gsim.ko",
+      "exists": true,
+      "size": 538864,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2352,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/hdcp_qseecom_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/hdcp_qseecom_dlkm.ko",
+      "exists": true,
+      "size": 86072,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2353,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/hdmi_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/hdmi_dlkm.ko",
+      "exists": true,
+      "size": 43576,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2354,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/health_monitor.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/health_monitor.ko",
+      "exists": true,
+      "size": 90296,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2355,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/heap_mem_ext_v01.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/heap_mem_ext_v01.ko",
+      "exists": true,
+      "size": 43560,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2356,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/hung_task_enh.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/hung_task_enh.ko",
+      "exists": true,
+      "size": 20376,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2357,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/hvc_gunyah.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/hvc_gunyah.ko",
+      "exists": true,
+      "size": 23944,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2358,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/hwmon.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/hwmon.ko",
+      "exists": true,
+      "size": 65912,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2359,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/i2c-msm-geni.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/i2c-msm-geni.ko",
+      "exists": true,
+      "size": 144272,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2360,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/i3c-master-msm-geni.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/i3c-master-msm-geni.ko",
+      "exists": true,
+      "size": 169232,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2361,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/icnss2.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/icnss2.ko",
+      "exists": true,
+      "size": 430192,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2362,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/ipam.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/ipam.ko",
+      "exists": true,
+      "size": 6563120,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2363,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/ipanetm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/ipanetm.ko",
+      "exists": true,
+      "size": 13960,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2364,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/leds-qpnp-vibrator-ldo.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/leds-qpnp-vibrator-ldo.ko",
+      "exists": true,
+      "size": 26288,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2365,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/leds-qti-flash.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/leds-qti-flash.ko",
+      "exists": true,
+      "size": 56872,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2366,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/leds-qti-tri-led.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/leds-qti-tri-led.ko",
+      "exists": true,
+      "size": 25952,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2367,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/llcc-qcom.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/llcc-qcom.ko",
+      "exists": true,
+      "size": 72240,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2368,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/llcc_perfmon.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/llcc_perfmon.ko",
+      "exists": true,
+      "size": 64360,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2369,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/lpass_bt_swr_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/lpass_bt_swr_dlkm.ko",
+      "exists": true,
+      "size": 33360,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2370,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/lpass_cdc_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/lpass_cdc_dlkm.ko",
+      "exists": true,
+      "size": 114856,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2371,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/lpass_cdc_rx_macro_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/lpass_cdc_rx_macro_dlkm.ko",
+      "exists": true,
+      "size": 218528,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2372,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/lpass_cdc_tx_macro_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/lpass_cdc_tx_macro_dlkm.ko",
+      "exists": true,
+      "size": 135344,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2373,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/lpass_cdc_va_macro_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/lpass_cdc_va_macro_dlkm.ko",
+      "exists": true,
+      "size": 129608,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2374,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/lpass_cdc_wsa2_macro_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/lpass_cdc_wsa2_macro_dlkm.ko",
+      "exists": true,
+      "size": 204408,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2375,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/lpass_cdc_wsa_macro_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/lpass_cdc_wsa_macro_dlkm.ko",
+      "exists": true,
+      "size": 211304,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2376,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/lt9611uxc.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/lt9611uxc.ko",
+      "exists": true,
+      "size": 81224,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2377,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mac80211.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mac80211.ko",
+      "exists": true,
+      "size": 1973448,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2378,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/machine_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/machine_dlkm.ko",
+      "exists": true,
+      "size": 176048,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2379,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/max31760_fan.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/max31760_fan.ko",
+      "exists": true,
+      "size": 28624,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2380,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mbhc_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mbhc_dlkm.ko",
+      "exists": true,
+      "size": 91384,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2381,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mem-hooks.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mem-hooks.ko",
+      "exists": true,
+      "size": 16040,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2382,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/memlat.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/memlat.ko",
+      "exists": true,
+      "size": 83680,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2383,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mhi.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mhi.ko",
+      "exists": true,
+      "size": 265928,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2384,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mhi_dev_satellite.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mhi_dev_satellite.ko",
+      "exists": true,
+      "size": 48952,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2385,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mhi_dev_uci.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mhi_dev_uci.ko",
+      "exists": true,
+      "size": 50504,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2386,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mmi_annotate.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mmi_annotate.ko",
+      "exists": true,
+      "size": 31416,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2387,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mmi_charger.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mmi_charger.ko",
+      "exists": true,
+      "size": 119528,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2388,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mmi_info.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mmi_info.ko",
+      "exists": true,
+      "size": 53968,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2389,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mmi_lpd_mitigate.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mmi_lpd_mitigate.ko",
+      "exists": true,
+      "size": 28120,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2390,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mmi_lpm_dbg.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mmi_lpm_dbg.ko",
+      "exists": true,
+      "size": 31568,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2391,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mmi_qcom_minidump.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mmi_qcom_minidump.ko",
+      "exists": true,
+      "size": 14288,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2392,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mmi_relay.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mmi_relay.ko",
+      "exists": true,
+      "size": 21512,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2393,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mmi_stow.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mmi_stow.ko",
+      "exists": true,
+      "size": 16384,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2394,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mmi_sys_temp.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mmi_sys_temp.ko",
+      "exists": true,
+      "size": 28568,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2395,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/modules.alias",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/modules.alias",
+      "exists": true,
+      "size": 38367,
+      "symlink": false,
+      "ext": ".alias",
+      "elf": null,
+      "zip": false
+    },
+    {
+      "line": 2396,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/modules.blocklist",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/modules.blocklist",
+      "exists": true,
+      "size": 1397,
+      "symlink": false,
+      "ext": ".blocklist",
+      "elf": null,
+      "zip": false
+    },
+    {
+      "line": 2397,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/modules.dep",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/modules.dep",
+      "exists": true,
+      "size": 46073,
+      "symlink": false,
+      "ext": ".dep",
+      "elf": null,
+      "zip": false
+    },
+    {
+      "line": 2398,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/modules.load",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/modules.load",
+      "exists": true,
+      "size": 8916,
+      "symlink": false,
+      "ext": ".load",
+      "elf": null,
+      "zip": false
+    },
+    {
+      "line": 2399,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/modules.softdep",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/modules.softdep",
+      "exists": true,
+      "size": 740,
+      "symlink": false,
+      "ext": ".softdep",
+      "elf": null,
+      "zip": false
+    },
+    {
+      "line": 2400,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/moto_binder.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/moto_binder.ko",
+      "exists": true,
+      "size": 102256,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2401,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/moto_f_usbnet.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/moto_f_usbnet.ko",
+      "exists": true,
+      "size": 86120,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2402,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/moto_mmap_fault.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/moto_mmap_fault.ko",
+      "exists": true,
+      "size": 21528,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2403,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/moto_reboot_reason.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/moto_reboot_reason.ko",
+      "exists": true,
+      "size": 17264,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2404,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/moto_sched.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/moto_sched.ko",
+      "exists": true,
+      "size": 290760,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2405,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/moto_swap5.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/moto_swap5.ko",
+      "exists": true,
+      "size": 164752,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2406,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/mpam.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/mpam.ko",
+      "exists": true,
+      "size": 15888,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2407,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm-mmrm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm-mmrm.ko",
+      "exists": true,
+      "size": 100416,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2408,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm_drm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm_drm.ko",
+      "exists": true,
+      "size": 4815992,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2409,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm_ext_display.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm_ext_display.ko",
+      "exists": true,
+      "size": 27496,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2410,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm_geni_serial.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm_geni_serial.ko",
+      "exists": true,
+      "size": 207408,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2411,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm_gpi.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm_gpi.ko",
+      "exists": true,
+      "size": 155928,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2412,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm_hw_fence.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm_hw_fence.ko",
+      "exists": true,
+      "size": 256200,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2413,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm_kgsl.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm_kgsl.ko",
+      "exists": true,
+      "size": 3049496,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2414,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm_lmh_dcvs.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm_lmh_dcvs.ko",
+      "exists": true,
+      "size": 27296,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2415,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm_memshare.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm_memshare.ko",
+      "exists": true,
+      "size": 50536,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2416,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm_performance.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm_performance.ko",
+      "exists": true,
+      "size": 68728,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2417,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm_sharedmem.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm_sharedmem.ko",
+      "exists": true,
+      "size": 20576,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2418,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm_show_epoch.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm_show_epoch.ko",
+      "exists": true,
+      "size": 11040,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2419,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm_show_resume_irq.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm_show_resume_irq.ko",
+      "exists": true,
+      "size": 24208,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2420,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm_sysstats.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm_sysstats.ko",
+      "exists": true,
+      "size": 35480,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2421,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/msm_video.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/msm_video.ko",
+      "exists": true,
+      "size": 1187624,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2422,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/nb7vpq904m.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/nb7vpq904m.ko",
+      "exists": true,
+      "size": 41336,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2423,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/nxp-nci.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/nxp-nci.ko",
+      "exists": true,
+      "size": 82824,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2424,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/panel_event_notifier.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/panel_event_notifier.ko",
+      "exists": true,
+      "size": 17872,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2425,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/pci-msm-drv.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/pci-msm-drv.ko",
+      "exists": true,
+      "size": 495160,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2426,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/pcie-pdc.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/pcie-pdc.ko",
+      "exists": true,
+      "size": 18056,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2427,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/pdr_interface.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/pdr_interface.ko",
+      "exists": true,
+      "size": 38352,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2428,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/phy-generic.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/phy-generic.ko",
+      "exists": true,
+      "size": 24792,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2429,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/phy-msm-snps-eusb2.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/phy-msm-snps-eusb2.ko",
+      "exists": true,
+      "size": 52696,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2430,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/phy-msm-ssusb-qmp.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/phy-msm-ssusb-qmp.ko",
+      "exists": true,
+      "size": 50376,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2431,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/phy-qcom-emu.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/phy-qcom-emu.ko",
+      "exists": true,
+      "size": 17856,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2432,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/phy-qcom-ufs-qmp-v4.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/phy-qcom-ufs-qmp-v4.ko",
+      "exists": true,
+      "size": 27352,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2433,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/pinctrl-spmi-gpio.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/pinctrl-spmi-gpio.ko",
+      "exists": true,
+      "size": 60144,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2434,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/pinctrl-spmi-mpp.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/pinctrl-spmi-mpp.ko",
+      "exists": true,
+      "size": 35768,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2435,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/pinctrl_lpi_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/pinctrl_lpi_dlkm.ko",
+      "exists": true,
+      "size": 44256,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2436,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/pm8941-pwrkey.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/pm8941-pwrkey.ko",
+      "exists": true,
+      "size": 27640,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2437,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/pmic-glink-debug.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/pmic-glink-debug.ko",
+      "exists": true,
+      "size": 26000,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2438,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/pmic_glink.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/pmic_glink.ko",
+      "exists": true,
+      "size": 40248,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2439,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/ps5169.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/ps5169.ko",
+      "exists": true,
+      "size": 50496,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2440,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/pwm-qti-lpg.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/pwm-qti-lpg.ko",
+      "exists": true,
+      "size": 59640,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2441,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/q6_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/q6_dlkm.ko",
+      "exists": true,
+      "size": 15856,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2442,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/q6_notifier_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/q6_notifier_dlkm.ko",
+      "exists": true,
+      "size": 38064,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2443,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/q6_pdr_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/q6_pdr_dlkm.ko",
+      "exists": true,
+      "size": 12696,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2444,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qca_cld3_wcn6450.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qca_cld3_wcn6450.ko",
+      "exists": true,
+      "size": 16317416,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2445,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qce50_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qce50_dlkm.ko",
+      "exists": true,
+      "size": 134904,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2446,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcedev-mod_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcedev-mod_dlkm.ko",
+      "exists": true,
+      "size": 136624,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2447,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom-cpufreq-hw-debug.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom-cpufreq-hw-debug.ko",
+      "exists": true,
+      "size": 21872,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2448,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom-hv-haptics.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom-hv-haptics.ko",
+      "exists": true,
+      "size": 208536,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2449,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom-pon.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom-pon.ko",
+      "exists": true,
+      "size": 15608,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2450,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom-spmi-adc5-gen3.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom-spmi-adc5-gen3.ko",
+      "exists": true,
+      "size": 65712,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2451,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom-spmi-temp-alarm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom-spmi-temp-alarm.ko",
+      "exists": true,
+      "size": 29576,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2452,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom-spmi-wled.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom-spmi-wled.ko",
+      "exists": true,
+      "size": 63464,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2453,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom-vadc-common.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom-vadc-common.ko",
+      "exists": true,
+      "size": 37640,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2454,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_cpuss_sleep_stats.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_cpuss_sleep_stats.ko",
+      "exists": true,
+      "size": 30464,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2455,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_edac.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_edac.ko",
+      "exists": true,
+      "size": 23384,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2456,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_glink.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_glink.ko",
+      "exists": true,
+      "size": 97944,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2457,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_glink_smem.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_glink_smem.ko",
+      "exists": true,
+      "size": 19848,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2458,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_glink_spss.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_glink_spss.ko",
+      "exists": true,
+      "size": 20352,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2459,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_iommu_debug.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_iommu_debug.ko",
+      "exists": true,
+      "size": 104552,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2460,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_lpm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_lpm.ko",
+      "exists": true,
+      "size": 91560,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2461,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_pil_info.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_pil_info.ko",
+      "exists": true,
+      "size": 18408,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2462,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_pm8008-regulator.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_pm8008-regulator.ko",
+      "exists": true,
+      "size": 47312,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2463,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_q6v5.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_q6v5.ko",
+      "exists": true,
+      "size": 32184,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2464,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_q6v5_pas.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_q6v5_pas.ko",
+      "exists": true,
+      "size": 135864,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2465,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_ramdump.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_ramdump.ko",
+      "exists": true,
+      "size": 24736,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2466,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_smd.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_smd.ko",
+      "exists": true,
+      "size": 46144,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2467,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_spss.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_spss.ko",
+      "exists": true,
+      "size": 43448,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2468,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_stats.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_stats.ko",
+      "exists": true,
+      "size": 64520,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2469,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcom_sysmon.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcom_sysmon.ko",
+      "exists": true,
+      "size": 45320,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2470,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qcrypto-msm_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qcrypto-msm_dlkm.ko",
+      "exists": true,
+      "size": 136648,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2471,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qfprom-sys.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qfprom-sys.ko",
+      "exists": true,
+      "size": 15624,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2472,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qmi_helpers.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qmi_helpers.ko",
+      "exists": true,
+      "size": 50568,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2473,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qpnp-amoled-regulator.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qpnp-amoled-regulator.ko",
+      "exists": true,
+      "size": 33640,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2474,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qpnp-lcdb-regulator.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qpnp-lcdb-regulator.ko",
+      "exists": true,
+      "size": 82864,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2475,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qpnp_adaptive_charge.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qpnp_adaptive_charge.ko",
+      "exists": true,
+      "size": 27296,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2476,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qrng_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qrng_dlkm.ko",
+      "exists": true,
+      "size": 27288,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2477,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qrtr-mhi.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qrtr-mhi.ko",
+      "exists": true,
+      "size": 50360,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2478,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qrtr-smd.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qrtr-smd.ko",
+      "exists": true,
+      "size": 17192,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2479,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qsee_ipc_irq_bridge.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qsee_ipc_irq_bridge.ko",
+      "exists": true,
+      "size": 35704,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2480,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qseecom_proxy.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qseecom_proxy.ko",
+      "exists": true,
+      "size": 16480,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2481,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qti-fixed-regulator.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qti-fixed-regulator.ko",
+      "exists": true,
+      "size": 21688,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2482,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qti-glink-adc.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qti-glink-adc.ko",
+      "exists": true,
+      "size": 21520,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2483,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qti-ocp-notifier.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qti-ocp-notifier.ko",
+      "exists": true,
+      "size": 21480,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2484,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qti_amoled_ecm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qti_amoled_ecm.ko",
+      "exists": true,
+      "size": 38704,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2485,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qti_battery_charger.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qti_battery_charger.ko",
+      "exists": true,
+      "size": 99880,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2486,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qti_battery_debug.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qti_battery_debug.ko",
+      "exists": true,
+      "size": 38416,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2487,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qti_cpufreq_cdev.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qti_cpufreq_cdev.ko",
+      "exists": true,
+      "size": 21040,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2488,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qti_devfreq_cdev.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qti_devfreq_cdev.ko",
+      "exists": true,
+      "size": 18360,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2489,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qti_glink_charger.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qti_glink_charger.ko",
+      "exists": true,
+      "size": 183568,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2490,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qti_qmi_cdev.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qti_qmi_cdev.ko",
+      "exists": true,
+      "size": 74496,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2491,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qti_qmi_sensor_v2.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qti_qmi_sensor_v2.ko",
+      "exists": true,
+      "size": 96584,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2492,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qti_thermal_vendor_hooks.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qti_thermal_vendor_hooks.ko",
+      "exists": true,
+      "size": 11280,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2493,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/qti_userspace_cdev.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/qti_userspace_cdev.ko",
+      "exists": true,
+      "size": 16808,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2494,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/rbs_fod_mmi.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/rbs_fod_mmi.ko",
+      "exists": true,
+      "size": 77800,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2495,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/rdbg.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/rdbg.ko",
+      "exists": true,
+      "size": 38192,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2496,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/reboot-mode.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/reboot-mode.ko",
+      "exists": true,
+      "size": 16664,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2497,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/redriver.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/redriver.ko",
+      "exists": true,
+      "size": 18520,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2498,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/repeater-qti-pmic-eusb2.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/repeater-qti-pmic-eusb2.ko",
+      "exists": true,
+      "size": 35944,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2499,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/repeater.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/repeater.ko",
+      "exists": true,
+      "size": 20320,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2500,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/rmnet_aps.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/rmnet_aps.ko",
+      "exists": true,
+      "size": 49760,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2501,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/rmnet_core.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/rmnet_core.ko",
+      "exists": true,
+      "size": 437776,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2502,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/rmnet_ctl.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/rmnet_ctl.ko",
+      "exists": true,
+      "size": 25536,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2503,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/rmnet_mem.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/rmnet_mem.ko",
+      "exists": true,
+      "size": 37688,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2504,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/rmnet_offload.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/rmnet_offload.ko",
+      "exists": true,
+      "size": 40112,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2505,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/rmnet_perf.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/rmnet_perf.ko",
+      "exists": true,
+      "size": 37440,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2506,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/rmnet_perf_tether.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/rmnet_perf_tether.ko",
+      "exists": true,
+      "size": 26744,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2507,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/rmnet_sch.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/rmnet_sch.ko",
+      "exists": true,
+      "size": 18648,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2508,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/rmnet_shs.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/rmnet_shs.ko",
+      "exists": true,
+      "size": 304560,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2509,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/rmnet_wlan.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/rmnet_wlan.ko",
+      "exists": true,
+      "size": 87264,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2510,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/rproc_qcom_common.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/rproc_qcom_common.ko",
+      "exists": true,
+      "size": 65912,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2511,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/sensors_class.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/sensors_class.ko",
+      "exists": true,
+      "size": 33912,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2512,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/sg.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/sg.ko",
+      "exists": true,
+      "size": 142504,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2513,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/slim-qcom-ngd-ctrl.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/slim-qcom-ngd-ctrl.ko",
+      "exists": true,
+      "size": 165376,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2514,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/slimbus.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/slimbus.ko",
+      "exists": true,
+      "size": 58392,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2515,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/smcinvoke_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/smcinvoke_dlkm.ko",
+      "exists": true,
+      "size": 273264,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2516,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/smmu_proxy_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/smmu_proxy_dlkm.ko",
+      "exists": true,
+      "size": 30376,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2517,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/smp2p.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/smp2p.ko",
+      "exists": true,
+      "size": 37728,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2518,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/smp2p_sleepstate.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/smp2p_sleepstate.ko",
+      "exists": true,
+      "size": 15096,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2519,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/snd-soc-hdmi-codec.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/snd-soc-hdmi-codec.ko",
+      "exists": true,
+      "size": 32328,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2520,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/snd-usb-audio-qmi.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/snd-usb-audio-qmi.ko",
+      "exists": true,
+      "size": 154904,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2521,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/snd_event_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/snd_event_dlkm.ko",
+      "exists": true,
+      "size": 23888,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2522,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/spf_core_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/spf_core_dlkm.ko",
+      "exists": true,
+      "size": 35352,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2523,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/spi-msm-geni.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/spi-msm-geni.ko",
+      "exists": true,
+      "size": 126544,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2524,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/spmi-pmic-arb-debug.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/spmi-pmic-arb-debug.ko",
+      "exists": true,
+      "size": 23480,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2525,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/sps_drv.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/sps_drv.ko",
+      "exists": true,
+      "size": 486168,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2526,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/stm_console.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/stm_console.ko",
+      "exists": true,
+      "size": 12456,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2527,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/stm_core.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/stm_core.ko",
+      "exists": true,
+      "size": 73112,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2528,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/stm_ftrace.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/stm_ftrace.ko",
+      "exists": true,
+      "size": 13776,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2529,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/stm_heartbeat.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/stm_heartbeat.ko",
+      "exists": true,
+      "size": 15016,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2530,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/stm_p_ost.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/stm_p_ost.ko",
+      "exists": true,
+      "size": 13736,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2531,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/stub_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/stub_dlkm.ko",
+      "exists": true,
+      "size": 13592,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2532,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/swr_ctrl_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/swr_ctrl_dlkm.ko",
+      "exists": true,
+      "size": 130992,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2533,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/swr_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/swr_dlkm.ko",
+      "exists": true,
+      "size": 59464,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2534,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/swr_dmic_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/swr_dmic_dlkm.ko",
+      "exists": true,
+      "size": 42952,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2535,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/swr_haptics_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/swr_haptics_dlkm.ko",
+      "exists": true,
+      "size": 38208,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2536,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/sx937x_sar.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/sx937x_sar.ko",
+      "exists": true,
+      "size": 80232,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2537,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/sync_fence.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/sync_fence.ko",
+      "exists": true,
+      "size": 43416,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2538,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/sys_pm_vx.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/sys_pm_vx.ko",
+      "exists": true,
+      "size": 47864,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2539,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/sysmon_subsystem_stats.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/sysmon_subsystem_stats.ko",
+      "exists": true,
+      "size": 56672,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2540,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/system_dlkm.modules.blocklist",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/system_dlkm.modules.blocklist",
+      "exists": true,
+      "size": 72,
+      "symlink": false,
+      "ext": ".blocklist",
+      "elf": null,
+      "zip": false
+    },
+    {
+      "line": 2541,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/thermal_config.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/thermal_config.ko",
+      "exists": true,
+      "size": 23280,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2542,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/touchscreen_mmi.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/touchscreen_mmi.ko",
+      "exists": true,
+      "size": 135632,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2543,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/tz_log_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/tz_log_dlkm.ko",
+      "exists": true,
+      "size": 52752,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2544,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/ubwcp.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/ubwcp.ko",
+      "exists": true,
+      "size": 305160,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2545,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/ucsi_glink.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/ucsi_glink.ko",
+      "exists": true,
+      "size": 35080,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2546,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/usb_f_ccid.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/usb_f_ccid.ko",
+      "exists": true,
+      "size": 57824,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2547,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/usb_f_cdev.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/usb_f_cdev.ko",
+      "exists": true,
+      "size": 68752,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2548,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/usb_f_gsi.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/usb_f_gsi.ko",
+      "exists": true,
+      "size": 222560,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2549,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/usb_f_qdss.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/usb_f_qdss.ko",
+      "exists": true,
+      "size": 53656,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2550,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/utags.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/utags.ko",
+      "exists": true,
+      "size": 72776,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2551,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/videocc-volcano.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/videocc-volcano.ko",
+      "exists": true,
+      "size": 30256,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2552,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/watchdogtest.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/watchdogtest.ko",
+      "exists": true,
+      "size": 17104,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2553,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wcd9378_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wcd9378_dlkm.ko",
+      "exists": true,
+      "size": 460616,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2554,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wcd9378_slave_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wcd9378_slave_dlkm.ko",
+      "exists": true,
+      "size": 28864,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2555,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wcd937x_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wcd937x_dlkm.ko",
+      "exists": true,
+      "size": 176672,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2556,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wcd937x_slave_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wcd937x_slave_dlkm.ko",
+      "exists": true,
+      "size": 28864,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2557,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wcd938x_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wcd938x_dlkm.ko",
+      "exists": true,
+      "size": 238280,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2558,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wcd938x_slave_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wcd938x_slave_dlkm.ko",
+      "exists": true,
+      "size": 29616,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2559,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wcd939x_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wcd939x_dlkm.ko",
+      "exists": true,
+      "size": 274512,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2560,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wcd939x_slave_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wcd939x_slave_dlkm.ko",
+      "exists": true,
+      "size": 29616,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2561,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wcd9xxx_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wcd9xxx_dlkm.ko",
+      "exists": true,
+      "size": 50032,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2562,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wcd_core_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wcd_core_dlkm.ko",
+      "exists": true,
+      "size": 73040,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2563,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wcd_usbss_i2c.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wcd_usbss_i2c.ko",
+      "exists": true,
+      "size": 87800,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2564,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wlan_antenna.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wlan_antenna.ko",
+      "exists": true,
+      "size": 17160,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2565,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wlan_firmware_service.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wlan_firmware_service.ko",
+      "exists": true,
+      "size": 97536,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2566,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wsa883x_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wsa883x_dlkm.ko",
+      "exists": true,
+      "size": 96688,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
+      "zip": false
+    },
+    {
+      "line": 2567,
+      "src": "vendor/motorola/marvel/proprietary/vendor_dlkm/lib/modules/wsa884x_dlkm.ko",
+      "dst": "$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules/wsa884x_dlkm.ko",
+      "exists": true,
+      "size": 144952,
+      "symlink": false,
+      "ext": ".ko",
+      "elf": {
+        "class": 2,
+        "machine": 183
+      },
       "zip": false
     }
   ]

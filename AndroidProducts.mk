@@ -5,8 +5,7 @@
 
 PRODUCT_MAKEFILES := \
     $(LOCAL_DIR)/twrp_marvel.mk \
-    $(LOCAL_DIR)/rom/evolution_marvel.mk \
-    $(LOCAL_DIR)/rom/lineage_marvel.mk
+    $(LOCAL_DIR)/rom/evolution_marvel.mk
 
 # Android 16 (TWRP-Test twrp-16.0) uses <product>-<release>-<variant> and its
 # product_config rejects the 2-part form; the official twrp-14.1 line is the

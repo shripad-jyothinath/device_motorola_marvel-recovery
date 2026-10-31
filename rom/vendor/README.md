@@ -8,9 +8,14 @@ The repository name is legacy (`avenger`), but every path in
 `marvel-vendor.mk` uses `vendor/motorola/marvel`. Cloning it anywhere else
 breaks all copy rules.
 
-The `rom-ready` branch already removes the 23 duplicate destination rules and
-adds the stock 36-31 top-level VINTF and first-stage fstab. The audit result is
-`rom/audit/vendor-audit-rom-ready.json`.
+The `rom-ready` branch already removes the 23 duplicate destination rules, adds
+the stock 36-31 top-level VINTF and first-stage fstab, and commits the real stock
+vendor_dlkm tree: **292 `.ko` modules** plus six metadata files. The audit result
+is `rom/audit/vendor-audit-rom-ready.json`.
+
+The stock-vs-repo `/vendor` comparison is still negative: 1,029 exact matches,
+512 different files, 12 repo-only, and 2,102 stock-only. Do not build a full
+vendor image from this tree; the ROM uses the stock vendor partition.
 
 ## Audit first
 

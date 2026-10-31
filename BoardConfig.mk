@@ -161,6 +161,6 @@ TARGET_USES_LOGD := true
 
 # ROM products only. The twrp_marvel product must keep the recovery-only
 # configuration above; this include does not affect it.
-ifneq ($(filter evolution_marvel lineage_marvel,$(TARGET_PRODUCT)),)
+ifneq ($(filter evolution_marvel,$(TARGET_PRODUCT)),)
 include $(DEVICE_PATH)/rom/board.mk
 endif

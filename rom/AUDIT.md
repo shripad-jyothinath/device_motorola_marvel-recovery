@@ -1,6 +1,6 @@
 # ROM bring-up audit — Motorola Edge 70 Fusion (`marvel`)
 
-Branch: `rom-base`
+Branch: `evox-a17`
 Target firmware: **A171WEH.36-31** (vendor 14 / API 34 / VNDK 34; product first API 36)
 Scope: static audit only. No ROM was built, flashed, or booted in this pass.
 
@@ -30,16 +30,18 @@ File: `rom/audit/vendor-audit.json` (one entry per copy rule).
 
 ### ROM-ready vendor branch
 
-The vendor repository now has a `rom-ready` branch (commit `dd6be28`) with:
+The vendor repository now has a `rom-ready` branch (commit `0de980d`) with:
 
-- the 23 duplicate rules removed: **2,200 copy rules, 0 duplicate destinations,
+- the 23 duplicate rules removed: **2,498 copy rules, 0 duplicate destinations,
   0 missing sources** (`rom/audit/vendor-audit-rom-ready.json`);
 - the stock 36-31 top-level `manifest.xml`, `manifest_volcano.xml`,
   `compatibility_matrix.xml`, and first-stage `fstab.qcom`;
-- copy rules for those four files.
+- copy rules for those four files;
+- the real stock **vendor_dlkm** contents pulled from the device: **292 `.ko`
+  modules** plus six metadata files, 298 copy rules targeting
+  `$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules`.
 
-This does not resolve the missing vendor_dlkm modules or the provenance warning
-below.
+The vendor_dlkm module blocker is resolved. The vendor binary provenance is not.
 
 ## Stock super extraction
 
@@ -53,8 +55,8 @@ The Motorola Rescue tool's stock ROM has the full 36-31 `super` image split into
 - `vendor_dlkm_a`: **23.7 MB**, EROFS.
 
 The vendor and vendor_dlkm images are EROFS. Windows 7-Zip does not support
-EROFS, so the 149 module files still need a Linux/Android `fsck.erofs` or ADB
-pull. The super/LP extraction scripts are committed under `rom/tools/`.
+EROFS, so the stock vendor_dlkm contents were pulled from the running device via
+ADB instead. The super/LP extraction scripts are committed under `rom/tools/`.
 
 ## Provenance warning
 
@@ -75,10 +77,20 @@ The donor property file also fails cross-checking against the stock 36-31
   **SM7750 (sun)**, not SM7635/volcano. They are kept only under
   `rom/reference/` and are not active.
 
-Because of this, the default ROM product uses the **stock vendor and stock
-vendor_dlkm partitions**. The vendor repo is only used when
-`MARVEL_BUILD_VENDOR_IMAGE=true`, and only after the provenance/gap issues below
-are resolved.
+A stock-vs-repo SHA-256 comparison of all `/vendor` files (`rom/tools/compare_vendor_hashes.js`)
+is also negative:
+
+- stock `/vendor` files: **3,643**;
+- repo `/vendor` files: **1,553**;
+- exact matches: **1,029**;
+- different contents: **512**;
+- repo-only: **12**;
+- stock-only: **2,102**.
+
+The vendor repository is therefore **not a 36-31 vendor image**. The default ROM
+product intentionally uses the stock vendor and vendor_dlkm partitions. Do not
+enable `MARVEL_BUILD_VENDOR_IMAGE` until the vendor tree is rebuilt from the
+stock `/vendor` files.
 
 ## Fstab and modules
 
@@ -95,9 +107,15 @@ Donor fstab vs stock 36-31 fstab:
 Kernel modules:
 
 - Stock vendor_boot contains **294 `.ko`** files.
-- The donor `modules.load` lists **310**; **149** are not in vendor_boot and therefore belong to **vendor_dlkm**.
-- The vendor repository contains **0 `.ko`** files.
-- The donor `modules.load.vendor_boot` covers all 294 vendor_boot modules, so the split is understood. The actual 149 vendor_dlkm `.ko` files are still missing.
+- The stock vendor_dlkm partition contains **292 `.ko`** files plus six metadata
+  files; all 298 files were pulled from the running device and added to the
+  `rom-ready` vendor branch.
+- The old donor `modules.load` lists 310 modules. Of the 149 donor names not in
+  stock vendor_boot, only 89 exist on this device; 60 donor names (for example
+  `evacc-tuna`, `debugcc-sun`, `zram`) are from another firmware and are not
+  present here. The donor module list is stale.
+- The vendor repository previously contained **0 `.ko`** files; that gap is now
+  closed.
 
 ## VINTF
 
@@ -127,7 +145,7 @@ Kernel modules:
 ## ROM scaffold in this branch
 
 - `rom/common.mk` — ROM product config, stock-vendor by default.
-- `rom/evolution_marvel.mk`, `rom/lineage_marvel.mk` — product entry points.
+- `rom/evolution_marvel.mk` — Evolution X product entry point.
 - `rom/board.mk` — ROM-only VINTF, props, fstab, sepolicy, and fs config.
 - `rom/vintf/` — stock 36-31 manifest, volcano manifest, and compatibility matrix.
 - `rom/fstab.qcom` — stock 36-31 first-stage fstab.
@@ -141,11 +159,11 @@ Kernel modules:
 
 ## Still blocked / next phase
 
-1. **vendor_dlkm modules**: pull the 149 missing `.ko` files from stock
-   `/vendor_dlkm/lib/modules` (or extract the EROFS `vendor_dlkm_a` image with
-   `fsck.erofs --extract`). This needs ADB or a Linux/WSL EROFS extractor.
-2. **Binary provenance**: hash stock `/vendor` files against the vendor repo if a
-   full vendor image is wanted.
+1. **vendor_dlkm modules**: **resolved** — 292 stock `.ko` files plus metadata
+   were pulled from the device and added to the `rom-ready` vendor branch.
+2. **Binary provenance**: **not resolved** — only 1,029 of 1,553 repo `/vendor`
+   files match stock; 512 differ and 2,102 stock files are absent. Rebuild the
+   vendor tree from the stock `/vendor` contents before a full vendor image.
 3. **VINTF merge**: reconcile the 58 vendor fragments with the stock top-level
    manifest before building a vendor image.
 4. **UDFPS HBM**: the SystemUI overlay references

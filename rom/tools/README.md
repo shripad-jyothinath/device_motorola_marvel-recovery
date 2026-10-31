@@ -18,6 +18,16 @@ node rom/tools/dedupe_vendor_makefile.js \
   --out /tmp/marvel-vendor.mk
 ```
 
+## `add_vendor_dlkm_rules.js`
+
+Generates the `$(TARGET_COPY_OUT_VENDOR_DLKM)` copy rules for every file in a
+pulled vendor_dlkm module directory.
+
+## `compare_vendor_hashes.js`
+
+Compares a stock `sha256sum` manifest of `/vendor` with the vendor repository.
+It reports exact matches, differing files, repo-only files, and stock-only files.
+
 ## `rebuild_super.js`
 
 Reconstructs `super.raw` from the Motorola RSA `super.img_sparsechunk.0..25`

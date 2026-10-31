@@ -1,0 +1,628 @@
+{
+  "summary": {
+    "stockVendorFiles": 3643,
+    "vendorRepoFiles": 1553,
+    "exactMatches": 1029,
+    "different": 512,
+    "repoOnly": 12,
+    "stockOnly": 2102
+  },
+  "differences": [
+    {
+      "path": "app/TxPwrAdmin/TxPwrAdmin.apk",
+      "stock": "0c8cdc25256aa8cb1a52000862666fb399727987cdc42046b62310de2015f3e6",
+      "repo": "be51c270bb7496668008280a3173b7edfdbf22c625f130e56aa9dc7d2351792a"
+    },
+    {
+      "path": "bin/apanic_annotate.sh",
+      "stock": "a9ecf3cc4a2699a37f5cc954a1eb013cab3a321495e52ea2f071b832c3b858af",
+      "repo": "b3093bd18566ec2116fad5119f0be0d78f26c686e9d6b60082fabf74b95882c9"
+    },
+    {
+      "path": "bin/apanic_copy.sh",
+      "stock": "0c34fd7baf1a26a05f1b688f9dd6c4088e3a8c8e3b47ef23a5fb0f93d6c71cb3",
+      "repo": "fd67760438ce55f8174d15f391ceeb127289b7279b853eedf213fe39d42c2096"
+    },
+    {
+      "path": "bin/apanic_save.sh",
+      "stock": "26a321dd8df461d332a49744c82f0faa9eb60dd71c185adfa12fadff59951c62",
+      "repo": "631db23c499d275e64fe0f03752bdd303de9991a776921e966584743f017759e"
+    },
+    {
+      "path": "bin/checkpoint_gc",
+      "stock": "ecdf5c04983a431dcacf192dd5d67398273848555fe2ec20829ae54f733fb375",
+      "repo": "7d55da99d5086a7313df9bcc09378173280c1b07ff97876aa3df5a79acf0f3cb"
+    },
+    {
+      "path": "bin/copy_qc_cert.sh",
+      "stock": "188aa43242785a4ccce17aed4627df6b906bb1fe98851f24dc4ab795e84496dd",
+      "repo": "4b2be7d7564aaabc7429a9b9d3dd8d97b00628f368b644d4af277c49c4ab88ef"
+    },
+    {
+      "path": "bin/hardware_revisions.sh",
+      "stock": "b2d845df5001d1faee7441135525c099f549a804546976e010e07b6b67f7a745",
+      "repo": "4ab85f18f7570f01f60f70056d969b8aec263bb56f685cc7f842af92772dd9b7"
+    },
+    {
+      "path": "bin/init.class_main.sh",
+      "stock": "269be3038616a2b9cde67503049f6384c5002859ea9bae60542725a9a1c322ab",
+      "repo": "be080b9b52e5f3827c50b3a249b0ca62fbff8ab9873a03849a0ddf91ae8bea5e"
+    },
+    {
+      "path": "bin/init.crda.sh",
+      "stock": "43a9a0ee8b1dce2d49b80f740c7bbabea1040c790db812f7bc62cf2cec17d044",
+      "repo": "d9bd1484d3dcc275ab827b11e19536691b4c3de1f8ee004bcaba5da35412edbf"
+    },
+    {
+      "path": "bin/init.gbmods.sh",
+      "stock": "272df83f5d31c86ac598ce1d3255f3da6da4f026ee48a570605ec4ecd84715f0",
+      "repo": "164fdc43ec2f6388b462fbdf15ef597027d30824a08fde858da6d055cfbe0e82"
+    },
+    {
+      "path": "bin/init.kernel.post_boot-memory.sh",
+      "stock": "04fa396a58d068a09ee5d0251fd0ca0e7605fc208caceed0cb4363c966ad2d3b",
+      "repo": "2e4e8fea327c79e7031fd67d4b066132149da47c3cf3ec6ad4c546440c34775b"
+    },
+    {
+      "path": "bin/init.kernel.post_boot.sh",
+      "stock": "6c0ea3b86da2e0dffd79d842d06980c1aff7ceece82632a9d355f7ae786d94c8",
+      "repo": "9d5a5211cc0e78fc4cbbebdca3a21cec5940c87a794493161f5ed7b2e52688e8"
+    },
+    {
+      "path": "bin/init.mdm.sh",
+      "stock": "ca7da94c1e619f12c84fca1a4a369286220a7545a27263982cd27a779e03e3d4",
+      "repo": "182d1500c7bd7a7f966b694099ae42f795c4da20fa50534a10a5809d715a4777"
+    },
+    {
+      "path": "bin/init.mmi.block_perm.sh",
+      "stock": "ca25f0e7c083f16d519ece1fb40e897b16b48f5fe4f73002c6b7277fc146c005",
+      "repo": "877730d4fe143c5d93711687ee9ab9dc7d589c1a3d8aaa4c2005d2c2fcb9879a"
+    },
+    {
+      "path": "bin/init.mmi.boot.sh",
+      "stock": "3fd73e7b40162e3058e54f5c40ffeedb352f3873a2b3b8b57ac45d365515aa41",
+      "repo": "aa09bcd3b2f3658a9660d83efdae0bc0347667fdd5807515314fb26e787316b9"
+    },
+    {
+      "path": "bin/init.mmi.cap.sh",
+      "stock": "f710fec8d3aa992d55bc446890f9e427e043996d5ea41c0137c6815ca65a1411",
+      "repo": "d470c0b6d2392b58f18e6d0ed1ce17e9ca7cf615f46ad91f6dd696381b264a7a"
+    },
+    {
+      "path": "bin/init.mmi.display.sh",
+      "stock": "debc68e217a918f3c83a0b48c8a3f10034e5f0f25f27cbdc9b616be03186c2e9",
+      "repo": "997a69aa26dd2da33df7deb00e0e3aef8408781a360f58eadf1cc9d844644b1c"
+    },
+    {
+      "path": "bin/init.mmi.mdlog-getlogs.sh",
+      "stock": "6940a82282c3e7d75e97a49af75272b403f68a9a5752dce121c7a65f574d9d0d",
+      "repo": "e7f1902a2d8335f1003bf060db9b8c872f5f31f3035553e4c70d9e7c72100b92"
+    },
+    {
+      "path": "bin/init.mmi.shutdown.sh",
+      "stock": "162830d868c88c5cf98856acf36b080243d8e1dd541bdaf8ff192bbf615949c8",
+      "repo": "ef6b3ecac882ce682c9fa17496fa9d7c9f09e7702d996bd1b2275fe72ef59511"
+    },
+    {
+      "path": "bin/init.mmi.touch.sh",
+      "stock": "b75def045002b78bac12dcc925c20a73d414b435f2da4c66ba6544251603bb29",
+      "repo": "f508c45b97b7fa5d42201833afa2116b336f3b125e0f3dfef3c183daa066b07c"
+    },
+    {
+      "path": "bin/init.mmi.usb.sh",
+      "stock": "3508a66624e9bad23694012ef2a3f6163c9e0ccaa0264e1a19f6d1bfac5ce873",
+      "repo": "f01b079140789e8b97a9f13e3a83bcae59edae779a84c4ee2e268857331136e3"
+    },
+    {
+      "path": "bin/init.mmi.wlan-getlogs.sh",
+      "stock": "ab2dc15e334f50b6a899e99a98dd053deb6ff00832dbecdbc6b9d76a755fd1f1",
+      "repo": "dd466b93a4a876a239a950b9fb74c60130dc7b489893b4703367d814234bf8ab"
+    },
+    {
+      "path": "bin/init.oem.fingerprint2.sh",
+      "stock": "3674a5eb5903f6a845333e1a096809bae174dd4f78a6f6c5e2085268b160a01f",
+      "repo": "d765213bfc5a4fa0fe0991faa5d5e50d07da944a05f0bc7d581ba6cf2b9a601b"
+    },
+    {
+      "path": "bin/init.oem.hw.sh",
+      "stock": "40110477be0c0feda1b26f61444cae36bae342c1e1186304878d7090bea6acb3",
+      "repo": "8ba85559e9721f1d8de2b9d7127d47c14071989e2208599dc5b4a83f216098f4"
+    },
+    {
+      "path": "bin/init.qcom.class_core.sh",
+      "stock": "fdf84ed982871b51fb4e76471ec661abd7c6a33239184e0a0a61428d90b6d3ba",
+      "repo": "1ccd9cf446a629babb9f58abac4f18f99ee017072acc5c91a829e7496e02d879"
+    },
+    {
+      "path": "bin/init.qcom.coex.sh",
+      "stock": "7f75148dcacec9d817d09a8e3041c3831cc6600375ced04d158c2a1221961810",
+      "repo": "6979f5fcebac1c72e926eec881215dbbe595525af3270cc2fd491bd1542307c0"
+    },
+    {
+      "path": "bin/init.qcom.early_boot.sh",
+      "stock": "a092f4acdb6cd19a3d33279afc45c6234be59d3be6e77aa0b032740704f98120",
+      "repo": "7d381e86860ffb5edabe278e53e5a513fa7f78aca00cf75ed670f338c48d9864"
+    },
+    {
+      "path": "bin/init.qcom.efs.sync.sh",
+      "stock": "4679bc9d30ae8ec1c04c5bccd02651e9639fa7422a1bcc1c47700e242b74de04",
+      "repo": "51b0b28ba7cd9e23b126c44a6d741a6ed3f9dcebc0cb252d17601ba8ae39f16d"
+    },
+    {
+      "path": "bin/init.qcom.post_boot.sh",
+      "stock": "05a376e5e4d63f64f46896ce59dce782ce2e55bcb2a9caa62bb982b20a9f01f9",
+      "repo": "be1f9fc4f22dbca325c01eae17c3546a118b316fd036a1f45cac14f7f1336198"
+    },
+    {
+      "path": "bin/init.qcom.sdio.sh",
+      "stock": "58deb99a4cc4cba3266cda8e766471335a9d8bc6c055fdf2b603e28210137da5",
+      "repo": "93db5c7d625561451536b99cc65eef644271f60b021aa064098778b89b86a529"
+    },
+    {
+      "path": "bin/init.qcom.sensors.sh",
+      "stock": "a60c0c7305c99e375bee0068e08231c861e70af2be24824762feb95cf27c723d",
+      "repo": "bd09c1746fab8deae2fe8ecc377aea3b7ed82bbb4d1362dd07330d49c5e28085"
+    },
+    {
+      "path": "bin/init.qcom.sh",
+      "stock": "e6bc5f3c5aab77312dc0c323ba47f8e6c6037ced911023832f88f5f29a18e2a0",
+      "repo": "ee236fc8c486f078ce5b7bd9ced6a67407359e1ed7a381a44a2ae6f591cb232d"
+    },
+    {
+      "path": "bin/init.qti.kernel.debug.sh",
+      "stock": "d929280eb413730e7b51ad426e8cd34a387cc5bf92af20689d9c4752cf36c061",
+      "repo": "fd30f99a4bf359da533bf978b7995eb91d4d85195e8df703419e10a798414eb7"
+    },
+    {
+      "path": "bin/init.qti.kernel.early_debug.sh",
+      "stock": "c92bc39fbae4b3940e49ee4aa8874d7feddfb063b7b3b7cad841d7ebc6d13606",
+      "repo": "325ae3febdaba73b4b3df48e1d18065070dc301f2a564b619212f8aabb6eda89"
+    },
+    {
+      "path": "bin/init.qti.kernel.sh",
+      "stock": "c8a859d030569f35ac576ddb9648d9708834fa10db13b2a48727fb777f10e045",
+      "repo": "51eed80a7f89983289604811b4918ae48709f8c638f341297d58d82123da8dc8"
+    },
+    {
+      "path": "bin/init.qti.media.sh",
+      "stock": "dff95250b7e90461277ea62391b16c5f102881677089cf9ebae62eed91ad6fdf",
+      "repo": "04a779c8990c4d1e34c0a6a4e6565758c65503636cb439ca0c13b3f07e073800"
+    },
+    {
+      "path": "bin/init.qti.qcv.sh",
+      "stock": "37014cd237abebc1154710f4129adc35f0ceb25f22638af3fcc3711b9809b826",
+      "repo": "a82f3fa7ed5fad40eac955e887e9f25ed62580be80a1e8236d0dc5f11bf815a7"
+    },
+    {
+      "path": "bin/init.qti.write.sh",
+      "stock": "ba6820e92beb129b848fea7dcf2988fd42d0e21f423df1ea67bceb9c95b1966d",
+      "repo": "43f399fbf0c862aee020020b1fb21fe794be07c7d1c582eb963dcb46b8f3eaee"
+    },
+    {
+      "path": "bin/mot_rkp_csr_extraction.sh",
+      "stock": "2216802336ad8a42abc19be7b788f1329a1e1e08d02d926f18c3af259b133224",
+      "repo": "85212752aac650f0b4aced83cdebbe867455ea09fd9be12db36745665bd07e19"
+    },
+    {
+      "path": "bin/mot_tcmd",
+      "stock": "9e140f7f8d089babe4c76f60ab07a9906d27c4d046553ce2ffe130f20997bde8",
+      "repo": "3d7a84bb076cd52620bfc4b6636e0b58f83d3b4404a1f514c4d4b524f6eb98f5"
+    },
+    {
+      "path": "bin/pstore_annotate.sh",
+      "stock": "e6362eeb12e76b944bf50e0708c3501eedd606ec5e077c0df99220425fd9b2b6",
+      "repo": "b94ad2cc02a5a282f99a93224141d147e54946716550bea1d7e58a6872e34edd"
+    },
+    {
+      "path": "bin/qca6234-service.sh",
+      "stock": "dc4e8a4fc183c8c7804a84125c56415cda6b5390f4a8023fe8f0d769fafc0201",
+      "repo": "5e54ff926a31c57f6ec5ea3cc03694ccf40eed310b9205311cef77eebf1a6be0"
+    },
+    {
+      "path": "bin/qtigetprop",
+      "stock": "e2dbdc36ec02a2cfae627e18af6b7df832fb604e37e0db0c54cc4a5346c813c5",
+      "repo": "c05f2d2c3e86cbd5fa85ebb9d2784a32b8e189bec116100bacc0e2ea8d6a6be3"
+    },
+    {
+      "path": "bin/qtisetprop",
+      "stock": "d6901fff61766c850924a0623d9952ede5ba98b7d495f293684ed9e8ef58f734",
+      "repo": "410c8bb52a8d0078a68fa06c1cd184dc99e9b674af5c6bc36e26cd2d12d688b8"
+    },
+    {
+      "path": "bin/sigma_dut",
+      "stock": "ade5fe60b9c3613982894db721206d0981ea3fa4526eccd61dc7fc2dcb676f9b",
+      "repo": "c2a1192b63c75a37cf16e8b823b62f81a9055c2bb6c700b6609ea33eec3055e0"
+    },
+    {
+      "path": "bin/subsystem_ramdump",
+      "stock": "4ed0d7b03f1b580005e4969d98a60eb196ef16b963ca1cc0b59cb385dc3dceec",
+      "repo": "22abf077c476a034545fffdb692cb31fa884d6afcefafb148e6c290b8acc2e84"
+    },
+    {
+      "path": "bin/system_dlkm_modprobe.sh",
+      "stock": "355b39bd207e675684bcb203686f8481ad7662081bfea7e6fa41d2211727c719",
+      "repo": "5b14530805a0922eac328d5845415b172b1b5b17f529382f8aaae1196f35eb53"
+    },
+    {
+      "path": "bin/vendor_modprobe.sh",
+      "stock": "5a89649acd17427b37c775f80d92e0b35e6ba76f6a1f110c5ab771868b317a73",
+      "repo": "9a52291092515fc590b9e33b9138b1bf05c3bb9fd0e3173325e58efa5ff710b8"
+    },
+    {
+      "path": "etc/a2dp_audio_policy_configuration.xml",
+      "stock": "e20164e2412fa4b6497a908b2304dd8fe19684925fbae38ed6461ad60f3a9ec2",
+      "repo": "959ff843c527ec86e31ea8a5747f1d368ea1d28d8e0e9c69c5bb82137f38b8d4"
+    },
+    {
+      "path": "etc/apdr.conf",
+      "stock": "de2b7951dc13e347a48afd5dd73bb2ca77303b0734b6d8843df3dcab67f5180e",
+      "repo": "b2fd2363232845c5c5764e561bcf4004d970c318b981425cdc9482e503d4561b"
+    },
+    {
+      "path": "etc/ArmHDCP_QTI_Android.cfg",
+      "stock": "88cc78961783a3ec4667327abdcdbf5afa40d9726dcd6a98812cec1f789b78c2",
+      "repo": "d8483b18eeaf1fc428e35a2a0027c7b97f39d1af53a18cdd7e5d8a30388c6cb3"
+    },
+    {
+      "path": "etc/attest_model_list.txt",
+      "stock": "6f5c97f8cab045ab453fa0ba218313ff19acd6b138b71509bbb8f8c805201310",
+      "repo": "265192664c5d27f65852a08054ddb870dc003169f82832f38baf9c8c496fcf4e"
+    },
+    {
+      "path": "etc/audio/sku_volcano/audio_effects.conf",
+      "stock": "6d9ef9583fdd3329f3ea4df02c062e2b5d1ab92f8a64688e25749f8dfcccea09",
+      "repo": "05d290e8cb2827997cc4a097bdea7ab7806343e36f4abcbd3a4b2e6a24e234bc"
+    },
+    {
+      "path": "etc/audio/sku_volcano/audio_effects.xml",
+      "stock": "1e42226d15666480ddac974fba0f5713ce0a1a89766e762db8a2fe800be1880d",
+      "repo": "6ce8c29c22ac65a82bca0b0748d7c0eceaf7492e868b44b1a110e46f8220fd59"
+    },
+    {
+      "path": "etc/audio/sku_volcano/audio_policy_configuration.xml",
+      "stock": "6fd36e9421817e795214052a7f04bf0c0d838453c9fe695c0fb893bf235d1d33",
+      "repo": "7f3ae528932785838e791797a0296a2a7da19e4f594bce7af8c502cac6936ebb"
+    },
+    {
+      "path": "etc/audio/sku_volcano_qssi/audio_policy_configuration.xml",
+      "stock": "6fd36e9421817e795214052a7f04bf0c0d838453c9fe695c0fb893bf235d1d33",
+      "repo": "7f3ae528932785838e791797a0296a2a7da19e4f594bce7af8c502cac6936ebb"
+    },
+    {
+      "path": "etc/audio_effects.xml",
+      "stock": "91d0382c7a54dfc554dbc5a1ba825340a13fb31542c7d046dc719502dc4a86fa",
+      "repo": "d1fff798d4654d71643c6e22b26e768b2fe80cbe8e2eada4fece0e75e2a6de99"
+    },
+    {
+      "path": "etc/audio_ext_spkr.conf",
+      "stock": "d10e5e60308932b712932c5695eca0896497e9210619d4d4198ee90ef65475ba",
+      "repo": "4ef1f82eefd12105850da592786be61672c607674257fef4c19112993570996e"
+    },
+    {
+      "path": "etc/audio_policy_configuration.xml",
+      "stock": "7f2c3e34832c325900a9cb89f3c7ceb20d9f5bf20e54bae60f87ff685083c055",
+      "repo": "deb739facfc8008cbfcb549c5a269205e4d61aa669f489f80f6081846e6dd5ef"
+    },
+    {
+      "path": "etc/audio_policy_volumes.xml",
+      "stock": "012100a13e30490a5e1590037a9c1ff5c0e1612d67e4753c418a79b792d3a814",
+      "repo": "9ddce3d8a0459a4513e75a5fee3252d56d9d24896d1d6b36131c86cd41a9cfe6"
+    },
+    {
+      "path": "etc/backend_conf.xml",
+      "stock": "18134d49304a5905a99bdb05c6854ac829a2af385f62486d7662382a731ac06c",
+      "repo": "18baf239756c4fe6b8b1c5d54afc94e6c6d5d42059141869a6053395f3e72d7b"
+    },
+    {
+      "path": "etc/bluetooth_qti_audio_policy_configuration.xml",
+      "stock": "15d0694fac1678db45507dbbc3a36c89be93ed820ca2b630514bba58f12f058e",
+      "repo": "324903c081c493d4e5e48d4ed5b1c2d2d37af803c319a0eba1ddf5ff056fa221"
+    },
+    {
+      "path": "etc/bluetooth_qti_hearing_aid_audio_policy_configuration.xml",
+      "stock": "c1207c777e039eb0e529c7e4f0aa1203d2b3b95cf675d21c6905f98527e8c80a",
+      "repo": "510487c71dec92a65b25c34a13f06e0b4428848934731fa4882a1684ee4e46ea"
+    },
+    {
+      "path": "etc/card-defs.xml",
+      "stock": "7d26f6a780b01d9afb5f22db7502fc57a6595af5d35f9938e7f227be9e842130",
+      "repo": "274f5c308f6ac3a09c15a6014a70f3e2d5aca5e75bc3cea81274993cd12e2e3c"
+    },
+    {
+      "path": "etc/charger_fw_fstab.qti",
+      "stock": "ea20ec5865dbfc2d877fcd7cc407f2eb58a1e7c89f3b9ed2389dc7f996dade33",
+      "repo": "41e1dbd8cec4fa4699f97db09d42f15517364debe75b159f619f01872f0758e5"
+    },
+    {
+      "path": "etc/clstc_config_library.xml",
+      "stock": "85e88df4458d54726dfdbc6a1e911ccc979faf191643ebc94e239b06d28c85db",
+      "repo": "6f4b7bdec40fd852b2a6a811b6b5518be46dcf22bb21e05c4bd3524ad367076b"
+    },
+    {
+      "path": "etc/cne/mwqem.conf",
+      "stock": "06f5f3921860f42c533175b5b22835094fe7f4c50c850ae9a2ea640142b2cc9e",
+      "repo": "fb5d81c9b08ad0e7e7ac8ada61554231a9a6794b54ccbcf6a045639472dd0713"
+    },
+    {
+      "path": "etc/cne/profileMwqem.xml",
+      "stock": "a941cbe5092b6f3e0224a6c44c942ab8dfae400e74976999ea53e5ff54fcd2b6",
+      "repo": "d00d7e540d67e11977ad563d3ea9dcce5cb28b9b19226bebc25186395ba09f6d"
+    },
+    {
+      "path": "etc/cne/wqeclient/ATT/ATT_profile1.xml",
+      "stock": "3e8934b9128b06f34b79f7cb675be2cd7c41df3a7ccef51ff9c12d259ca7271d",
+      "repo": "6dfec4f95bcfd0e26e0c6e0fd3726599e6ace8268ee8d076f1cfdd332ef8e0af"
+    },
+    {
+      "path": "etc/cne/wqeclient/ATT/ATT_profile2.xml",
+      "stock": "9f832cf1b17e3f6275d4bd0424b257a964416aa4c79444102a72b99318d2f713",
+      "repo": "0ac71b3f24bf0ef1d57882bf1658fae2b1f0ed3692567e41f84b3366e691117e"
+    },
+    {
+      "path": "etc/cne/wqeclient/ATT/ATT_profile3.xml",
+      "stock": "f9c5a332163e1cead91c0cf9cd0332f572d5809de8c4ada05586409bc1536567",
+      "repo": "093ff8b39333760431379a698b9373d4c105ebe161aa3dab4e997ff253d82d21"
+    },
+    {
+      "path": "etc/cne/wqeclient/ATT/ATT_profile4.xml",
+      "stock": "46a472e9d05544e77a0bd3720c0b72725541fe76741d977ebf4654bd8ac684e7",
+      "repo": "6529b4edb9d06dceabbe16986ea2e995a0c0010e90ac7f9fa521033a230690a7"
+    },
+    {
+      "path": "etc/cne/wqeclient/ATT/ATT_profile5.xml",
+      "stock": "27c4f00fb5451a0b46b84d073d916ae0c655534d296d650d6653641c880a6835",
+      "repo": "11c3fe51a1ab23134ee7f299e24f2e2259e2e27530db2a8f2153c7237932fc9c"
+    },
+    {
+      "path": "etc/cne/wqeclient/ATT/ATT_profile6.xml",
+      "stock": "894dbe19e0eeb970eababe1dde51bf36f9e8a17b88c6dc358c1e56cf90598c3e",
+      "repo": "df461fa1984bad30973359022a785ce90e4e99ec223a02cbdecb48920596fcc2"
+    },
+    {
+      "path": "etc/cne/wqeclient/ATT/ATT_profile7.xml",
+      "stock": "4769c0ea4f4fe7e903e0b4ecc6f48512c481499afe280aa3c41bf75e40a509a7",
+      "repo": "86328040b7938787e9b890792937b981e20fe7ce99d255f1b5445a909761d5df"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile1.xml",
+      "stock": "dd4042b6643fc10b6b487aa6d4455c510c89c067064f5cc2176d5b8c5d0d96ba",
+      "repo": "fb872dcf1365ec213b56b28f1a0ef1437c9a1966cc0257985ef6bbbfd4dfef08"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile15.xml",
+      "stock": "d4b2156dcc03d69456089d5275c610cb7f683b20527522e1d001373ea5c4708e",
+      "repo": "2da58b3c239c1bd73cea10c02746e3c5de62fba44f4d36fd7963995249a49ac1"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile16.xml",
+      "stock": "10d52ce800c43d182ffd8242e0e5f4a67e75167bf0d1b5579dd2ded527608a4b",
+      "repo": "c8d1f5738c3c482d5425ca422cea9e03eee4315834e33ada0558df71e06e266f"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile17.xml",
+      "stock": "8a27e407ffc647afefc9fe463bef857717a00aa01a8b55a4debe98a307d72e61",
+      "repo": "654bde62656bb8755ba581d740816573ed14e7cacda6100c993022d55b4b87c9"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile18.xml",
+      "stock": "ddcf52664542e8f2da75fd0f7259222643847d2d53a6085cc92f1021d7d96b4f",
+      "repo": "89fae19b487319ea8ebf069ae99518a008af1a0303fa21a34e05a4e6867b23c5"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile19.xml",
+      "stock": "bbda0afbd54e438e7d18ad6a4a8ba7864069a9a04dd83b0e7659aa21319a12c8",
+      "repo": "2d16c3a5515ec292cfab8160a50a16a94911ebb960ec6a3c85bdef2b517e9c5d"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile2.xml",
+      "stock": "95d1cda14ddc99cf34db873658b18a8188c4417d71c497bef9682868e94f9b2f",
+      "repo": "cd62e748888cd61b4238a096c3972ded046be093440beb729f1a6b57bb69c817"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile20.xml",
+      "stock": "a2db87837317756219ba293e9d7b31af49799fbf6838a1d7a42603e0a16d2653",
+      "repo": "1b7ce15ab3fc72aedaac1063c82d07e746a03b294fa5ab8c5e094ead47d02cc3"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile21.xml",
+      "stock": "d7a3d531cc499a6abfa047aec2874ba8d4a6f4ea346f102e3f769d4e8c65e063",
+      "repo": "412266b3745e340a861415dd96f85cce1dc1f11636423118edd4f94b408c2bd6"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile3.xml",
+      "stock": "2a0e59ddd9b6a8b9e5f0d83bfd3f23da009f0a38dd0fa3096cadfb4945705d44",
+      "repo": "00ae67a21a47a1aafa50769eaf220a3f4b59e978752420ee5fc0c83c4f3aeeed"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile32.xml",
+      "stock": "fadd78089180b05f13b6cc29bc6fc67487c4511b1cc8fed803ae8eacea62e1d2",
+      "repo": "dca818b75c9c1af68b4af72c907d259db7cbf3a2acf19016c63d60318da5151a"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile4.xml",
+      "stock": "f9c5a332163e1cead91c0cf9cd0332f572d5809de8c4ada05586409bc1536567",
+      "repo": "093ff8b39333760431379a698b9373d4c105ebe161aa3dab4e997ff253d82d21"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile5.xml",
+      "stock": "53184de3d3d43d2f597b2f05c9c84f106b177c7cdf77484dd66274d6fc1c5d80",
+      "repo": "f6b16ab78ae5cbb0f32cbfaf44a69ccb1059f4955a7b531a5ad78ec042d95ab1"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile6.xml",
+      "stock": "6f16766ec32b00894627165170c4812c407c8869dea4976c1faddf54da32857e",
+      "repo": "cb7ae73befd3f3dd7369a44690052dd1d3691491b30c526f1cccc88ca6af6c85"
+    },
+    {
+      "path": "etc/cne/wqeclient/ROW/ROW_profile7.xml",
+      "stock": "736e038719f0352b16f09db5dd076f54fbeeb9837f253049567e21ca2a7d8d20",
+      "repo": "9ac6b10d717a009d5887c86eca50b298b4b15e98e9813275a203dbcdb12dd117"
+    },
+    {
+      "path": "etc/cne/wqeclient/VZW/VZW_profile1.xml",
+      "stock": "55f3b9e784f74f67b7f1ea120e5581d0f40e606eae5ffb6817fe006abf0a1a05",
+      "repo": "2006c7900c51cf691f0b84e4afc6b8d858d9259e782e76c21b7d2ef7f45fd6b3"
+    },
+    {
+      "path": "etc/cne/wqeclient/VZW/VZW_profile2.xml",
+      "stock": "4f83caa5bdff5b730f991bf0d3c5d9678db666a292b1c9c729a227a0232cccac",
+      "repo": "fdd4604461521d6693eec9754a19429e2db82a26540808e689a6c64c68e8a9e7"
+    },
+    {
+      "path": "etc/cne/wqeclient/VZW/VZW_profile3.xml",
+      "stock": "50eb2ff632cdb218219d58881bdc56317c244f47de37d9a6a0d5a525208eb91b",
+      "repo": "722b6877c275449eaa46c5c7f67fbe658f281b32504292c0678300263268ed13"
+    },
+    {
+      "path": "etc/cne/wqeclient/VZW/VZW_profile4.xml",
+      "stock": "ead3962a0204e462abc2737fddb5672ad69c8625862f868ac677ee355ad9abdf",
+      "repo": "553cd4bbe1e90345ac5f4b6066a004df15c381d3ac3cd88ad4abecb6f347367f"
+    },
+    {
+      "path": "etc/cne/wqeclient/VZW/VZW_profile5.xml",
+      "stock": "688006e3f402d36f398a8a8088021ca531c5148c1e678d895b8da93e37b3fdfd",
+      "repo": "d26f9903bd09fca55d522016ec34f6002a1033839d37133228a8bbe23cb463d1"
+    },
+    {
+      "path": "etc/cne/wqeclient/VZW/VZW_profile6.xml",
+      "stock": "3bef79a3109d25be0b66390f726c7e31f6e087433e9bfc3adfaebed5f5d2564f",
+      "repo": "d5b34167c30ce27ac92fcfffb1e4c9c089ab1ba8cdeec5e1ca3fc4c2db75bad5"
+    },
+    {
+      "path": "etc/cne/wqeclient/VZW/VZW_profile7.xml",
+      "stock": "1fd1d5b3f11b66f4930ca78bba6a3fcb801faec153f2adec1e180e75ca95e91a",
+      "repo": "9b8f32329c8c4c54470f9145ffaab8f0576f40dd4a821bd6813f7d64987e4816"
+    },
+    {
+      "path": "etc/data/dsi_config.xml",
+      "stock": "51be3314719b926c3a53c5240d2e9d02dc16928da9c629f90f734b7ed3c861a9",
+      "repo": "b259c9c029eccbb382832171af7dc96be3967d233c34760ea5bc62ea5bcc2854"
+    },
+    {
+      "path": "etc/data/nicm_config.xml",
+      "stock": "d9c5fd8ab8be49512d6ce4bf628c1f7c3218de1c287569e3f19e64040d35d0a0",
+      "repo": "b4be2d518cefaa6dbb971285443b5958eeadf620955b1cf5b1b0db0f4dcc4c40"
+    },
+    {
+      "path": "etc/default-permissions/com.qualcomm.qti.cne.xml",
+      "stock": "9d20226a40d1aa054b06fad4c13cb470db886f480791c0d424de4b6fc1d1de69",
+      "repo": "89da0e29fd190f6fa51afd789856692fe3b154f8ce8e55a37adf139bb8899822"
+    }
+  ],
+  "repoOnly": [
+    "bin/bootloaderlog",
+    "bin/expat",
+    "bin/fdrcontrol",
+    "bin/fotacontrol",
+    "bin/getconfig",
+    "bin/masterclear",
+    "bin/poweroffcontrol",
+    "bin/ptf",
+    "bin/setconfig",
+    "bin/ufsgetsn",
+    "etc/cgroups.json",
+    "etc/vintf/manifest.xml"
+  ],
+  "stockOnly": [
+    "apex/com.google.android.widevine.nonupdatable.apex",
+    "app/CACertService/oat/arm64/CACertService.odex",
+    "app/CACertService/oat/arm64/CACertService.vdex",
+    "app/CneApp/oat/arm64/CneApp.odex",
+    "app/CneApp/oat/arm64/CneApp.vdex",
+    "app/IWlanService/oat/arm64/IWlanService.odex",
+    "app/IWlanService/oat/arm64/IWlanService.vdex",
+    "app/TimeService/oat/arm64/TimeService.odex",
+    "app/TimeService/oat/arm64/TimeService.vdex",
+    "app/TxPwrAdmin/oat/arm64/TxPwrAdmin.odex",
+    "app/TxPwrAdmin/oat/arm64/TxPwrAdmin.vdex",
+    "bin/ATFWD-daemon",
+    "bin/GPTEE_Sample_client",
+    "bin/MDNonsleep_Report",
+    "bin/PalTest",
+    "bin/PktRspTest",
+    "bin/TrustedUISampleTAClient",
+    "bin/TrustedUISampleTestAIDL",
+    "bin/ar_util_in_test_example",
+    "bin/athdiag",
+    "bin/audioadsprpcd",
+    "bin/audiodsd2pcmtest",
+    "bin/audioflacapp",
+    "bin/awk",
+    "bin/boringssl_self_test64",
+    "bin/cnss_diag",
+    "bin/color_sampling_test",
+    "bin/color_sampling_tool",
+    "bin/cplay",
+    "bin/ctrlapp_dut",
+    "bin/debug-diag",
+    "bin/diag-router",
+    "bin/diag_callback_sample",
+    "bin/diag_dci_sample",
+    "bin/diag_klog",
+    "bin/diag_mdlog",
+    "bin/diag_mdlog-getlogs",
+    "bin/diag_mdlog-wrap",
+    "bin/diag_socket_log",
+    "bin/diag_uart_log",
+    "bin/diagcommd",
+    "bin/dlsc",
+    "bin/dpmQmiMgr",
+    "bin/dumpsys",
+    "bin/early_eth.sh",
+    "bin/ese_test_app",
+    "bin/feature_enabler_client",
+    "bin/fmfactorytest",
+    "bin/fmfactorytestserver",
+    "bin/gpu_counter_producer",
+    "bin/hostapd_cli",
+    "bin/hw/android.hardware.audio.service",
+    "bin/hw/android.hardware.audio.service_64",
+    "bin/hw/android.hardware.biometrics.face-service.face-isv",
+    "bin/hw/android.hardware.biometrics.face@1.0-service.face",
+    "bin/hw/android.hardware.biometrics.fingerprint-service-rbs",
+    "bin/hw/android.hardware.biometrics.fingerprint@2.1-goodixservice",
+    "bin/hw/android.hardware.bluetooth@1.1-service-qti",
+    "bin/hw/android.hardware.boot-service.qti",
+    "bin/hw/android.hardware.cas-service.example",
+    "bin/hw/android.hardware.drm-service.clearkey",
+    "bin/hw/android.hardware.health-service.qti",
+    "bin/hw/android.hardware.nfc-service.nxp",
+    "bin/hw/android.hardware.power-service",
+    "bin/hw/android.hardware.security.keymint-service.strongbox-nxp",
+    "bin/hw/android.hardware.sensors-service.multihal",
+    "bin/hw/android.hardware.thermal-service.qti",
+    "bin/hw/android.hardware.usb-service.qti",
+    "bin/hw/android.hardware.weaver-service.nxp-qti",
+    "bin/hw/android.hardware.wifi-service",
+    "bin/hw/capabilityconfigstoretest",
+    "bin/hw/com.motorola.hardware.display.panel-service",
+    "bin/hw/com.motorola.hardware.display.touch-service",
+    "bin/hw/com.motorola.thermalstatus@service",
+    "bin/hw/hostapd",
+    "bin/hw/motorola.hardware.fdr-service",
+    "bin/hw/motorola.hardware.haptic-service",
+    "bin/hw/motorola.hardware.health-service",
+    "bin/hw/motorola.hardware.health.storage-service",
+    "bin/hw/motorola.hardware.health.storage@1.0-service",
+    "bin/hw/motorola.hardware.input@1.1-service",
+    "bin/hw/motorola.hardware.rpmb-service",
+    "bin/hw/motorola.hardware.sensorext-service",
+    "bin/hw/motorola.hardware.vibrator@1.0-service",
+    "bin/hw/pasrknob",
+    "bin/hw/vendor.dolby.dms.service",
+    "bin/hw/vendor.dolby.media.c2@1.0-service",
+    "bin/hw/vendor.qti.hardware.capabilityconfigstore@1.0-service",
+    "bin/hw/vendor.qti.hardware.display.allocator-service",
+    "bin/hw/vendor.qti.hardware.display.composer-service",
+    "bin/hw/vendor.qti.hardware.display.demura-service",
+    "bin/hw/vendor.qti.hardware.iop@2.0-service",
+    "bin/hw/vendor.qti.hardware.limits@1.2-service",
+    "bin/hw/vendor.qti.hardware.memtrack-service",
+    "bin/hw/vendor.qti.hardware.secureprocessor@1.0",
+    "bin/hw/vendor.qti.hardware.trustedui-aidl-service-qti",
+    "bin/hw/vendor.qti.hardware.vibrator.service",
+    "bin/hw/vendor.qti.memory.pasrmanager-service",
+    "bin/hw/vendor.zuialarm.hardware.alarm@1.0-service",
+    "bin/hw/wpa_supplicant"
+  ]
+}

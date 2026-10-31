@@ -3,62 +3,43 @@
 ## Ready / pushed
 
 - Device tree: `shripad-jyothinath/device_motorola_marvel-recovery`, branch
-  `evox-a17` (this branch).
+  `evox-a17`.
 - Vendor tree: `shripad-jyothinath/android_vendor_motorola_avenger`, branch
   `rom-ready`; must be checked out at `vendor/motorola/marvel`.
+- Evolution X is the only active ROM target.
 - Stock 36-31 VINTF, fstab, and a generated `vendor.prop` are in `rom/`.
-- Vendor makefile is deduped from 2,219 to 2,200 copy rules; 0 missing sources,
-  0 duplicate destinations.
-- Stock ROM extraction helpers are in `rom/tools/`:
-  - `rebuild_super.js` reconstructs the 23.62 GB raw super from the RSA sparse
-    chunks.
-  - `extract_lp.js` extracts logical partitions from the raw super.
+- The real stock vendor_dlkm tree is committed on `rom-ready`: 292 `.ko` modules
+  plus six metadata files, 298 copy rules.
+- Vendor audit: 2,498 rules, 0 duplicate destinations, 0 missing sources.
+- Stock super extraction helpers are in `rom/tools/`; the stock `/vendor` hash
+  comparison is in `rom/audit/vendor-hash-compare.json`.
 
 ## Still needed from you
 
-1. **ADB (preferred) or a Linux/WSL EROFS extractor.**
-   The stock `vendor_dlkm_a` image is 23.7 MB of **EROFS**, not ext4. Windows
-   7-Zip misreads it. I need one of:
-   - ADB access with the device in Android or TWRP, so I can pull
-     `/vendor_dlkm/lib/modules` directly; or
-   - a Linux/WSL environment with `erofs-utils` (`fsck.erofs --extract`), or a
-     Windows EROFS extractor.
+1. **Evolution X source tree + build server.**
+   Roughly 32 GB RAM and 150 GB free disk. Once the source and server are
+   available, I can run the first build and report the real errors.
 
-   This is the only missing piece for the 149 vendor_dlkm modules.
+2. **Device test window after the build.**
+   Keep a stock firmware backup. Do not relock the bootloader. The first system
+   image may require a data wipe, so schedule that deliberately.
 
-   If ADB is available, the exact pull is:
+## Optional: full vendor image
 
-   ```sh
-   adb shell ls -l /vendor_dlkm/lib/modules
-   adb pull /vendor_dlkm/lib/modules rom/stock-vendor-dlkm-modules
-   ```
+The vendor repository is not a verified 36-31 vendor image. The stock device
+comparison is:
 
-   In TWRP, mount `vendor_dlkm` first if it is not already mounted.
+- 1,029 exact matches
+- 512 files with different contents
+- 12 repo-only files
+- 2,102 stock vendor files not in the repo
 
-2. **Choose the ROM target.**
-   Evolution X (`evox-a17`, matching the vendor branch) is the default. Confirm
-   if you want LineageOS instead.
+The default ROM product uses the **stock vendor and vendor_dlkm partitions**, so
+this does not block an Evolution X system-only build. A full vendor image would
+require rebuilding the vendor tree from the stock `/vendor` contents first.
 
-3. **Build server.**
-   A ROM build needs roughly 32 GB RAM and 150 GB free disk; the hosted runner
-   numbers in the recovery README are not enough. If you provide the server, I
-   can run the first build and return the actual errors.
+## No longer needed
 
-4. **Device test window.**
-   First boot needs the device, a stock firmware backup, and a willingness to
-   wipe data if the first system image does not boot. Do not relock the
-   bootloader.
-
-## Optional but valuable
-
-- A full stock vendor image hash manifest (or ADB access to `/vendor`) lets me
-  prove whether the 830 MB vendor blob set is actually 36-31 rather than the old
-  `roadstr W1WRS36...` list.
-- A complete `vendor_dlkm` image, if you have one separate from the super chunks.
-
-## What is already known to be blocked
-
-- The vendor repo has no top-level VINTF/fstab before `rom-ready`; fixed.
-- 149 donor module names are not in stock vendor_boot; they are in vendor_dlkm.
-- The vendor repo has 0 `.ko` files and no `build.prop`.
-- The stock vendor and vendor_dlkm partitions are EROFS.
+- ADB: used to pull the stock vendor_dlkm modules and the `/vendor` SHA-256
+  manifest.
+- EROFS extraction on the host: the device pull avoided it.
