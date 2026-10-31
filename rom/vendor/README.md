@@ -2,10 +2,15 @@
 
 Repository: `shripad-jyothinath/android_vendor_motorola_avenger`
 Required checkout path: `vendor/motorola/marvel`
+Branch: `rom-ready`
 
 The repository name is legacy (`avenger`), but every path in
 `marvel-vendor.mk` uses `vendor/motorola/marvel`. Cloning it anywhere else
-breaks all 2,219 copy rules.
+breaks all copy rules.
+
+The `rom-ready` branch already removes the 23 duplicate destination rules and
+adds the stock 36-31 top-level VINTF and first-stage fstab. The audit result is
+`rom/audit/vendor-audit-rom-ready.json`.
 
 ## Audit first
 
@@ -24,8 +29,8 @@ node rom/tools/audit_vendor.js \
 
 ## Clean duplicates
 
-The current makefile has 23 duplicate destination rules. The dedupe tool keeps
-the first rule and drops the later exact duplicates:
+The `rom-ready` branch has no duplicate destinations. The dedupe tool is kept for
+verification and for the old `evox-a17` branch:
 
 ```sh
 node rom/tools/dedupe_vendor_makefile.js \

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ROM local manifest for the marvel bring-up.
+
+  The device tree branch is evox-a17. The vendor branch is optional when using
+  the stock vendor partition; it is wired to the cleaned rom-ready branch.
+-->
+<manifest>
+  <remote name="marvel-github" fetch="https://github.com/" />
+
+  <project name="shripad-jyothinath/device_motorola_marvel-recovery"
+           path="device/motorola/marvel"
+           remote="marvel-github"
+           revision="evox-a17" />
+
+  <project name="shripad-jyothinath/android_vendor_motorola_avenger"
+           path="vendor/motorola/marvel"
+           remote="marvel-github"
+           revision="rom-ready" />
+</manifest>

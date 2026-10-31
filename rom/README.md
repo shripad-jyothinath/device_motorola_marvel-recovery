@@ -21,7 +21,8 @@ cross-checks, and the still-missing pieces.
 ## Build
 
 Use an Evolution X or LineageOS source tree. Put this repository at
-`device/motorola/marvel`.
+`device/motorola/marvel` and apply `rom/local_manifest.xml` if you use `repo`.
+Read `rom/DEPENDENCIES.md` for the current blockers.
 
 ```sh
 source build/envsetup.sh
@@ -41,21 +42,24 @@ vendor_dlkm modules.
 ## Optional full vendor image
 
 The vendor repository is `shripad-jyothinath/android_vendor_motorola_avenger`,
-but it must be checked out at `vendor/motorola/marvel`:
+but it must be checked out at `vendor/motorola/marvel` on the `rom-ready`
+branch:
 
 ```sh
-git clone --depth 1 -b evox-a17 \
+git clone --depth 1 -b rom-ready \
   https://github.com/shripad-jyothinath/android_vendor_motorola_avenger.git \
   vendor/motorola/marvel
 ```
 
-Then remove the 23 duplicate copy rules and set the vendor-image flag:
+The `rom-ready` branch already has the 23 duplicate rules removed. Verify the
+cleaned makefile and set the vendor-image flag only after `rom/AUDIT.md` items
+1-3 are resolved:
 
 ```sh
 node rom/tools/dedupe_vendor_makefile.js \
   --file vendor/motorola/marvel/marvel-vendor.mk \
   --out /tmp/marvel-vendor.mk
-# Replace the vendor makefile only after reviewing the diff.
+# If rom-ready is used, this should report removed=0.
 export MARVEL_BUILD_VENDOR_IMAGE=true
 ```
 

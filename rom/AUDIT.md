@@ -28,6 +28,34 @@ File: `rom/audit/vendor-audit.json` (one entry per copy rule).
 - **14 duplicate destination groups / 23 extra entries.** They are exact duplicate rules in the audio and `sku_volcano` sensor permission sets.
 - `rom/tools/dedupe_vendor_makefile.js` removes all 23 and leaves 0 duplicate destinations (verified).
 
+### ROM-ready vendor branch
+
+The vendor repository now has a `rom-ready` branch (commit `dd6be28`) with:
+
+- the 23 duplicate rules removed: **2,200 copy rules, 0 duplicate destinations,
+  0 missing sources** (`rom/audit/vendor-audit-rom-ready.json`);
+- the stock 36-31 top-level `manifest.xml`, `manifest_volcano.xml`,
+  `compatibility_matrix.xml`, and first-stage `fstab.qcom`;
+- copy rules for those four files.
+
+This does not resolve the missing vendor_dlkm modules or the provenance warning
+below.
+
+## Stock super extraction
+
+The Motorola Rescue tool's stock ROM has the full 36-31 `super` image split into
+26 sparse chunks. Using `rom/tools/rebuild_super.js` and
+`rom/tools/extract_lp.js`:
+
+- reconstructed raw super: **23.62 GB**;
+- 12 logical partitions;
+- `vendor_a`: **1,047.6 MB**, EROFS;
+- `vendor_dlkm_a`: **23.7 MB**, EROFS.
+
+The vendor and vendor_dlkm images are EROFS. Windows 7-Zip does not support
+EROFS, so the 149 module files still need a Linux/Android `fsck.erofs` or ADB
+pull. The super/LP extraction scripts are committed under `rom/tools/`.
+
 ## Provenance warning
 
 The vendor makefile's 2,219 source paths exactly match the dropped device tree's
@@ -114,8 +142,8 @@ Kernel modules:
 ## Still blocked / next phase
 
 1. **vendor_dlkm modules**: pull the 149 missing `.ko` files from stock
-   `/vendor_dlkm/lib/modules` (or from a stock `vendor_dlkm` image). This needs
-   device ADB or a firmware image that was not extracted here.
+   `/vendor_dlkm/lib/modules` (or extract the EROFS `vendor_dlkm_a` image with
+   `fsck.erofs --extract`). This needs ADB or a Linux/WSL EROFS extractor.
 2. **Binary provenance**: hash stock `/vendor` files against the vendor repo if a
    full vendor image is wanted.
 3. **VINTF merge**: reconcile the 58 vendor fragments with the stock top-level
