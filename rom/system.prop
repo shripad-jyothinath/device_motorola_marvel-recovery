@@ -1,0 +1,5 @@
+# Device-specific system properties for the ROM product.
+#
+# Keep this file nearly empty until a property is verified against the stock
+# 36-31 build. Vendor props belong in rom/props/vendor.prop and are only used
+# when building a vendor image.

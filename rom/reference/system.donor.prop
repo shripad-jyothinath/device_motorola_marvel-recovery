@@ -1,0 +1,6 @@
+# Legacy crypto compatibility
+persist.vold.ecryptfs_supported=true
+
+# Keyboard
+ro.com.google.ime.kb_pad_port_l=4
+ro.com.google.ime.kb_pad_port_r=4

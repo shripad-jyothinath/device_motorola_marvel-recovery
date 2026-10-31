@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <!-- Status bar height -->
+    <dimen name="status_bar_height">38.0dp</dimen>
+    <dimen name="status_bar_height_default">38.0dp</dimen>
+
+    <!-- Rounded corner radii for quad-curved panel -->
+    <dimen name="rounded_corner_radius_top">28.0dp</dimen>
+    <dimen name="rounded_corner_radius_bottom">28.0dp</dimen>
+
+    <!-- Side margins for curved edges -->
+    <dimen name="status_bar_padding_start">16.0dp</dimen>
+    <dimen name="status_bar_padding_end">16.0dp</dimen>
+</resources>

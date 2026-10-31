@@ -1,0 +1,6 @@
+#
+# Copyright (C) 2026 The LineageOS Project
+# SPDX-License-Identifier: Apache-2.0
+#
+
+vendor.lineage.biometrics.udfps.IUdfpsHbm/default            u:object_r:udfps_hbm_service:s0

@@ -1,0 +1,5 @@
+# Platform-common system_ext properties for SM7750 (sun)
+# Qualcomm camera topology selection requires the vendor-enhanced framework path.
+ro.vendor.qti.va_aosp.support=1
+ro.audio.ihaladaptervendorextension_enabled=true
+ro.control_kcmd=0

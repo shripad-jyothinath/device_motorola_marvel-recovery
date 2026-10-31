@@ -158,3 +158,9 @@ TARGET_USES_LOGD := true
 -include device/qcom/sepolicy_vndr/SEPolicy.mk
 -include device/lineage/sepolicy/libperfmgr/sepolicy.mk
 -include hardware/motorola/sepolicy/qti/SEPolicy.mk
+
+# ROM products only. The twrp_marvel product must keep the recovery-only
+# configuration above; this include does not affect it.
+ifneq ($(filter evolution_marvel lineage_marvel,$(TARGET_PRODUCT)),)
+include $(DEVICE_PATH)/rom/board.mk
+endif

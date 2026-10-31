@@ -1,0 +1,4 @@
+# Fingerprint HAL permissions
+allow hal_fingerprint_default vendor_fingerprint_data_file:chr_file rw_file_perms;
+allow hal_fingerprint_default sysfs_graphics:file r_file_perms;
+allow hal_fingerprint_default uhid_device:chr_file rw_file_perms;

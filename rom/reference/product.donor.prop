@@ -1,0 +1,4 @@
+# Platform-common product properties for SM7750 (sun)
+ro.product.vendor.cpu.abilist=arm64-v8a
+ro.product.vendor.cpu.abilist32=
+ro.product.vendor.cpu.abilist64=arm64-v8a

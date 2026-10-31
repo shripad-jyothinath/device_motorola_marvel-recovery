@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <!-- Default refresh rate in the normal operating condition. -->
+    <integer name="config_defaultRefreshRate">120</integer>
+
+    <!-- The default peak refresh rate for a given device. -->
+    <integer name="config_defaultPeakRefreshRate">144</integer>
+
+    <!-- The bounding path of the cutout (front punch-hole camera) -->
+    <string name="config_mainBuiltInDisplayCutout" translatable="false">
+        M 0,0 H -32 V 96 H 32 V 0 Z
+    </string>
+
+    <!-- Indicate whether the display cutout region is at the top of the display -->
+    <bool name="config_fillMainBuiltInDisplayCutout">true</bool>
+
+    <!-- Whether device has physical in-display fingerprint sensor -->
+    <bool name="config_supportsInDisplayFingerprint">true</bool>
+
+    <!-- Whether device has under-display fingerprint sensor (UDFPS) -->
+    <bool name="config_supportsUdfps">true</bool>
+
+    <!-- UDFPS optical sensor coordinates: center X (636), center Y (2494), radius (106) for 1272x2772 panel -->
+    <integer-array name="config_udfps_sensor_props">
+        <item>636</item>
+        <item>2494</item>
+        <item>106</item>
+    </integer-array>
+
+    <!-- Power profile battery capacity in mAh (7,000 mAh) -->
+    <integer name="config_batteryCapacity">7000</integer>
+
+    <!-- Flag indicating whether the device supports 5G Standalone (SA) and Non-Standalone (NSA) -->
+    <bool name="config_5g_supported">true</bool>
+
+    <!-- Whether the device supports Smart Charging / TurboPower -->
+    <bool name="config_smartChargingAvailable">true</bool>
+
+    <!-- Whether the device supports edge lighting pulse on notification for curved screen -->
+    <bool name="config_edgeLightSupported">true</bool>
+</resources>
+

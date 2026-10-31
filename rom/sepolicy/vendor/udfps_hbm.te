@@ -1,0 +1,11 @@
+#
+# Copyright (C) 2026 The LineageOS Project
+# SPDX-License-Identifier: Apache-2.0
+#
+
+type udfps_hbm_service, service_manager_type, hal_service_type;
+
+add_service(hal_fingerprint_default, udfps_hbm_service)
+binder_call(system_app, hal_fingerprint_default)
+allow system_app udfps_hbm_service:service_manager find;
+allow platform_app udfps_hbm_service:service_manager find;
