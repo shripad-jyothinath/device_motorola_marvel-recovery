@@ -24,12 +24,10 @@ PRODUCT_CHARACTERISTICS := nosdcard
 
 # Optional full vendor image. Disabled by default: the stock vendor partition
 # already contains the matching 36-31 HALs and props. See rom/vendor/README.md.
+# The rom-ready vendor makefile installs its own VINTF/fstab files, so do not
+# duplicate those PRODUCT_COPY_FILES here.
 ifeq ($(MARVEL_BUILD_VENDOR_IMAGE),true)
 $(call inherit-product, vendor/motorola/marvel/marvel-vendor.mk)
-
-PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/rom/fstab.qcom:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.qcom \
-    $(DEVICE_PATH)/rom/vintf/manifest_volcano.xml:$(TARGET_COPY_OUT_VENDOR)/etc/vintf/manifest_volcano.xml
 endif
 
 # Virtual A/B OTA

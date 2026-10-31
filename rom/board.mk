@@ -21,6 +21,6 @@ TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/rom/fstab.qcom
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/rom/sepolicy/vendor
 TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/rom/config.fs
 
-# Kernel modules are intentionally not wired here. The stock vendor_boot has
-# 294 modules, but the vendor_dlkm half is not in the vendor repository or the
-# extracted firmware yet. See rom/AUDIT.md.
+# Kernel modules are supplied by the stock vendor_dlkm partition in the default
+# build. The rom-ready vendor branch also contains the 292 stock .ko files and
+# their copy rules for an optional full vendor image.
