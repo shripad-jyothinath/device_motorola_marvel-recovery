@@ -39,9 +39,11 @@ this does not block an Evolution X system-only build. A full vendor image would
 require rebuilding the vendor tree from the stock `/vendor` contents first.
 
 I pulled the full stock `/vendor` tar over ADB: **1.95 GB**, 3,643 regular files
-and 3,415 symlinks. Windows cannot create those symlinks, so it is kept locally
-rather than committed as a broken tree. On the build server I can extract it and
-regenerate the vendor tree if you want full vendor-image support.
+and 3,415 symlinks. It was verified on Linux with SHA-256
+`1b0b06dcf39681b7594b8a01e7cb3b1e4dcf41b8920021ddcf33645518766ac5` and
+`sha256sum -c` passed **3,643/3,643**. Windows cannot create the symlinks, so it
+is kept locally rather than committed as a broken tree. On the build server I can
+extract it and regenerate the vendor tree if you want full vendor-image support.
 
 ## No longer needed
 

@@ -58,6 +58,16 @@ The vendor and vendor_dlkm images are EROFS. Windows 7-Zip does not support
 EROFS, so the stock vendor_dlkm contents were pulled from the running device via
 ADB instead. The super/LP extraction scripts are committed under `rom/tools/`.
 
+The full stock vendor tar was also verified on a Linux host:
+
+- SHA-256: `1b0b06dcf39681b7594b8a01e7cb3b1e4dcf41b8920021ddcf33645518766ac5`
+- 3,643 regular files
+- 3,415 symlinks
+- `sha256sum -c`: **3,643 / 3,643 OK**
+
+The tar is exact, but it is not committed because the Windows workspace cannot
+materialize the symlinks. Stock vendor remains the build source.
+
 ## Provenance warning
 
 The vendor makefile's 2,219 source paths exactly match the dropped device tree's
