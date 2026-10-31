@@ -8,6 +8,7 @@ DEVICE_PATH := device/motorola/marvel
 # recovery session.
 DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/rom/vintf/manifest.xml
 DEVICE_MATRIX_FILE := $(DEVICE_PATH)/rom/vintf/compatibility_matrix.xml
+DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := $(DEVICE_PATH)/rom/vintf/framework_compatibility_matrix.xml
 
 # Device properties. vendor.prop is generated from the stock 36-31
 # vendor/build.prop; build metadata and VNDK identity are intentionally omitted.

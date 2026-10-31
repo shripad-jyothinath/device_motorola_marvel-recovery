@@ -60,9 +60,6 @@
             <instance>sigmahal64</instance>
         </interface>
     </hal>
-    <vendor-ndk>
-        <version>34</version>
-    </vendor-ndk>
     <system-sdk>
         <version>34</version>
     </system-sdk>
