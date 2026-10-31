@@ -67,7 +67,7 @@ are harmless no-ops. `fox_marvel.mk` only sets `OF_*` variables, which a pure TW
 |---|---|
 | identifiers | `device/xiaomi/amethyst` → `device/motorola/marvel`, `twrp_amethyst` → `twrp_marvel`, brand/model/manufacturer → Motorola |
 | `board-info.txt` | `require board=marvel\|volcano` |
-| partition sizes | `recovery 134217728`, `dtbo 34603008`, `super 21474836480`, group `mot_dp_group` / `21470642176` |
+| partition sizes | `recovery 134217728`, `dtbo 34603008`, `super 23622320128`, group `mot_dp_group` / `23618125824` |
 | dynamic list | **no `odm`** (marvel keeps ODM content in `vendor/odm`) |
 | kernel modules | one unquoted `TW_LOAD_VENDOR_MODULES` list: `goodix_brl_mmi` (+ `goodix_fod_mmi`, `rbs_fod_mmi`; all three are blocklisted on stock), `smcinvoke_dlkm` + `qseecom_proxy` (QSEECom, needed for decryption and not in vendor_boot's `modules.load.recovery`), `qti_battery_charger`, `adsp_loader_dlkm`. libmodprobe resolves the MMI chain (`touchscreen_mmi`, `mmi_*`, `panel_event_notifier`, `sensors_class`) from `modules.dep`. |
 | crypto services | QTI stack on every unit: `qseecomd`, `qseecom-service`, `ssgtzd`, `keymint-qti`, `gatekeeper_default`. **NXP** StrongBox/weaver/secure_element only on `dnes` SKUs, gated on `ro.boot.strongbox_support`. Blobs are the full dependency closure from A171WEH.36-18 (see `BLOBS.md`); the crypto VINTF manifests are from 36-31. |

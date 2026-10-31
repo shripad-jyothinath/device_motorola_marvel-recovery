@@ -107,17 +107,11 @@ AB_OTA_PARTITIONS += \
     vendor_boot \
     vendor_dlkm
 
-AB_OTA_POSTINSTALL_CONFIG += \
-    RUN_POSTINSTALL_system=true \
-    POSTINSTALL_PATH_system=system/bin/otapreopt_script \
-    FILESYSTEM_TYPE_system=erofs \
-    POSTINSTALL_OPTIONAL_system=true
-
-AB_OTA_POSTINSTALL_CONFIG += \
-    RUN_POSTINSTALL_vendor=true \
-    POSTINSTALL_PATH_vendor=bin/checkpoint_gc \
-    FILESYSTEM_TYPE_vendor=erofs \
-    POSTINSTALL_OPTIONAL_vendor=true
+# TWRP's update_engine cannot complete postinstall on this VABC layout:
+# it unmaps the target snapshots before otapreopt/checkpoint_gc and then fails
+# to mount /dev/block/mapper/system_b. The payload is still complete; skip the
+# optional postinstall hooks so the update can finish and switch slots.
+# AB_OTA_POSTINSTALL_CONFIG is intentionally omitted.
 
 # NOTE: no PRODUCT_SOONG_NAMESPACES for vendor/qcom/... here. The TWRP-Test
 # twrp-16.0 manifest has no vendor/ tree at all except vendor/twrp, so a
