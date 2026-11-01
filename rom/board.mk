@@ -43,3 +43,11 @@ TARGET_PREBUILT_KERNEL_HEADERS := $(CURDIR)/device/motorola/marvel/prebuilt/kern
 # vendor from it would overwrite the stock partitions with partial data.
 BOARD_PREBUILT_VENDORIMAGE := $(CURDIR)/stock-images/vendor_a_stock.img
 BOARD_PREBUILT_VENDOR_DLKMIMAGE := $(CURDIR)/stock-images/vendor_dlkm_a_stock.img
+
+# Stock marvel's top-level vbmeta has a direct recovery hash descriptor, not a
+# chained recovery partition. Do not emit a test-key recovery chain in the ROM
+# vbmeta; keep the recovery image buildable without adding that chain.
+BOARD_AVB_RECOVERY_KEY_PATH :=
+BOARD_AVB_RECOVERY_ALGORITHM :=
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX :=
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION :=
