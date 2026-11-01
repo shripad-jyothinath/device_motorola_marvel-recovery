@@ -10,12 +10,8 @@
 DEVICE_PATH := device/motorola/marvel
 
 $(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/compression_with_xor.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
-
-PRODUCT_VIRTUAL_AB_OTA := false
-PRODUCT_USE_SNAPSHOT := false
-PRODUCT_VIRTUAL_AB_COMPRESSION := false
-PRODUCT_ENFORCE_VIRTUAL_AB_OTA := false
 
 # Stock vendor is Android 14 / API 34 / VNDK 34. The product first API is 36,
 # but the VINTF level must stay at the vendor's FCM level for this vendor.
