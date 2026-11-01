@@ -44,6 +44,12 @@ TARGET_PREBUILT_KERNEL_HEADERS := $(CURDIR)/device/motorola/marvel/prebuilt/kern
 BOARD_PREBUILT_VENDORIMAGE := $(CURDIR)/stock-images/vendor_a_stock.img
 BOARD_PREBUILT_VENDOR_DLKMIMAGE := $(CURDIR)/stock-images/vendor_dlkm_a_stock.img
 
+# The ROM product's generated vendor_boot has no first-stage fstab and no
+# kernel modules. The stock vendor_boot carries both (first_stage_ramdisk plus
+# 294 modules), and the boot kernel is byte-identical between the stock A and
+# ROM B images, so use the stock image directly.
+BOARD_PREBUILT_VENDOR_BOOTIMAGE := $(DEVICE_PATH)/prebuilt/vendor_boot_a.img
+
 # Stock marvel's top-level vbmeta has a direct recovery hash descriptor, not a
 # chained recovery partition. Do not emit a test-key recovery chain in the ROM
 # vbmeta; keep the recovery image buildable without adding that chain.
