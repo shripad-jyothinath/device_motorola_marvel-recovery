@@ -4,22 +4,26 @@
 # TWRP/OrangeFox flags for Motorola Edge 70 Fusion (marvel / XT2605)
 
 # --- Logical (dynamic) partitions -------------------------------------------
-/system_image      emmc   /dev/block/mapper/system        flags=display="System Image";backup=1;flashimg=1;slotselect;logical
+# Only real super volumes carry the logical flag. TWRP's
+# Unmap_Super_Devices() treats every Is_Super entry as a DM partition; the
+# *_image pseudo-entries would make it try to destroy nonexistent names such as
+# system_image_b and abort Format Data before make_f2fs runs.
+/system_image      emmc   /dev/block/mapper/system        flags=display="System Image";backup=1;flashimg=1;slotselect
 /system            erofs  /dev/block/mapper/system        flags=display="System";slotselect;logical
 /system            ext4   /dev/block/mapper/system        flags=display="System";slotselect;logical
-/system_ext_image  emmc   /dev/block/mapper/system_ext    flags=display="System EXT Image";backup=1;flashimg=1;slotselect;logical
+/system_ext_image  emmc   /dev/block/mapper/system_ext    flags=display="System EXT Image";backup=1;flashimg=1;slotselect
 /system_ext        erofs  /dev/block/mapper/system_ext    flags=display="System EXT";slotselect;logical
 /system_ext        ext4   /dev/block/mapper/system_ext    flags=display="System EXT";slotselect;logical
-/product_image     emmc   /dev/block/mapper/product       flags=display="Product Image";backup=1;flashimg=1;slotselect;logical
+/product_image     emmc   /dev/block/mapper/product       flags=display="Product Image";backup=1;flashimg=1;slotselect
 /product           erofs  /dev/block/mapper/product       flags=display="Product";slotselect;logical
 /product           ext4   /dev/block/mapper/product       flags=display="Product";slotselect;logical
-/vendor_image      emmc   /dev/block/mapper/vendor        flags=display="Vendor Image";backup=1;flashimg=1;slotselect;logical
+/vendor_image      emmc   /dev/block/mapper/vendor        flags=display="Vendor Image";backup=1;flashimg=1;slotselect
 /vendor            erofs  /dev/block/mapper/vendor        flags=display="Vendor";slotselect;logical
 /vendor            ext4   /dev/block/mapper/vendor        flags=display="Vendor";slotselect;logical
-/vendor_dlkm_image emmc   /dev/block/mapper/vendor_dlkm   flags=display="Vendor DLKM Image";backup=1;flashimg=1;slotselect;logical
+/vendor_dlkm_image emmc   /dev/block/mapper/vendor_dlkm   flags=display="Vendor DLKM Image";backup=1;flashimg=1;slotselect
 /vendor_dlkm       erofs  /dev/block/mapper/vendor_dlkm   flags=display="Vendor DLKM";slotselect;logical
 /vendor_dlkm       ext4   /dev/block/mapper/vendor_dlkm   flags=display="Vendor DLKM";slotselect;logical
-/system_dlkm_image emmc   /dev/block/mapper/system_dlkm   flags=display="System DLKM Image";backup=1;flashimg=1;slotselect;logical
+/system_dlkm_image emmc   /dev/block/mapper/system_dlkm   flags=display="System DLKM Image";backup=1;flashimg=1;slotselect
 /system_dlkm       erofs  /dev/block/mapper/system_dlkm   flags=display="System DLKM";slotselect;logical
 /system_dlkm       ext4   /dev/block/mapper/system_dlkm   flags=display="System DLKM";slotselect;logical
 
