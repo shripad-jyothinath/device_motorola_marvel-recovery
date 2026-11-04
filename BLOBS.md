@@ -5,6 +5,11 @@ Everything under `recovery/root/vendor/` comes from the stock **A171WEH.36-18** 
 security patch 2026-08-01). That is the package Motorola's Rescue and Smart Assistant
 serves for XT2605 retail (cid 50), and the build the phone runs after the OTA.
 
+The 36-31 vendor tree is not a crypto-binary mismatch: 2,687/2,710 vendor
+files are byte-identical, and KeyMint, Gatekeeper, QSEECom, ssgtzd and the TEE
+libraries are unchanged. The 36-18 provenance is a package origin, not a
+different crypto ABI.
+
 The previous set (46 files from `W2WE36.56-32-ST3.2`) was replaced wholesale: it was
 from an older TrustZone build and was missing most of the libraries the services
 actually link against.
