@@ -66,7 +66,8 @@ PRODUCT_PACKAGES += \
     otapreopt_script \
     snapuserd_ramdisk \
     modprobe \
-    toolbox_ramdisk
+    toolbox_ramdisk \
+    ramdisk_build_prop
 
 PRODUCT_PACKAGES_DEBUG += \
     update_engine_client

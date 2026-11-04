@@ -48,6 +48,16 @@ MARVEL_STOCK_IMAGE_DIR ?= $(CURDIR)/stock-images
 BOARD_PREBUILT_VENDORIMAGE := $(MARVEL_STOCK_IMAGE_DIR)/vendor_a_stock.img
 BOARD_PREBUILT_VENDOR_DLKMIMAGE := $(MARVEL_STOCK_IMAGE_DIR)/vendor_dlkm_a_stock.img
 
+# GKI modules for system_dlkm. The stock 60-module set is the only set that
+# matches the stock 6.1 kernel; an empty system_dlkm breaks Bluetooth, NFC,
+# USB tethering, zram and every vendor module that depends on those GKI
+# modules. Keep the source directory next to the stock vendor images.
+MARVEL_STOCK_DLKM_DIR ?= $(MARVEL_STOCK_IMAGE_DIR)/system_dlkm
+BOARD_SYSTEM_KERNEL_MODULES := $(wildcard $(MARVEL_STOCK_DLKM_DIR)/lib/modules/*/*.ko)
+ifeq ($(strip $(BOARD_SYSTEM_KERNEL_MODULES)),)
+$(error Stock system_dlkm modules not found under $(MARVEL_STOCK_DLKM_DIR)/lib/modules; copy the 60 stock GKI .ko files there)
+endif
+
 ifneq ($(MARVEL_BUILD_VENDOR_IMAGE),true)
 ifeq ($(wildcard $(BOARD_PREBUILT_VENDORIMAGE)),)
 $(error Stock vendor image not found at $(BOARD_PREBUILT_VENDORIMAGE). Set MARVEL_STOCK_IMAGE_DIR to the directory containing vendor_a_stock.img and vendor_dlkm_a_stock.img)
