@@ -18,6 +18,16 @@
   "vendor_dlkm_image": {
     "sha256": "9a7b86a0d21ce44ba049ccea8cccb7fb4d62948654f93eb58f6fa195ec4137b9"
   },
+  "stock_images": {
+    "vendor": {
+      "file": "vendor_a_stock.img",
+      "sha256": "db8c89948ee189fd5c16c8b94616ad607d62f19fb6cd918d711e6d9be4816c33"
+    },
+    "vendor_dlkm": {
+      "file": "vendor_dlkm_a_stock.img",
+      "sha256": "9a7b86a0d21ce44ba049ccea8cccb7fb4d62948654f93eb58f6fa195ec4137b9"
+    }
+  },
   "kernel": {
     "vermagic": "6.1.157-android14-11-ga8b0b542991e-ab15601211 SMP preempt mod_unload modversions aarch64"
   },
