@@ -64,7 +64,9 @@ PRODUCT_PACKAGES += \
     update_verifier \
     checkpoint_gc \
     otapreopt_script \
-    snapuserd_ramdisk
+    snapuserd_ramdisk \
+    modprobe \
+    toolbox_ramdisk
 
 PRODUCT_PACKAGES_DEBUG += \
     update_engine_client
@@ -73,7 +75,10 @@ PRODUCT_PACKAGES_DEBUG += \
 # prebuilt vendor_boot cannot carry it, so verify the built init_boot contains
 # system/bin/snapuserd, system/bin/snapuserd_ramdisk and
 # system/etc/init/snapuserd.rc (rom/tools/verify_init_boot.sh). Without it a
-# VABC mount waits on dm-user forever: splash, no kernel panic.
+# VABC mount waits on dm-user forever: splash, no kernel panic. The stock
+# first-stage ramdisk also carries modprobe, toolbox_ramdisk and
+# system/etc/ramdisk/build.prop; keep those so the ROM init_boot matches the
+# stock first-stage environment.
 
 # RRO overlays, verified and rescaled for the 1272x2772 panel in this tree.
 PRODUCT_PACKAGES += \

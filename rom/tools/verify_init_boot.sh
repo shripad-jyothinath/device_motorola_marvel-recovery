@@ -49,7 +49,10 @@ rc=0
 for entry in \
     system/bin/snapuserd \
     system/bin/snapuserd_ramdisk \
-    system/etc/init/snapuserd.rc
+    system/etc/init/snapuserd.rc \
+    system/bin/modprobe \
+    system/bin/toolbox_ramdisk \
+    system/etc/ramdisk/build.prop
 do
     found=0
     if [ "$LIST_OK" = 1 ]; then
