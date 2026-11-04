@@ -41,8 +41,21 @@ TARGET_PREBUILT_KERNEL_HEADERS := $(CURDIR)/device/motorola/marvel/prebuilt/kern
 # Use the exact stock vendor images dumped from the device's slot A. The
 # vendor tree on this build host is not a complete 36-31 image, so generating
 # vendor from it would overwrite the stock partitions with partial data.
-BOARD_PREBUILT_VENDORIMAGE := $(CURDIR)/stock-images/vendor_a_stock.img
-BOARD_PREBUILT_VENDOR_DLKMIMAGE := $(CURDIR)/stock-images/vendor_dlkm_a_stock.img
+#
+# Point MARVEL_STOCK_IMAGE_DIR at the directory holding the two dumps when
+# building, for example .../marvel-data/stock-vendor-images.
+MARVEL_STOCK_IMAGE_DIR ?= $(CURDIR)/stock-images
+BOARD_PREBUILT_VENDORIMAGE := $(MARVEL_STOCK_IMAGE_DIR)/vendor_a_stock.img
+BOARD_PREBUILT_VENDOR_DLKMIMAGE := $(MARVEL_STOCK_IMAGE_DIR)/vendor_dlkm_a_stock.img
+
+ifneq ($(MARVEL_BUILD_VENDOR_IMAGE),true)
+ifeq ($(wildcard $(BOARD_PREBUILT_VENDORIMAGE)),)
+$(error Stock vendor image not found at $(BOARD_PREBUILT_VENDORIMAGE). Set MARVEL_STOCK_IMAGE_DIR to the directory containing vendor_a_stock.img and vendor_dlkm_a_stock.img)
+endif
+ifeq ($(wildcard $(BOARD_PREBUILT_VENDOR_DLKMIMAGE)),)
+$(error Stock vendor_dlkm image not found at $(BOARD_PREBUILT_VENDOR_DLKMIMAGE). Set MARVEL_STOCK_IMAGE_DIR to the directory containing vendor_a_stock.img and vendor_dlkm_a_stock.img)
+endif
+endif
 
 # The ROM product's generated vendor_boot has no first-stage fstab and no
 # kernel modules. The stock vendor_boot carries both (first_stage_ramdisk plus
