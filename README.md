@@ -19,6 +19,9 @@ which is the same SoC and the same partition scheme.
 Every blob, the fstab, the init triggers and the prebuilts come from that build. Update the
 phone to it with the normal OTA before flashing this recovery. Do **not** use Rescue and
 Smart Assistant's "Rescue" on a phone you care about: it wipes userdata.
+The prebuilt boot DTB is the 36-18 copy (`DA70456E…`, 430,639 B) rather than the
+36-31 `B34E9B90…` (430,629 B); the only difference is `__symbols__/msm_vidc`,
+so this is a provenance note, not a functional mismatch.
 
 ## Build
 
@@ -69,7 +72,7 @@ are harmless no-ops. `fox_marvel.mk` only sets `OF_*` variables, which a pure TW
 | `board-info.txt` | `require board=marvel\|volcano` |
 | partition sizes | `recovery 134217728`, `dtbo 34603008`, `super 23622320128`, group `mot_dp_group` / `23618125824` |
 | dynamic list | **no `odm`** (marvel keeps ODM content in `vendor/odm`) |
-| kernel modules | one unquoted `TW_LOAD_VENDOR_MODULES` list: `goodix_brl_mmi` (+ `goodix_fod_mmi`, `rbs_fod_mmi`; all three are blocklisted on stock), `smcinvoke_dlkm` + `qseecom_proxy` (QSEECom, needed for decryption and not in vendor_boot's `modules.load.recovery`), `qti_battery_charger`, `adsp_loader_dlkm`. libmodprobe resolves the MMI chain (`touchscreen_mmi`, `mmi_*`, `panel_event_notifier`, `sensors_class`) from `modules.dep`. |
+| kernel modules | one unquoted `TW_LOAD_VENDOR_MODULES` list: `goodix_brl_mmi` (+ `goodix_fod_mmi`, `rbs_fod_mmi`; all three are blocklisted on stock), `smcinvoke_dlkm` + `qseecom_proxy` (QSEECom, needed for decryption; both are present in the stock `modules.load.recovery`, but kept explicit for TWRP), `qti_battery_charger`, `adsp_loader_dlkm`. libmodprobe resolves the MMI chain (`touchscreen_mmi`, `mmi_*`, `panel_event_notifier`, `sensors_class`) from `modules.dep`. |
 | crypto services | QTI stack on every unit: `qseecomd`, `qseecom-service`, `ssgtzd`, `keymint-qti`, `gatekeeper_default`. **NXP** StrongBox/weaver/secure_element only on `dnes` SKUs, gated on `ro.boot.strongbox_support`. Blobs are the full dependency closure from A171WEH.36-18 (see `BLOBS.md`); the crypto VINTF manifests are from 36-31. |
 | crypto rc | `init.recovery.encryption.rc`: firmware mounted → `vendor.qseecomd`, `qseecom-service`, `vendor.ssgtzd`; listeners registered → `vendor.keymint-qti`, `vendor.gatekeeper_default`; StrongBox SKUs additionally `vendor.secure_element`, `vendor.keymint-strongbox`, `vendor.weaver_nxp` |
 | fstab | dropped `odm`; both `erofs`+`ext4` for every logical partition; `/metadata` and `/data` exactly as the OS's `vendor/etc/fstab.qcom`: **`fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized+wrappedkey_v0`**, **`metadata_encryption=aes-256-xts:wrappedkey_v0`**, `inlinecrypt` mount option; `modem` is **ext4** |

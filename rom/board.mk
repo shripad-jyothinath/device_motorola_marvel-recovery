@@ -4,6 +4,9 @@
 
 DEVICE_PATH := device/motorola/marvel
 
+# The board is API 34 even though the product first API is 36.
+BOARD_SHIPPING_API_LEVEL := 34
+
 # VINTF. These are the stock A171WEH.36-31 files, verified against the running
 # recovery session.
 DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/rom/vintf/manifest.xml

@@ -62,7 +62,7 @@ This document keeps the earlier failure history below for reference; the configu
 - TWRP 3.7.1_16-0; boot header v4, `kernel_size=0` (kernel from `boot`), legacy LZ4 ramdisk.
 - Header `os_version=0x220001A9` = Android 17.0.0 / 2026-09-01; `prop.default` security patch 2026-09-01.
 - Tree: `device_motorola_marvel-recovery`.
-- Crypto blobs under `recovery/root/vendor` are taken from **A171WEH.36-18** (see `BLOBS.md`); the phone is **A171WEH.36-31**. This is a known mismatch.
+- Crypto blobs under `recovery/root/vendor` are taken from **A171WEH.36-18** (see `BLOBS.md`); the phone is **A171WEH.36-31**. The crypto services and libraries are byte-identical between the two vendor trees, so this is not a binary mismatch.
 - TWRP base is `twrp-16.0` (Android 16) per CI; the tree's own README (line 410) notes that Android 17 data on a TWRP-16 base is untested and a mismatch may make decryption fail.
 
 ## Symptom

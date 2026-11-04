@@ -1,13 +1,16 @@
 # ROM bring-up — Motorola Edge 70 Fusion (`marvel`)
 
-This branch (`evox-a17`) keeps the TWRP product untouched and adds a separate
-ROM-side scaffold. The recovery product is still `twrp_marvel.mk`; the only
-active ROM product is `evolution_marvel`.
+This branch (`evox-a17`) keeps the ROM product separate from the TWRP product;
+the recovery tree is maintained on `master`. The only active ROM product is
+`evolution_marvel`.
 
 ## What is active
 
-- Stock 36-31 `vendor` and `vendor_dlkm` partitions by default. No vendor image
-  is rebuilt.
+- Stock 36-31 `vendor`, `vendor_dlkm`, and `system_dlkm` partitions by default.
+  No vendor image is rebuilt. `MARVEL_STOCK_IMAGE_DIR` must contain
+  `vendor_a_stock.img`, `vendor_dlkm_a_stock.img`, and
+  `system_dlkm/lib/modules/*/*.ko` (the 60 stock GKI modules).
+- Product first API is 36; vendor compatibility/VNDK stays at 34.
 - Stock `manifest.xml`, `manifest_volcano.xml`, `compatibility_matrix.xml`, and
   first-stage `fstab.qcom`.
 - `rom/props/vendor.prop` generated from stock `vendor/build.prop`.

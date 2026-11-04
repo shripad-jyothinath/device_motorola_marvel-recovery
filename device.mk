@@ -158,8 +158,9 @@ TW_EXCLUDE_TWRPAPP      := true
 #
 # goodix_brl_mmi / goodix_fod_mmi / rbs_fod_mmi are in the stock
 # modules.blocklist, so they must be named here explicitly.
-# smcinvoke_dlkm / qseecom_proxy are not in vendor_boot's modules.load.recovery,
-# so nothing else loads them in recovery.
+# smcinvoke_dlkm / qseecom_proxy are present in the stock vendor_boot
+# modules.load.recovery; keep them explicit here because TWRP's own loader
+# uses this list.
 #
 # Keep this ONE unquoted list: TWRP passes a value that starts and ends with a
 # quote through verbatim, so several "quoted" chunks would concatenate into one
