@@ -165,6 +165,9 @@ TW_EXCLUDE_TWRPAPP      := true
 # quote through verbatim, so several "quoted" chunks would concatenate into one
 # C string and glue neighbouring module names together.
 # ---------------------------------------------------------------------------
+# Stock module dump and per-module metadata:
+# https://github.com/shripad-jyothinath/android_vendor_motorola_marvel_modules
+# Run rom/tools/check_vendor_modules.js <module-repo> after changing this list.
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 TW_LOAD_VENDOR_BOOT_MODULES := true
 TW_LOAD_VENDOR_MODULES := \

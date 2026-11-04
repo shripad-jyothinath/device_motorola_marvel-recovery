@@ -1,0 +1,32 @@
+{
+  "source": "A171WEH.36-31",
+  "module_repo": "https://github.com/shripad-jyothinath/android_vendor_motorola_marvel_modules",
+  "modules": {
+    "vendor_boot": 294,
+    "vendor_dlkm": 292
+  },
+  "hashes": {
+    "kernel": {
+      "path": "prebuilt/kernel",
+      "sha256": "ca8f54a3c8f3570fd02549281060e12d436f131ce08dc2825978f154fcf70ee0"
+    },
+    "vendor_boot": {
+      "path": "prebuilt/vendor_boot_a.img",
+      "sha256": "ed7508888d292c98bc5eacb708818706626340adc7e70f475f2b4ca95b65306a"
+    }
+  },
+  "vendor_dlkm_image": {
+    "sha256": "9a7b86a0d21ce44ba049ccea8cccb7fb4d62948654f93eb58f6fa195ec4137b9"
+  },
+  "kernel": {
+    "vermagic": "6.1.157-android14-11-ga8b0b542991e-ab15601211 SMP preempt mod_unload modversions aarch64"
+  },
+  "goodix_firmware": [
+    "recovery/root/vendor/firmware/boe_goodix_firmware.bin",
+    "recovery/root/vendor/firmware/boe_goodix_cfg_group.bin",
+    "recovery/root/vendor/firmware/csot_goodix_firmware.bin",
+    "recovery/root/vendor/firmware/csot_goodix_cfg_group.bin",
+    "recovery/root/vendor/firmware/tm_goodix_firmware.bin",
+    "recovery/root/vendor/firmware/tm_goodix_cfg_group.bin"
+  ]
+}
