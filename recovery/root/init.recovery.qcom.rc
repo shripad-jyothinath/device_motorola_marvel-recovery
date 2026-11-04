@@ -67,6 +67,15 @@ on early-fs
     write /proc/sys/walt/sched_lib_mask_force 255
 
 on early-fs
+    # Mount /metadata before TWRP starts. update_engine_sideload writes the
+    # VABC snapshot state here, and first-stage init reads it after the reboot.
+    # Without it init logs "Not booting from new slot" and mounts the base
+    # partitions instead of the OTA snapshots.
+    mkdir /metadata 0771 system system
+    wait /dev/block/bootdevice/by-name/metadata 10
+    mount f2fs /dev/block/bootdevice/by-name/metadata /metadata noatime nosuid nodev discard
+
+on early-fs
     # I/O tuning
     write /sys/block/sde/queue/read_ahead_kb 2048
     write /sys/block/sde/queue/nr_requests 256

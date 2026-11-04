@@ -32,13 +32,16 @@ $(call inherit-product, vendor/motorola/marvel/marvel-vendor.mk)
 endif
 
 # Virtual A/B OTA
+#
+# recovery is intentionally excluded. The ROM product still builds a recovery
+# image (BoardConfig sets BOARD_RECOVERYIMAGE_PARTITION_SIZE), but shipping it
+# in AB_OTA_PARTITIONS overwrites the TWRP recovery partition with AOSP recovery.
 AB_OTA_UPDATER := true
 AB_OTA_PARTITIONS += \
     boot \
     dtbo \
     init_boot \
     product \
-    recovery \
     system \
     system_dlkm \
     system_ext \
@@ -65,6 +68,12 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PACKAGES_DEBUG += \
     update_engine_client
+
+# snapuserd_ramdisk installs into the generic (init_boot) ramdisk. The stock
+# prebuilt vendor_boot cannot carry it, so verify the built init_boot contains
+# system/bin/snapuserd, system/bin/snapuserd_ramdisk and
+# system/etc/init/snapuserd.rc (rom/tools/verify_init_boot.sh). Without it a
+# VABC mount waits on dm-user forever: splash, no kernel panic.
 
 # RRO overlays, verified and rescaled for the 1272x2772 panel in this tree.
 PRODUCT_PACKAGES += \

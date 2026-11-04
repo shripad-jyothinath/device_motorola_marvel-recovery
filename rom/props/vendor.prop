@@ -1,5 +1,9 @@
 # Generated from stock A171WEH.36-31 vendor/build.prop.
 # Build metadata and VNDK/API identity are intentionally omitted; the build sets them.
+#
+# The QTI and NXP KeyMint HALs wait for this property and pass it to the TA as
+# the vendor patch level. Keep it equal to the installed vendor firmware.
+ro.vendor.build.security_patch=2026-09-01
 
 ro.product.vendor.brand=motorola
 ro.product.vendor.device=marvel
