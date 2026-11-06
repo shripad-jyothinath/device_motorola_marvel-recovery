@@ -37,6 +37,9 @@ TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/rom/config.fs
 KERNEL_BUILD_OUT_PREFIX := $(CURDIR)/
 TARGET_PREBUILT_KERNEL_HEADERS := $(CURDIR)/device/motorola/marvel/prebuilt/kernel-headers.tar.gz
 
+# BoardConfigSoong.mk exports these before this file sets them; refresh the
+# exported Soong values now that the final paths are known.
+
 # Kernel modules are supplied by the stock vendor_dlkm partition in the default
 # build. The rom-ready vendor branch also contains the 292 stock .ko files and
 # their copy rules for an optional full vendor image.
@@ -83,3 +86,7 @@ BOARD_AVB_RECOVERY_KEY_PATH :=
 BOARD_AVB_RECOVERY_ALGORITHM :=
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX :=
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION :=
+
+# Register the full Lineage Soong variable set after all local paths are set.
+include vendor/lineage/config/BoardConfigKernel.mk
+include vendor/lineage/config/BoardConfigSoong.mk

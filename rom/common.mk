@@ -57,6 +57,7 @@ AB_OTA_PARTITIONS += \
     system_dlkm \
     system_ext \
     vbmeta \
+    vbmeta_system \
     vendor \
     vendor_boot \
     vendor_dlkm
@@ -68,6 +69,7 @@ AB_OTA_PARTITIONS += \
 # AB_OTA_POSTINSTALL_CONFIG is intentionally omitted.
 
 # Device-side packages that are not recovery-specific.
+PRODUCT_PACKAGES += android.hidl.allocator@1.0-service
 PRODUCT_PACKAGES += \
     fastbootd \
     update_engine \
