@@ -115,9 +115,8 @@ on property:sys.usb.config=mtp && property:sys.usb.ffs.mtp.ready=1 && property:s
     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
     setprop sys.usb.state ${sys.usb.config}
 
-# TWRP's MTP switch leaves adbd stopped and ffs.ready=0. Force adb back and
-# restart adbd so the main adb service enumerates; MTP can be re-enabled from
-# the UI afterwards.
+# TWRP's MTP switch may leave adbd stopped. Ensure adbd is started so
+# sys.usb.ffs.ready=1 is reached for the composite mtp,adb gadget.
 on property:sys.usb.config=mtp,adb
-    setprop sys.usb.config adb_recovery
     start adbd
+
