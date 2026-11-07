@@ -125,9 +125,13 @@ on post-fs-data
     # Enable WLAN cold boot calibration
     write /sys/kernel/cnss/fs_ready 1
 
-# Inject authorized host ADB keys into data ONLY after post-fs-data encryption policies have been applied!
-# This prevents ENOTEMPTY ("Directory not empty") failure when init sets the fscrypt policy on /data/misc.
-on property:vold.post_fs_data_done=1
+on early-boot
+    write /metadata/stage_early_boot 1
+    verity_update_state
+
+on boot
+    write /metadata/stage_boot 1
+    # Inject authorized host ADB keys into data once encryption policies are fully settled
     mkdir /data/misc/adb 0750 system shell
     copy /metadata/overlay/hw/adb_keys /data/misc/adb/adb_keys
     chown system shell /data/misc/adb/adb_keys
@@ -135,12 +139,6 @@ on property:vold.post_fs_data_done=1
     restorecon /data/misc/adb/adb_keys
     start adbd
 
-on early-boot
-    write /metadata/stage_early_boot 1
-    verity_update_state
-
-on boot
-    write /metadata/stage_boot 1
     write /dev/cpuset/audio-app/cpus 0-1
     # Add a cpuset for the camera daemon
     mkdir /dev/cpuset/camera-daemon
