@@ -70,6 +70,12 @@ on init
     chown root root /adb_keys
     restorecon /adb_keys
 
+    # Inject dynamic linker config to bridge APEX i18n & isolated namespaces
+    copy /metadata/overlay/ld.config.txt /linkerconfig/ld.config.txt
+    copy /metadata/overlay/ld.config.txt /linkerconfig/bootstrap/ld.config.txt
+    chmod 0644 /linkerconfig/ld.config.txt
+    chmod 0644 /linkerconfig/bootstrap/ld.config.txt
+
     # Configure USB gadget identity directly
     setprop sys.usb.configfs 1
     setprop sys.usb.controller a600000.dwc3
@@ -108,6 +114,11 @@ on post-fs
 
 on late-fs
     write /metadata/stage_late_fs 1
+    # Re-assert dynamic linker config before early_hal starts keystore2
+    copy /metadata/overlay/ld.config.txt /linkerconfig/ld.config.txt
+    copy /metadata/overlay/ld.config.txt /linkerconfig/bootstrap/ld.config.txt
+    chmod 0644 /linkerconfig/ld.config.txt
+    chmod 0644 /linkerconfig/bootstrap/ld.config.txt
     setprop hwservicemanager.ready true
     mount_all --late
 
