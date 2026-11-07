@@ -318,3 +318,15 @@ mode: 0771
 user: AID_MEDIA
 group: AID_MEDIA
 caps: 0
+
+[vendor/bin/vendor_modprobe.sh]
+mode: 0755
+user: AID_ROOT
+group: AID_SHELL
+caps: 0
+
+[vendor/bin/system_dlkm_modprobe.sh]
+mode: 0755
+user: AID_ROOT
+group: AID_SHELL
+caps: 0

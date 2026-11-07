@@ -209,7 +209,21 @@ BOARD_USES_QCOM_FBE_DECRYPTION  := true
 #   libnetutils, libssl            <- ssgtzd's dsi_netctrl/nicm chain
 #   libion                         <- libkeymasterdeviceutils, librecovery_updater
 #   libjsoncpp                     <- ssgtzd, libtaautoload
+#   libpcre2                       <- libselinux (vndservicemanager)
+#   libhardware_legacy             <- libjc_keymint_transport_nxp (StrongBox)
+#   libgatekeeper                  <- hw/libqtigatekeeper
+#   libz                           <- libboot_control_qti, toybox
+#   libfmq, libui, libgralloctypes <- display/allocator/composer services
 MARVEL_RECOVERY_SYSTEM_LIBS := \
+    libfmq \
+    libgatekeeper \
+    libgralloctypes \
+    libhardware_legacy \
+    libminijail \
+    libnl \
+    libpcre2 \
+    libui \
+    libz \
     android.hardware.common-V2-ndk \
     libdmabufheap \
     libion \

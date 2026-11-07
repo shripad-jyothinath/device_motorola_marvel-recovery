@@ -1,2 +1,31 @@
+//
+// Copyright (C) 2026 The Android Open Source Project
+// Copyright (C) 2026 Shripad
+// SPDX-License-Identifier: Apache-2.0
+//
+
 soong_namespace {
+}
+
+// 0-dependency static stub for boringssl_self_test64
+// Bypasses the boringssl-self-check-failed reboot loop during early boot
+cc_binary {
+    name: "boringssl_self_test64_vendor",
+    srcs: ["stubs/boringssl_self_test64_stub.S"],
+    vendor: true,
+    nostdlib: true,
+    static_executable: true,
+    no_default_compiler_flags: true,
+    system_shared_libs: [],
+}
+
+// Prebuilt static stub fallback for standalone builds
+cc_prebuilt_binary {
+    name: "boringssl_self_test64_prebuilt",
+    srcs: ["prebuilt/stubs/boringssl_self_test64_static"],
+    vendor: true,
+    strip: {
+        none: true,
+    },
+    check_elf_files: false,
 }

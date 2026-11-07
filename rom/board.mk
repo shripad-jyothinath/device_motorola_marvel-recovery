@@ -9,7 +9,13 @@ BOARD_SHIPPING_API_LEVEL := 34
 
 # VINTF. These are the stock A171WEH.36-31 files, verified against the running
 # recovery session.
+# VINTF manifests:
+# - Vendor manifest: declares vendor HALs including Qualcomm IKeyMintDevice/default.
+# - ODM manifest: declares ODM HALs including NXP StrongBox IKeyMintDevice/strongbox
+#   and IWeaver/default on the eSE.
+# Separating vendor and ODM avoids duplicate FqInstance errors in libvintf.
 DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/rom/vintf/manifest.xml
+ODM_MANIFEST_FILES += $(DEVICE_PATH)/rom/vintf/manifest_bnes.xml
 DEVICE_MATRIX_FILE := $(DEVICE_PATH)/rom/vintf/compatibility_matrix.xml
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := $(DEVICE_PATH)/rom/vintf/framework_compatibility_matrix.xml
 

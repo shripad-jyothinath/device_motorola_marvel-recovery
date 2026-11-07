@@ -1,0 +1,126 @@
+<!--
+    Input:
+        device/moto/marvel/vintf/manifest_bnes.xml
+        vendor/qcom/proprietary/securemsm/esehal/vintf_res/secure_element-service.xml
+        vendor/nxp/opensource/keymaster/keymint/KM300/android.hardware.security.keymint-service.strongbox.xml
+        vendor/nxp/opensource/keymaster/keymint/KM300/android.hardware.security.sharedsecret-service.strongbox.xml
+        vendor/nxp/opensource/keymaster/weaver/aidl_impl/android.hardware.weaver-service.nxp.xml
+-->
+<manifest version="7.0" type="device">
+    <hal format="aidl" override="true">
+        <name>android.hardware.nfc</name>
+        <fqname>INfc/default</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>android.hardware.radio.data</name>
+        <version>2</version>
+        <fqname>IRadioData/slot1</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>android.hardware.radio.messaging</name>
+        <version>2</version>
+        <fqname>IRadioMessaging/slot1</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>android.hardware.radio.modem</name>
+        <version>2</version>
+        <fqname>IRadioModem/slot1</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>android.hardware.radio.network</name>
+        <version>2</version>
+        <fqname>IRadioNetwork/slot1</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>android.hardware.radio.sap</name>
+        <fqname>ISap/slot1</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>android.hardware.radio.sim</name>
+        <version>2</version>
+        <fqname>IRadioSim/slot1</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>android.hardware.radio.voice</name>
+        <version>2</version>
+        <fqname>IRadioVoice/slot1</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>android.hardware.secure_element</name>
+        <fqname>ISecureElement/SIM1</fqname>
+        <fqname>ISecureElement/eSE1</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>android.hardware.security.keymint</name>
+        <version>3</version>
+        <fqname>IKeyMintDevice/strongbox</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>android.hardware.security.keymint</name>
+        <version>3</version>
+        <fqname>IRemotelyProvisionedComponent/strongbox</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>android.hardware.security.sharedsecret</name>
+        <fqname>ISharedSecret/strongbox</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>android.hardware.weaver</name>
+        <version>2</version>
+        <fqname>IWeaver/default</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>android.se.omapi</name>
+        <fqname>ISecureElementService/default</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>vendor.nxp.nxpnfc_aidl</name>
+        <fqname>INxpNfc/default</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>vendor.qti.hardware.data.connectionaidl</name>
+        <fqname>IDataConnection/slot1</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>vendor.qti.hardware.data.connectionfactory</name>
+        <fqname>IFactory/slot0</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>vendor.qti.hardware.data.iwlandata</name>
+        <fqname>IIWlan/slot1</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>vendor.qti.hardware.radio.am</name>
+        <fqname>IQcRilAudio/slot1</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>vendor.qti.hardware.radio.ims</name>
+        <version>16</version>
+        <fqname>IImsRadio/imsradio0</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>vendor.qti.hardware.radio.lpa</name>
+        <fqname>IUimLpa/UimLpa0</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>vendor.qti.hardware.radio.qcrilhook</name>
+        <fqname>IQtiOemHook/oemhook0</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>vendor.qti.hardware.radio.qtiradio</name>
+        <version>11</version>
+        <fqname>IQtiRadioStable/slot1</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>vendor.qti.hardware.radio.uim</name>
+        <fqname>IUim/Uim0</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>vendor.qti.hardware.radio.uim_remote_client</name>
+        <fqname>IUimRemoteServiceClient/uimRemoteClient0</fqname>
+    </hal>
+    <hal format="aidl" override="true">
+        <name>vendor.qti.hardware.radio.uim_remote_server</name>
+        <fqname>IUimRemoteServiceServer/uimRemoteServer0</fqname>
+    </hal>
+</manifest>

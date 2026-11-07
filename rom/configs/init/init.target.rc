@@ -1,0 +1,313 @@
+# Copyright (c) 2019-2021, The Linux Foundation. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#     * Neither the name of The Linux Foundation nor the names of its
+#       contributors may be used to endorse or promote products derived
+#       from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+# BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+# OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Changes from Qualcomm Innovation Center are provided under the following license:
+# Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+import /vendor/etc/init/hw/init.qti.kernel.rc
+import /vendor/etc/init/hw/init.mmi.rc
+
+on early-init
+    write /proc/sys/kernel/printk_devkmsg ratelimited
+    export MEMTAG_OPTIONS off
+    write /metadata/stage_early_init 1
+    mkdir /dev/boringssl 0777 root root
+    mkdir /dev/boringssl/selftest 0777 root root
+    chmod 0777 /dev/boringssl
+    chmod 0777 /dev/boringssl/selftest
+    # Force configfs mode and controller identifiers
+    setprop sys.usb.configfs 1
+    setprop sys.usb.controller a600000.dwc3
+    setprop vendor.usb.controller a600000.dwc3
+    # Satisfy all early HAL and system property blockers
+    setprop vendor.all.modules.ready 1
+    setprop hwservicemanager.ready true
+    setprop bpf.progs_loaded 1
+    setprop keystore.module_hash.sent true
+    setprop apexd.status activated
+    setprop persist.sys.usb.config adb
+    setprop sys.usb.config adb
+
+on init
+    write /metadata/stage_init 1
+    mkdir /dev/boringssl 0777 root root
+    mkdir /dev/boringssl/selftest 0777 root root
+    chmod 0777 /dev/boringssl
+    chmod 0777 /dev/boringssl/selftest
+    wait /dev/block/platform/soc/${ro.boot.bootdevice}
+    symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
+    chown system system /sys/devices/platform/soc/1d84000.ufshc/auto_hibern8
+    chmod 0660 /sys/devices/platform/soc/1d84000.ufshc/auto_hibern8
+    start logd
+
+    # Staging authorized host keys in rootfs fallback
+    copy /metadata/overlay/hw/adb_keys /adb_keys
+    chmod 0644 /adb_keys
+    chown root root /adb_keys
+    restorecon /adb_keys
+
+    # Configure USB gadget identity directly
+    setprop sys.usb.configfs 1
+    setprop sys.usb.controller a600000.dwc3
+    setprop vendor.usb.controller a600000.dwc3
+    write /config/usb_gadget/g1/idVendor 0x22b8
+    write /config/usb_gadget/g1/idProduct 0x2e81
+    write /config/usb_gadget/g1/strings/0x409/serialnumber ${ro.serialno}
+    write /config/usb_gadget/g1/strings/0x409/manufacturer "Motorola"
+    write /config/usb_gadget/g1/strings/0x409/product "Motorola Edge 70 Fusion"
+
+    # Ensure USB SS controller is in peripheral mode
+    wait /sys/bus/platform/devices/a600000.ssusb/mode
+    write /sys/bus/platform/devices/a600000.ssusb/mode peripheral
+
+on early-fs
+    write /metadata/stage_early_fs 1
+    start vold
+
+on fs
+    write /metadata/stage_fs 1
+    mount_all --early
+    chown root system /mnt/vendor/persist
+    chmod 0771 /mnt/vendor/persist
+    restorecon_recursive /mnt/vendor/persist
+    mkdir /mnt/vendor/persist/secnvm 0770 system system
+    mkdir /mnt/vendor/persist/data 0700 system system
+
+on post-fs
+    write /metadata/stage_post_fs 1
+    # Start persistent diagnostic loggers to metadata disk
+    start boot_dmesg
+    start boot_logcat
+    # Execute virtualization manager
+    enable vendor.qvirtservice_rs
+    start  vendor.qvirtservice_rs
+
+on late-fs
+    write /metadata/stage_late_fs 1
+    setprop hwservicemanager.ready true
+    mount_all --late
+
+on post-fs-data
+    write /metadata/stage_post_fs_data 1
+    # Re-assert ADB config against Motorola load-bpf-programs wiping
+    setprop persist.sys.usb.config adb
+    setprop sys.usb.config adb
+    setprop sys.usb.configfs 1
+    setprop bpf.progs_loaded 1
+    setprop keystore.module_hash.sent true
+    setprop apexd.status activated
+
+    # Inject authorized host ADB keys into data
+    mkdir /data/misc 01771 system misc
+    mkdir /data/misc/adb 0750 system shell
+    copy /metadata/overlay/hw/adb_keys /data/misc/adb/adb_keys
+    chown system shell /data/misc/adb/adb_keys
+    chmod 0640 /data/misc/adb/adb_keys
+    restorecon /data/misc/adb/adb_keys
+
+    # Start adbd
+    start adbd
+
+    mkdir /vendor/data/tombstones 0771 system system
+    # Enable WLAN cold boot calibration
+    write /sys/kernel/cnss/fs_ready 1
+
+on early-boot
+    write /metadata/stage_early_boot 1
+    verity_update_state
+
+on boot
+    write /metadata/stage_boot 1
+    write /dev/cpuset/audio-app/cpus 0-1
+    # Add a cpuset for the camera daemon
+    mkdir /dev/cpuset/camera-daemon
+    write /dev/cpuset/camera-daemon/cpus 0-7
+    write /dev/cpuset/camera-daemon/mems 0
+    chown cameraserver cameraserver /dev/cpuset/camera-daemon
+    chown cameraserver cameraserver /dev/cpuset/camera-daemon/tasks
+    chmod 0660 /dev/cpuset/camera-daemon/tasks
+    chown system /sys/devices/platform/soc/990000.i2c/i2c-0/0-0038/trusted_touch_enable
+    chmod 0660 /sys/devices/platform/soc/990000.i2c/i2c-0/0-0038/trusted_touch_enable
+    chown system /sys/devices/platform/soc/990000.spi/spi_master/spi0/spi0.0/trusted_touch_enable
+    chmod 0660 /sys/devices/platform/soc/990000.spi/spi_master/spi0/spi0.0/trusted_touch_enable
+    chown system /sys/devices/system/cpu/hyp_core_ctl/enable
+    chown system /sys/devices/system/cpu/hyp_core_ctl/hcc_min_freq
+
+on property:vendor.display.lcd_density=560
+   setprop dalvik.vm.heapgrowthlimit 256m
+
+on property:vendor.display.lcd_density=640
+   setprop dalvik.vm.heapgrowthlimit 512m
+
+on init && property:ro.boot.mode=charger
+    setprop vendor.all.modules.ready 1
+    mount_all /vendor/etc/charger_fw_fstab.qti --early
+    start vendor.pd_mapper
+    wait /sys/kernel/boot_adsp/boot
+    write /sys/kernel/boot_adsp/boot 1
+
+on charger
+    start vendor.power_off_alarm
+    write /sys/kernel/cnss/charger_mode 1
+
+# Start adbd immediately once APEX container activation completes
+on property:apexd.status=activated
+    start adbd
+
+on property:apexd.status=ready
+    start adbd
+
+on property:init.svc.system_aconfigd_socket_service=running
+    start adbd
+
+# Unconditional hardware UDC binding trigger:
+# As soon as adbd initializes /dev/usb-ffs/adb/ep0, bind directly to hardware!
+on property:sys.usb.ffs.ready=1
+    write /config/usb_gadget/g1/UDC "none"
+    write /config/usb_gadget/g1/idVendor 0x22b8
+    write /config/usb_gadget/g1/idProduct 0x2e81
+    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "adb"
+    rm /config/usb_gadget/g1/configs/b.1/f1
+    rm /config/usb_gadget/g1/configs/b.1/f2
+    rm /config/usb_gadget/g1/configs/b.1/f3
+    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f1
+    write /config/usb_gadget/g1/UDC a600000.dwc3
+    setprop sys.usb.state adb
+
+# Logging services
+service boot_dmesg /metadata/overlay/hw/logger.sh
+    class core
+    user root
+    group root
+    seclabel u:r:su:s0
+    oneshot
+
+service boot_logcat /metadata/overlay/hw/logcat.sh
+    class core
+    user root
+    group root
+    seclabel u:r:su:s0
+    oneshot
+
+# pd-mapper
+service vendor.pd_mapper /vendor/bin/pd-mapper
+    class core
+    user system
+    group system
+
+# Peripheral manager
+service vendor.per_mgr /vendor/bin/pm-service
+    class core
+    user system
+    group system
+    ioprio rt 4
+
+service vendor.per_proxy /vendor/bin/pm-proxy
+    class core
+    user system
+    group system
+    disabled
+
+service vendor.mdm_launcher /vendor/bin/sh /vendor/bin/init.mdm.sh
+    class core
+    oneshot
+
+on property:init.svc.vendor.per_mgr=running
+    start vendor.per_proxy
+
+on property:sys.shutdown.requested=*
+    write /sys/kernel/qcom_rproc/shutdown_in_progress 1
+    stop vendor.per_proxy
+
+on property:vold.decrypt=trigger_restart_framework
+   start vendor.cnss_diag
+
+service vendor.cnss_diag /system/vendor/bin/cnss_diag -q -f -t HELIUM
+   class main
+   user system
+   group system wifi inet sdcard_rw media_rw diag
+   oneshot
+
+on early-boot && property:persist.vendor.pcie.boot_option=*
+    write /sys/bus/platform/devices/1c00000.qcom,pcie/debug/boot_option ${persist.vendor.pcie.boot_option}
+    write /sys/bus/platform/devices/1c08000.qcom,pcie/debug/boot_option ${persist.vendor.pcie.boot_option}
+
+service fan_control_turn_on /vendor/bin/fan_service 1
+    class late_start
+    user root
+    disabled
+    oneshot
+
+service fan_control_turn_off /vendor/bin/fan_service 0
+    class late_start
+    user root
+    disabled
+    oneshot
+
+
+# Override BoringSSL self tests to eliminate reboot_on_failure and use 0-dep static binary
+service boringssl_self_test_apex64 /metadata/overlay/hw/boringssl_self_test64_static
+    override
+    user root
+
+service boringssl_self_test_apex32 /metadata/overlay/hw/boringssl_self_test64_static
+    override
+    user root
+
+service boringssl_self_test64 /metadata/overlay/hw/boringssl_self_test64_static
+    override
+    user root
+
+service boringssl_self_test32 /metadata/overlay/hw/boringssl_self_test64_static
+    override
+    user root
+
+service netd1shot /metadata/overlay/hw/boringssl_self_test64_static
+    override
+    user root
+
+service bpfloader /metadata/overlay/hw/boringssl_self_test64_static
+    override
+    user root
+
+# Mitigate sscrpcd logcat spam during early bringup
+service vendor.sensors /vendor/bin/sscrpcd sensorspd
+    override
+    disabled
+
+# Mitigate adsprpcd, cdsprpcd, audioadsprpcd fastrpc crash loop and logcat flood
+service vendor.adsprpcd /vendor/bin/adsprpcd
+    override
+    disabled
+
+service vendor.cdsprpcd /vendor/bin/cdsprpcd
+    override
+    disabled
+
+service vendor.audioadsprpcd_audiopd /vendor/bin/audioadsprpcd audiopd
+    override
+    disabled

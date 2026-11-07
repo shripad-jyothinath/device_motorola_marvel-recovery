@@ -1,0 +1,19 @@
+# Copyright (C) 2026 The Android Open Source Project
+# Copyright (C) 2026 Shripad
+# SPDX-License-Identifier: Apache-2.0
+#
+# Overridden BoringSSL self test configuration (no reboot on failure, 64-bit only).
+# Neutralizes the "reboot,boringssl-self-check-failed" loop observed in Slot B bringup.
+on early-init && property:ro.product.cpu.abilist64=*
+    exec_start boringssl_self_test64_vendor
+
+service boringssl_self_test64_vendor /vendor/bin/boringssl_self_test64
+    setenv BORINGSSL_SELF_TEST_CREATE_FLAG true
+    stdio_to_kmsg
+    user root
+
+service boringssl_self_test32_vendor /vendor/bin/boringssl_self_test64
+    setenv BORINGSSL_SELF_TEST_CREATE_FLAG true
+    stdio_to_kmsg
+    user root
+    disabled

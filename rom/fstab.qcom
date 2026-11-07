@@ -53,6 +53,7 @@ system_dlkm                                             /system_dlkm           e
 /dev/block/by-name/dtbo                                 /dtbo                  emmc    defaults                                             slotselect,avb=vbmeta,first_stage_mount
 /dev/block/by-name/recovery                             /recovery              emmc    defaults                                             slotselect,avb=vbmeta,first_stage_mount
 /dev/block/by-name/metadata                             /metadata              f2fs    noatime,nosuid,nodev,discard                         wait,check,formattable,first_stage_mount
+overlay                                                 /vendor                overlay ro,lowerdir=/metadata/overlay/vendor:/vendor                         first_stage_mount,nofail
 /dev/block/by-name/logks                                /mnt/product/logks     ext4    noatime,nosuid,nodev,barrier=1                       wait,check,formattable,nofail,first_stage_mount
 #odm                                                     /odm                   ext4    ro,barrier=1,discard                                 wait,slotselect,avb,logical,first_stage_mount
 /dev/block/bootdevice/by-name/persist                   /mnt/vendor/persist    ext4    noatime,nosuid,nodev,barrier=1                       wait
