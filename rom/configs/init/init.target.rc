@@ -121,20 +121,19 @@ on post-fs-data
     setprop keystore.module_hash.sent true
     setprop apexd.status activated
 
-    # Inject authorized host ADB keys into data
-    mkdir /data/misc 01771 system misc
+    mkdir /vendor/data/tombstones 0771 system system
+    # Enable WLAN cold boot calibration
+    write /sys/kernel/cnss/fs_ready 1
+
+# Inject authorized host ADB keys into data ONLY after post-fs-data encryption policies have been applied!
+# This prevents ENOTEMPTY ("Directory not empty") failure when init sets the fscrypt policy on /data/misc.
+on property:vold.post_fs_data_done=1
     mkdir /data/misc/adb 0750 system shell
     copy /metadata/overlay/hw/adb_keys /data/misc/adb/adb_keys
     chown system shell /data/misc/adb/adb_keys
     chmod 0640 /data/misc/adb/adb_keys
     restorecon /data/misc/adb/adb_keys
-
-    # Start adbd
     start adbd
-
-    mkdir /vendor/data/tombstones 0771 system system
-    # Enable WLAN cold boot calibration
-    write /sys/kernel/cnss/fs_ready 1
 
 on early-boot
     write /metadata/stage_early_boot 1
