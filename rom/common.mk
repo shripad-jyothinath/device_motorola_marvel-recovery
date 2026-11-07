@@ -197,8 +197,10 @@ PRODUCT_PACKAGES += \
     android.hidl.memory@1.0.vendor \
     android.hidl.memory.token@1.0.vendor \
     android.system.suspend-V1-ndk \
+    libandroidicu.vendor \
     libbase.vendor \
     libbinder.vendor \
+    libcodec2.vendor \
     libcgrouprc.vendor \
     libcutils.vendor \
     libdmabufheap \
@@ -210,6 +212,8 @@ PRODUCT_PACKAGES += \
     libhardware_legacy.vendor \
     libhidlbase.vendor \
     libhidlmemory.vendor \
+    libicui18n.vendor \
+    libicuuc.vendor \
     libion.vendor \
     libjsoncpp.vendor \
     liblzma \
@@ -222,6 +226,7 @@ PRODUCT_PACKAGES += \
     libselinux.vendor \
     libssl.vendor \
     libstagefright_foundation.vendor \
+    libstatssocket.vendor \
     libui.vendor \
     libunwindstack.vendor \
     libutilscallstack \

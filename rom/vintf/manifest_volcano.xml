@@ -102,34 +102,7 @@
         <transport>hwbinder</transport>
         <fqname>@1.1::IImsFactory/default</fqname>
     </hal>
-<hal format="aidl">
-       <name>vendor.qti.hardware.qseecom</name>
-       <version>1</version>
-       <interface>
-           <name>IQSEECom</name>
-           <instance>default</instance>
-       </interface>
-   </hal>
-<hal format="aidl">
-        <name>android.hardware.security.keymint</name>
-        <version>3</version>
-        <fqname>IKeyMintDevice/default</fqname>
-    </hal>
-<hal format="aidl">
-        <name>android.hardware.security.sharedsecret</name>
-        <fqname>ISharedSecret/default</fqname>
-    </hal>
-<hal format="aidl">
-        <name>android.hardware.security.secureclock</name>
-        <fqname>ISecureClock/default</fqname>
-    </hal>
-<hal format="aidl">
-        <name>android.hardware.security.keymint</name>
-        <version>3</version>
-        <fqname>IRemotelyProvisionedComponent/default</fqname>
-    </hal>
-<hal format="aidl">
-        <name>android.hardware.boot</name>
-        <fqname>IBootControl/default</fqname>
-    </hal>
+    <sepolicy>
+        <version>34.0</version>
+    </sepolicy>
 </manifest>

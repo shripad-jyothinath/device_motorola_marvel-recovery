@@ -73,10 +73,12 @@ chmod 0644 "${DEST_DIR}/etc/init/hw/"*.rc "${DEST_DIR}/etc/init/"*.rc
 
 # 4. Required Vendor Libraries (Closure of 44 libraries)
 LIBS=(
+    "libandroidicu.so"
     "libbase.so"
     "libbinder.so"
     "libc++.so"
     "libcgrouprc.so"
+    "libcodec2.so"
     "libcrypto.so"
     "libcutils.so"
     "libhardware.so"
@@ -91,6 +93,8 @@ LIBS=(
     "libpng.so"
     "libselinux.so"
     "libpcre2.so"
+    "libicui18n.so"
+    "libicuuc.so"
     "libion.so"
     "libgatekeeper.so"
     "libhardware_legacy.so"
@@ -101,6 +105,7 @@ LIBS=(
     "libnl.so"
     "libssl.so"
     "libfmq.so"
+    "libstatssocket.so"
     "libui.so"
     "libunwindstack.so"
     "libutilscallstack.so"

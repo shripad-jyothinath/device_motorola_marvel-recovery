@@ -215,16 +215,21 @@ BOARD_USES_QCOM_FBE_DECRYPTION  := true
 #   libz                           <- libboot_control_qti, toybox
 #   libfmq, libui, libgralloctypes <- display/allocator/composer services
 MARVEL_RECOVERY_SYSTEM_LIBS := \
+    libandroidicu \
     libcgrouprc \
+    libcodec2 \
     libfmq \
     libgatekeeper \
     libgralloctypes \
     libhardware_legacy \
+    libicui18n \
+    libicuuc \
     liblzma \
     libminijail \
     libnl \
     libpackagelistparser \
     libpcre2 \
+    libstatssocket \
     libui \
     libunwindstack \
     libutilscallstack \
