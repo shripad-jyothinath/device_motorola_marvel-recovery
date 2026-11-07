@@ -50,14 +50,18 @@ TARGET_PREBUILT_KERNEL_HEADERS := $(CURDIR)/device/motorola/marvel/prebuilt/kern
 # build. The rom-ready vendor branch also contains the 292 stock .ko files and
 # their copy rules for an optional full vendor image.
 
-# Use the exact stock vendor images dumped from the device's slot A. The
-# vendor tree on this build host is not a complete 36-31 image, so generating
-# vendor from it would overwrite the stock partitions with partial data.
+# Default to the exact stock vendor images dumped from the device's slot A.
+# MARVEL_BUILD_VENDOR_IMAGE=true switches to the source-complete vendor tree
+# and leaves BOARD_PREBUILT_VENDORIMAGE empty so the vendor image is generated.
 #
-# Point MARVEL_STOCK_IMAGE_DIR at the directory holding the two dumps when
-# building, for example .../marvel-data/stock-vendor-images.
+# Point MARVEL_STOCK_IMAGE_DIR at the directory holding the stock vendor_dlkm
+# dump when building, for example .../marvel-data/stock-vendor-images.
 MARVEL_STOCK_IMAGE_DIR ?= $(CURDIR)/stock-images
+ifneq ($(MARVEL_BUILD_VENDOR_IMAGE),true)
 BOARD_PREBUILT_VENDORIMAGE := $(MARVEL_STOCK_IMAGE_DIR)/vendor_a_stock.img
+else
+BOARD_PREBUILT_VENDORIMAGE :=
+endif
 BOARD_PREBUILT_VENDOR_DLKMIMAGE := $(MARVEL_STOCK_IMAGE_DIR)/vendor_dlkm_a_stock.img
 
 # GKI modules for system_dlkm. The stock 60-module set is the only set that

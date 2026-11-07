@@ -127,6 +127,10 @@ $(foreach p, $(filter-out SYSTEM, $(BOARD_PARTITION_LIST)), $(eval BOARD_USES_$(
 # image and on a running phone), so the erofs default above already matches.
 TARGET_COPY_OUT_ODM := vendor/odm
 
+ifeq ($(MARVEL_BUILD_VENDOR_IMAGE),true)
+-include vendor/motorola/marvel/BoardConfigVendor.mk
+endif
+
 # Display: 1272x2772 @ 450 dpi (`wm size` / `wm density` on the device)
 TARGET_SCREEN_HEIGHT  := 2772
 TARGET_SCREEN_WIDTH   := 1272
