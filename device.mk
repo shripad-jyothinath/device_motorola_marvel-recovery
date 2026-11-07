@@ -215,14 +215,19 @@ BOARD_USES_QCOM_FBE_DECRYPTION  := true
 #   libz                           <- libboot_control_qti, toybox
 #   libfmq, libui, libgralloctypes <- display/allocator/composer services
 MARVEL_RECOVERY_SYSTEM_LIBS := \
+    libcgrouprc \
     libfmq \
     libgatekeeper \
     libgralloctypes \
     libhardware_legacy \
+    liblzma \
     libminijail \
     libnl \
+    libpackagelistparser \
     libpcre2 \
     libui \
+    libunwindstack \
+    libutilscallstack \
     libz \
     android.hardware.common-V2-ndk \
     libdmabufheap \

@@ -7,105 +7,89 @@
 # Modifications Copyright (C) 2026 Shripad
 # SPDX-License-Identifier: Apache-2.0
 #
-# Fixed vendor_modprobe.sh for Motorola Edge 70 Fusion (marvel)
-# - Strips CRLF (\r) from modules.load and modules.blocklist
+# Robust vendor_modprobe.sh for Motorola Edge 70 Fusion (marvel - SM7635)
 # - Auto-mounts /vendor_dlkm if not mounted
-# - Prioritizes /vendor/lib/modules over /vendor_dlkm/lib/modules
+# - Fallback detection of MODULE_DIR between /vendor/lib/modules and /vendor_dlkm/lib/modules
 # - Explicitly loads qseecom_proxy and smcinvoke_dlkm for /dev/smcinvoke
-# - Fixes permissions on /dev/smcinvoke (0660 system drmrpc)
+# - Fixes permissions on /dev/smcinvoke (0660 system drmrpc / 1000:1026)
+# - Strips CRLF (\r) from modules.load and modules.blocklist
+# - Loads all modules with individual background execution and insmod fallback
 # - Signals vendor.all.modules.ready 1
 #=============================================================================
 
-VENDOR_DIR="/vendor/lib/modules"
-VENDOR_DLKM_DIR="/vendor_dlkm/lib/modules"
+echo "vendor_modprobe: starting..." > /dev/kmsg
 
-MODPROBE="/vendor/bin/modprobe"
-
-# Auto-mount /vendor_dlkm if unmounted
-if [ ! -d "${VENDOR_DLKM_DIR}" ]; then
-	for blk in /dev/block/bootdevice/by-name/vendor_dlkm /dev/block/mapper/vendor_dlkm /dev/block/mapper/vendor_dlkm_a /dev/block/mapper/vendor_dlkm_b; do
-		if [ -b "${blk}" ]; then
-			mkdir -p /vendor_dlkm
-			mount -t erofs "${blk}" /vendor_dlkm -o ro 2>/dev/null || mount -t ext4 "${blk}" /vendor_dlkm -o ro 2>/dev/null || true
-			break
-		fi
-	done
+# 1. Ensure /vendor_dlkm is mounted
+if [ ! -d /vendor_dlkm/lib/modules ]; then
+	echo "vendor_modprobe: mounting /vendor_dlkm..." > /dev/kmsg
+	mkdir -p /vendor_dlkm
+	mount -t erofs -o ro /dev/block/mapper/vendor_dlkm_b /vendor_dlkm 2>/dev/null || \
+	mount -t ext4 -o ro /dev/block/mapper/vendor_dlkm_b /vendor_dlkm 2>/dev/null || \
+	mount -t erofs -o ro /dev/block/mapper/vendor_dlkm_a /vendor_dlkm 2>/dev/null || \
+	mount -t ext4 -o ro /dev/block/mapper/vendor_dlkm_a /vendor_dlkm 2>/dev/null || \
+	mount -t erofs -o ro /dev/block/bootdevice/by-name/vendor_dlkm_b /vendor_dlkm 2>/dev/null || \
+	mount -t ext4 -o ro /dev/block/bootdevice/by-name/vendor_dlkm_b /vendor_dlkm 2>/dev/null || \
+	mount -t erofs -o ro /dev/block/bootdevice/by-name/vendor_dlkm /vendor_dlkm 2>/dev/null || \
+	mount -t ext4 -o ro /dev/block/bootdevice/by-name/vendor_dlkm /vendor_dlkm 2>/dev/null || true
 fi
 
-# Prioritize /vendor/lib/modules, fallback to /vendor_dlkm/lib/modules
-POSSIBLE_DIRS="${VENDOR_DIR} ${VENDOR_DLKM_DIR}"
-audio_arch=`getprop ro.boot.audio`
+# 2. Ensure /vendor/lib/modules exists and has modules.dep
+if [ ! -f /vendor/lib/modules/modules.dep ] && [ -d /vendor_dlkm/lib/modules ]; then
+	echo "vendor_modprobe: bind mounting /vendor_dlkm/lib/modules to /vendor/lib/modules..." > /dev/kmsg
+	mkdir -p /vendor/lib/modules
+	mount -o bind /vendor_dlkm/lib/modules /vendor/lib/modules 2>/dev/null || true
+fi
 
-for dir in ${POSSIBLE_DIRS} ;
-do
-	if [ ! -e ${dir}/modules.load ]; then
-		continue
-	fi
+# 3. Determine MODULE_DIR (prefer where modules.dep or qseecom_proxy.ko actually resides)
+MODULE_DIR="/vendor/lib/modules"
+if [ ! -f "${MODULE_DIR}/modules.dep" ] && [ -f "/vendor_dlkm/lib/modules/modules.dep" ]; then
+	MODULE_DIR="/vendor_dlkm/lib/modules"
+elif [ ! -f "${MODULE_DIR}/qseecom_proxy.ko" ] && [ -f "/vendor_dlkm/lib/modules/qseecom_proxy.ko" ]; then
+	MODULE_DIR="/vendor_dlkm/lib/modules"
+fi
 
-	if [ "$audio_arch" == "audioreach" ]; then
-		if [ -e ${dir}/modules.audio.ar.blocklist ]; then
-			audio_blocklist_expr="$(sed -n -e 's/blocklist \(.*\)/\1/p' ${dir}/modules.audio.ar.blocklist | tr -d '\r' | sed -e 's/-/_/g' -e 's/^/-e /')"
-		fi
-	elif [ "$audio_arch" == "audiolite" ]; then
-		if [ -e ${dir}/modules.audio.audiolite.blocklist ]; then
-			audio_blocklist_expr="$(sed -n -e 's/blocklist \(.*\)/\1/p' ${dir}/modules.audio.audiolite.blocklist | tr -d '\r' | sed -e 's/-/_/g' -e 's/^/-e /')"
-		fi
-	else
-		if [ -e ${dir}/modules.audio.legacy.blocklist ]; then
-			audio_blocklist_expr="$(sed -n -e 's/blocklist \(.*\)/\1/p' ${dir}/modules.audio.legacy.blocklist | tr -d '\r' | sed -e 's/-/_/g' -e 's/^/-e /')"
-		fi
-	fi
+echo "vendor_modprobe: using MODULE_DIR=${MODULE_DIR}" > /dev/kmsg
 
-	# Use pattern if block list is empty so that all modules pass through grep below
-	if [ "X${audio_blocklist_expr}" = "X" ]; then
-		audio_blocklist_expr="-e %"
-	fi
+# 4. Explicitly load TrustZone & security modules first via insmod & modprobe
+echo "vendor_modprobe: loading qseecom_proxy and smcinvoke_dlkm..." > /dev/kmsg
+insmod ${MODULE_DIR}/qseecom_proxy.ko 2>/dev/null || /vendor/bin/modprobe -b -d ${MODULE_DIR} -a qseecom_proxy 2>/dev/null || true
+insmod ${MODULE_DIR}/smcinvoke_dlkm.ko 2>/dev/null || /vendor/bin/modprobe -b -d ${MODULE_DIR} -a smcinvoke_dlkm 2>/dev/null || true
 
-	if [ -e ${dir}/modules.blocklist ]; then
-		blocklist_expr="$(sed -n -e 's/blocklist \(.*\)/\1/p' ${dir}/modules.blocklist | tr -d '\r' | sed -e 's/-/_/g' -e 's/^/-e /')"
-	fi
+# 5. Ensure /dev/smcinvoke node permissions
+if [ -e /dev/smcinvoke ]; then
+	chmod 0660 /dev/smcinvoke
+	chown system:drmrpc /dev/smcinvoke 2>/dev/null || chown 1000:1026 /dev/smcinvoke 2>/dev/null
+	echo "vendor_modprobe: /dev/smcinvoke node configured successfully" > /dev/kmsg
+else
+	echo "vendor_modprobe: /dev/smcinvoke not found immediately after insmod" > /dev/kmsg
+fi
 
-	# Use pattern if block list is empty so that all modules pass through grep below
-	if [ "X${blocklist_expr}" = "X" ]; then
-		blocklist_expr="-e %"
-	fi
-
-	# Filter out modules in blocklist, stripping all \r carriage returns
-	load_modules=$(sed = ${dir}/modules.load | tr -d '\r' | sed 'N;s/\n/\t/' | sort -uk2 | sort -nk1 | cut -f2- | grep -w -v ${blocklist_expr} | grep -w -v ${audio_blocklist_expr})
-	first_module=$(echo ${load_modules} | cut -d " " -f1)
-	other_modules=$(echo ${load_modules} | cut -d " " -f2-)
-
-	echo "vendor_modprobe: loading modules from ${dir}..."
-
-	# Explicitly load critical security modules first to ensure /dev/smcinvoke is created
-	${MODPROBE} -b -s -d ${dir} -a qseecom_proxy 2>/dev/null || true
-	${MODPROBE} -b -s -d ${dir} -a smcinvoke_dlkm 2>/dev/null || true
-
-	if [ -n "${first_module}" ]; then
-		if ! ${MODPROBE} -b -s -d ${dir} -a ${first_module} > /dev/null ; then
-			echo "vendor_modprobe: first_module failed on ${dir}, continuing individual loads..."
+# 6. Load remaining modules from modules.load
+if [ -f ${MODULE_DIR}/modules.load ]; then
+	BLOCKLIST_EXPR="-e %"
+	if [ -f ${MODULE_DIR}/modules.blocklist ]; then
+		BLOCKLIST_EXPR=$(tr -d '\r' < ${MODULE_DIR}/modules.blocklist | sed -n -e 's/blocklist \(.*\)/\1/p' | sed -e 's/-/_/g' -e 's/^/-e /')
+		if [ -z "${BLOCKLIST_EXPR}" ]; then
+			BLOCKLIST_EXPR="-e %"
 		fi
 	fi
 
-	# Load modules individually so a single init failure does not abort remaining modules
-	for module in ${other_modules}; do
-		( ${MODPROBE} -b -d ${dir} -a ${module} > /dev/null ) &
+	echo "vendor_modprobe: loading modules from modules.load..." > /dev/kmsg
+	LOAD_MODULES=$(tr -d '\r' < ${MODULE_DIR}/modules.load | grep -w -v ${BLOCKLIST_EXPR})
+
+	for mod in ${LOAD_MODULES}; do
+		( /vendor/bin/modprobe -b -d ${MODULE_DIR} -a ${mod} 2>/dev/null || insmod ${MODULE_DIR}/${mod} 2>/dev/null || insmod ${MODULE_DIR}/${mod}.ko 2>/dev/null ) &
 	done
-
 	wait
+	echo "vendor_modprobe: all modules loaded" > /dev/kmsg
+fi
 
-	# Ensure /dev/smcinvoke permissions are set for qseecomd and KeyMint
-	if [ -e /dev/smcinvoke ]; then
-		chmod 0660 /dev/smcinvoke
-		chown system drmrpc /dev/smcinvoke
-	fi
+# 7. Final check for /dev/smcinvoke permissions
+if [ -e /dev/smcinvoke ]; then
+	chmod 0660 /dev/smcinvoke
+	chown system:drmrpc /dev/smcinvoke 2>/dev/null || chown 1000:1026 /dev/smcinvoke 2>/dev/null
+fi
 
-	echo "vendor_modprobe: all vendor modules loaded successfully!"
-	setprop vendor.all.modules.ready 1
-	exit 0
-done
-
-# If no modules.load was found, still signal ready so init does not hang
-echo "vendor_modprobe: no modules.load found, signaling vendor.all.modules.ready 1"
 setprop vendor.all.modules.ready 1
+echo "vendor_modprobe: vendor.all.modules.ready=1 set, exiting 0" > /dev/kmsg
 exit 0

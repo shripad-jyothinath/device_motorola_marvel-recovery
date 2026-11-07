@@ -199,6 +199,7 @@ PRODUCT_PACKAGES += \
     android.system.suspend-V1-ndk \
     libbase.vendor \
     libbinder.vendor \
+    libcgrouprc.vendor \
     libcutils.vendor \
     libdmabufheap \
     libexpat.vendor \
@@ -211,15 +212,19 @@ PRODUCT_PACKAGES += \
     libhidlmemory.vendor \
     libion.vendor \
     libjsoncpp.vendor \
+    liblzma \
     libminijail.vendor \
     libnetutils \
     libnl \
+    libpackagelistparser \
     libpcre2.vendor \
     libprocessgroup.vendor \
     libselinux.vendor \
     libssl.vendor \
     libstagefright_foundation.vendor \
     libui.vendor \
+    libunwindstack.vendor \
+    libutilscallstack \
     libutils.vendor \
     libxml2.vendor \
     libz.vendor
