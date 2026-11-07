@@ -197,6 +197,8 @@ PRODUCT_PACKAGES += \
     android.hidl.memory@1.0.vendor \
     android.hidl.memory.token@1.0.vendor \
     android.system.suspend-V1-ndk \
+    vendor.qti.hardware.qseecom@1.0.vendor \
+    vendor.qti.hardware.qseecom@1.0-impl \
     libandroidicu.vendor \
     libbase.vendor \
     libbinder.vendor \

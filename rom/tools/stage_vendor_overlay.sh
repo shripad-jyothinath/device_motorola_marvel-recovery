@@ -147,4 +147,15 @@ if command -v chcon >/dev/null 2>&1; then
     chcon u:object_r:vendor_modinstall-sh_exec:s0 "${DEST_DIR}/bin/system_dlkm_modprobe.sh" 2>/dev/null || true
 fi
 
+# 5. QSEECom 1.0 Implementation Symlink
+# vendor.qti.hardware.qseecom@1.0-service links directly against vendor.qti.hardware.qseecom@1.0-impl.so
+# in /vendor/lib64/ (stock vendor places it only in /vendor/lib64/hw/)
+if [ -f "/vendor/lib64/hw/vendor.qti.hardware.qseecom@1.0-impl.so" ]; then
+    echo "--> Creating QSEECom 1.0 impl symlink in lib64..."
+    ln -sf hw/vendor.qti.hardware.qseecom@1.0-impl.so "${DEST_DIR}/lib64/vendor.qti.hardware.qseecom@1.0-impl.so"
+elif [ -f "${DEST_DIR}/lib64/hw/vendor.qti.hardware.qseecom@1.0-impl.so" ]; then
+    echo "--> Creating QSEECom 1.0 impl symlink in lib64..."
+    ln -sf hw/vendor.qti.hardware.qseecom@1.0-impl.so "${DEST_DIR}/lib64/vendor.qti.hardware.qseecom@1.0-impl.so"
+fi
+
 echo "=== Staging Complete! (${MISSING_COUNT} warnings) ==="
