@@ -43,12 +43,10 @@ on early-init
     setprop sys.usb.configfs 1
     setprop sys.usb.controller a600000.dwc3
     setprop vendor.usb.controller a600000.dwc3
-    # Satisfy all early HAL and system property blockers
-    setprop vendor.all.modules.ready 1
+    # Satisfy early HAL and system property blockers
     setprop hwservicemanager.ready true
     setprop bpf.progs_loaded 1
     setprop keystore.module_hash.sent true
-    setprop apexd.status activated
     setprop persist.sys.usb.config adb
     setprop sys.usb.config adb
 
@@ -130,11 +128,17 @@ on post-fs-data
     setprop sys.usb.configfs 1
     setprop bpf.progs_loaded 1
     setprop keystore.module_hash.sent true
-    setprop apexd.status activated
 
     mkdir /vendor/data/tombstones 0771 system system
     # Enable WLAN cold boot calibration
     write /sys/kernel/cnss/fs_ready 1
+
+on property:apexd.status=activated
+    # Re-apply comprehensive dynamic linker bridge over linkerconfig output
+    copy /metadata/overlay/ld.config.txt /linkerconfig/ld.config.txt
+    copy /metadata/overlay/ld.config.txt /linkerconfig/default/ld.config.txt
+    chmod 0644 /linkerconfig/ld.config.txt
+    chmod 0644 /linkerconfig/default/ld.config.txt
 
 on early-boot
     write /metadata/stage_early_boot 1
@@ -269,27 +273,27 @@ service fan_control_turn_off /vendor/bin/fan_service 0
 
 
 # Override BoringSSL self tests to eliminate reboot_on_failure and use 0-dep static binary
-service boringssl_self_test_apex64 /metadata/overlay/hw/boringssl_self_test64_static
+service boringssl_self_test_apex64 /vendor/bin/boringssl_self_test64
     override
     user root
 
-service boringssl_self_test_apex32 /metadata/overlay/hw/boringssl_self_test64_static
+service boringssl_self_test_apex32 /vendor/bin/boringssl_self_test64
     override
     user root
 
-service boringssl_self_test64 /metadata/overlay/hw/boringssl_self_test64_static
+service boringssl_self_test64 /vendor/bin/boringssl_self_test64
     override
     user root
 
-service boringssl_self_test32 /metadata/overlay/hw/boringssl_self_test64_static
+service boringssl_self_test32 /vendor/bin/boringssl_self_test64
     override
     user root
 
-service netd1shot /metadata/overlay/hw/boringssl_self_test64_static
+service netd1shot /vendor/bin/boringssl_self_test64
     override
     user root
 
-service bpfloader /metadata/overlay/hw/boringssl_self_test64_static
+service bpfloader /vendor/bin/boringssl_self_test64
     override
     user root
 

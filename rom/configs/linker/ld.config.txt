@@ -9,17 +9,33 @@ namespace.default.isolated = false
 namespace.default.search.paths = /system/${LIB}
 namespace.default.search.paths += /system_ext/${LIB}
 namespace.default.search.paths += /product/${LIB}
+namespace.default.search.paths += /apex/com.android.art/${LIB}
+namespace.default.search.paths += /apex/com.android.runtime/${LIB}
 namespace.default.search.paths += /apex/com.android.i18n/${LIB}
+namespace.default.search.paths += /apex/com.android.tethering/${LIB}
+namespace.default.search.paths += /apex/com.android.os.statsd/${LIB}
+namespace.default.search.paths += /apex/com.android.media/${LIB}
+namespace.default.search.paths += /apex/com.android.conscrypt/${LIB}
+namespace.default.search.paths += /apex/com.android.neuralnetworks/${LIB}
+namespace.default.search.paths += /apex/com.android.sdkext/${LIB}
+namespace.default.search.paths += /apex/com.android.adbd/${LIB}
+namespace.default.search.paths += /bootstrap-apex/com.android.art/${LIB}
+namespace.default.search.paths += /bootstrap-apex/com.android.runtime/${LIB}
 namespace.default.search.paths += /bootstrap-apex/com.android.i18n/${LIB}
 namespace.default.search.paths += /vendor/${LIB}
 
 [vendor]
 namespace.default.isolated = false
 namespace.default.search.paths = /vendor/${LIB}
+namespace.default.search.paths += /vendor/${LIB}/hw
 namespace.default.search.paths += /system/${LIB}
 namespace.default.search.paths += /system_ext/${LIB}
 namespace.default.search.paths += /product/${LIB}
+namespace.default.search.paths += /apex/com.android.art/${LIB}
+namespace.default.search.paths += /apex/com.android.runtime/${LIB}
 namespace.default.search.paths += /apex/com.android.i18n/${LIB}
+namespace.default.search.paths += /bootstrap-apex/com.android.art/${LIB}
+namespace.default.search.paths += /bootstrap-apex/com.android.runtime/${LIB}
 namespace.default.search.paths += /bootstrap-apex/com.android.i18n/${LIB}
 
 [default]
@@ -27,6 +43,16 @@ namespace.default.isolated = false
 namespace.default.search.paths = /system/${LIB}
 namespace.default.search.paths += /system_ext/${LIB}
 namespace.default.search.paths += /product/${LIB}
+namespace.default.search.paths += /apex/com.android.art/${LIB}
+namespace.default.search.paths += /apex/com.android.runtime/${LIB}
 namespace.default.search.paths += /apex/com.android.i18n/${LIB}
+namespace.default.search.paths += /apex/com.android.tethering/${LIB}
+namespace.default.search.paths += /apex/com.android.os.statsd/${LIB}
+namespace.default.search.paths += /apex/com.android.media/${LIB}
+namespace.default.search.paths += /apex/com.android.conscrypt/${LIB}
+namespace.default.search.paths += /apex/com.android.neuralnetworks/${LIB}
+namespace.default.search.paths += /bootstrap-apex/com.android.art/${LIB}
+namespace.default.search.paths += /bootstrap-apex/com.android.runtime/${LIB}
 namespace.default.search.paths += /bootstrap-apex/com.android.i18n/${LIB}
 namespace.default.search.paths += /vendor/${LIB}
+
