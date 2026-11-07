@@ -51,9 +51,10 @@ fi
 echo "vendor_modprobe: using MODULE_DIR=${MODULE_DIR}" > /dev/kmsg
 
 # 4. Explicitly load TrustZone & security modules first via insmod & modprobe
-echo "vendor_modprobe: loading qseecom_proxy and smcinvoke_dlkm..." > /dev/kmsg
+echo "vendor_modprobe: loading qseecom_proxy, smcinvoke_dlkm, and msm_drm..." > /dev/kmsg
 insmod ${MODULE_DIR}/qseecom_proxy.ko 2>/dev/null || /vendor/bin/modprobe -b -d ${MODULE_DIR} -a qseecom_proxy 2>/dev/null || true
 insmod ${MODULE_DIR}/smcinvoke_dlkm.ko 2>/dev/null || /vendor/bin/modprobe -b -d ${MODULE_DIR} -a smcinvoke_dlkm 2>/dev/null || true
+insmod ${MODULE_DIR}/msm_drm.ko 2>/dev/null || /vendor/bin/modprobe -b -d ${MODULE_DIR} -a msm_drm 2>/dev/null || true
 
 # 5. Ensure /dev/smcinvoke node permissions
 if [ -e /dev/smcinvoke ]; then
