@@ -71,9 +71,8 @@ cp "${DEVICE_TREE_DIR}/rom/configs/init/init.qti.kernel.rc" "${DEST_DIR}/etc/ini
 cp "${DEVICE_TREE_DIR}/rom/configs/init/boringssl_self_test.rc" "${DEST_DIR}/etc/init/boringssl_self_test.rc"
 chmod 0644 "${DEST_DIR}/etc/init/hw/"*.rc "${DEST_DIR}/etc/init/"*.rc
 
-# 4. Required Vendor Libraries (Closure of 44 libraries)
+# 4. Required Vendor Libraries (Closure of libraries)
 LIBS=(
-    "libandroidicu.so"
     "libbase.so"
     "libbinder.so"
     "libc++.so"
@@ -93,8 +92,6 @@ LIBS=(
     "libpng.so"
     "libselinux.so"
     "libpcre2.so"
-    "libicui18n.so"
-    "libicuuc.so"
     "libion.so"
     "libgatekeeper.so"
     "libhardware_legacy.so"
@@ -156,6 +153,14 @@ if [ -f "/vendor/lib64/hw/vendor.qti.hardware.qseecom@1.0-impl.so" ]; then
 elif [ -f "${DEST_DIR}/lib64/hw/vendor.qti.hardware.qseecom@1.0-impl.so" ]; then
     echo "--> Creating QSEECom 1.0 impl symlink in lib64..."
     ln -sf hw/vendor.qti.hardware.qseecom@1.0-impl.so "${DEST_DIR}/lib64/vendor.qti.hardware.qseecom@1.0-impl.so"
+fi
+
+# 6. Dynamic Linker Namespace Bridge (APEX i18n resolution)
+if [ -f "${DEVICE_TREE_DIR}/rom/configs/linker/ld.config.txt" ]; then
+    echo "--> Staging dynamic linker configuration bridge..."
+    OVERLAY_ROOT="$(dirname "${DEST_DIR}")"
+    cp "${DEVICE_TREE_DIR}/rom/configs/linker/ld.config.txt" "${OVERLAY_ROOT}/ld.config.txt"
+    chmod 0644 "${OVERLAY_ROOT}/ld.config.txt"
 fi
 
 echo "=== Staging Complete! (${MISSING_COUNT} warnings) ==="

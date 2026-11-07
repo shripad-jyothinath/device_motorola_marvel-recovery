@@ -1,0 +1,32 @@
+dir.system = /system/bin
+dir.system_ext = /system_ext/bin
+dir.product = /product/bin
+dir.vendor = /vendor/bin
+dir.odm = /odm/bin
+
+[system]
+namespace.default.isolated = false
+namespace.default.search.paths = /system/${LIB}
+namespace.default.search.paths += /system_ext/${LIB}
+namespace.default.search.paths += /product/${LIB}
+namespace.default.search.paths += /apex/com.android.i18n/${LIB}
+namespace.default.search.paths += /bootstrap-apex/com.android.i18n/${LIB}
+namespace.default.search.paths += /vendor/${LIB}
+
+[vendor]
+namespace.default.isolated = false
+namespace.default.search.paths = /vendor/${LIB}
+namespace.default.search.paths += /system/${LIB}
+namespace.default.search.paths += /system_ext/${LIB}
+namespace.default.search.paths += /product/${LIB}
+namespace.default.search.paths += /apex/com.android.i18n/${LIB}
+namespace.default.search.paths += /bootstrap-apex/com.android.i18n/${LIB}
+
+[default]
+namespace.default.isolated = false
+namespace.default.search.paths = /system/${LIB}
+namespace.default.search.paths += /system_ext/${LIB}
+namespace.default.search.paths += /product/${LIB}
+namespace.default.search.paths += /apex/com.android.i18n/${LIB}
+namespace.default.search.paths += /bootstrap-apex/com.android.i18n/${LIB}
+namespace.default.search.paths += /vendor/${LIB}
