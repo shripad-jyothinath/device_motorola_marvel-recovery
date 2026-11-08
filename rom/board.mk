@@ -14,9 +14,15 @@ BOARD_SHIPPING_API_LEVEL := 34
 # - ODM manifest: declares ODM HALs including NXP StrongBox IKeyMintDevice/strongbox
 #   and IWeaver/default on the eSE.
 # Separating vendor and ODM avoids duplicate FqInstance errors in libvintf.
+ifeq ($(MARVEL_BUILD_VENDOR_IMAGE),true)
+DEVICE_MANIFEST_FILE := vendor/motorola/marvel/proprietary/vendor/etc/vintf/manifest_volcano.xml
+ODM_MANIFEST_FILES += vendor/motorola/marvel/proprietary/odm/etc/vintf/manifest_bnes.xml
+DEVICE_MATRIX_FILE := vendor/motorola/marvel/proprietary/vendor/etc/vintf/compatibility_matrix.xml
+else
 DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/rom/vintf/manifest.xml
 ODM_MANIFEST_FILES += $(DEVICE_PATH)/rom/vintf/manifest_bnes.xml
 DEVICE_MATRIX_FILE := $(DEVICE_PATH)/rom/vintf/compatibility_matrix.xml
+endif
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := $(DEVICE_PATH)/rom/vintf/framework_compatibility_matrix.xml
 
 # Device properties. vendor.prop is generated from the stock 36-31
