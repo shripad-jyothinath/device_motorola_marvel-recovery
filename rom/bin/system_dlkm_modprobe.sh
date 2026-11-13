@@ -35,10 +35,35 @@ if [ -z "${LOAD_FILE}" ]; then
 	exit 0
 fi
 
-# If modules exist, load them
+# If modules exist, load the first one sequentially (matching the stock
+# script's dependency-safe first load), then load the rest in parallel.
 DIR=$(dirname "${LOAD_FILE}")
-LOAD_MODULES=$(tr -d '\r' < "${LOAD_FILE}")
+VENDOR_DLKM_DIR="/vendor_dlkm/lib/modules"
+BLOCKLIST_EXPR="-e %"
+if [ -e "${VENDOR_DLKM_DIR}/system_dlkm.modules.blocklist" ] && \
+   grep -q blocklist "${VENDOR_DLKM_DIR}/system_dlkm.modules.blocklist"; then
+	BLOCKLIST_EXPR="$(sed -n -e 's/blocklist \(.*\)/\1/p' "${VENDOR_DLKM_DIR}/system_dlkm.modules.blocklist" | \
+		sed -e 's/-/[-_]/g' -e 's/^/-e /')"
+	[ -n "${BLOCKLIST_EXPR}" ] || BLOCKLIST_EXPR="-e %"
+fi
+LOAD_MODULES=$(tr -d '\r' < "${LOAD_FILE}" | grep -w -v ${BLOCKLIST_EXPR})
+FIRST=""
+OTHERS=""
 for mod in ${LOAD_MODULES}; do
+	if [ -z "${FIRST}" ]; then
+		FIRST="${mod}"
+	else
+		OTHERS="${OTHERS} ${mod}"
+	fi
+done
+
+if [ -n "${FIRST}" ]; then
+	/vendor/bin/modprobe -b -d "${DIR}" -a "${FIRST}" 2>/dev/null || \
+		insmod "${DIR}/${FIRST}" 2>/dev/null || \
+		insmod "${DIR}/${FIRST}.ko" 2>/dev/null
+fi
+
+for mod in ${OTHERS}; do
 	( /vendor/bin/modprobe -b -d "${DIR}" -a "${mod}" 2>/dev/null || insmod "${DIR}/${mod}" 2>/dev/null || insmod "${DIR}/${mod}.ko" 2>/dev/null ) &
 done
 wait

@@ -624,5 +624,7 @@
     "bin/hw/vendor.qti.memory.pasrmanager-service",
     "bin/hw/vendor.zuialarm.hardware.alarm@1.0-service",
     "bin/hw/wpa_supplicant"
-  ]
+  ],
+  "_historical": true,
+  "_historicalNote": "Historical donor-era hash comparison. Current exact vendor tree is byte-identical to vendor_a_stock.img except generated files; see the private artifacts comparison."
 }

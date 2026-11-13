@@ -28683,5 +28683,7 @@
       "elf": null,
       "zip": false
     }
-  ]
+  ],
+  "_historical": true,
+  "_historicalNote": "Historical donor-era audit. Current exact vendor tree: 2,709 payload files, 281 symlinks, 2,693 copy rules, zero content differences (stock-vendor-36-31 at a1075d8)."
 }

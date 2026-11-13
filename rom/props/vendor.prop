@@ -1,6 +1,6 @@
 # Generated from stock A171WEH.36-31 vendor/build.prop.
-# The stock image identity and VNDK values are pinned here so the rebuilt vendor
-# image matches the installed stock vendor ABI.
+# The stock VNDK/API values are pinned here; product identity is stamped by
+# the build from PRODUCT_MODEL/PRODUCT_NAME.
 #
 # The QTI and NXP KeyMint HALs wait for this property and pass it to the TA as
 # the vendor patch level. Keep it equal to the installed vendor firmware.
@@ -15,19 +15,15 @@ ro.product.first_api_level=36
 ro.product.vendor.brand=motorola
 ro.product.vendor.device=marvel
 ro.product.vendor.manufacturer=motorola
-ro.product.vendor.model=marvel
-ro.product.vendor.name=marvel
 ro.vendor.build.vendorprefix=/vendor
 ro.vendor.product.cpu.abilist=arm64-v8a
 ro.vendor.product.cpu.abilist32=
 ro.vendor.product.cpu.abilist64=arm64-v8a
 ro.mot.build.guid=5ebf08e36aefdcf
 ro.bionic.arch=arm64
-ro.bionic.cpu_variant=kryo300
 ro.bionic.2nd_arch=
 ro.bionic.2nd_cpu_variant=
 persist.sys.dalvik.vm.lib.2=libart.so
-dalvik.vm.isa.arm64.variant=kryo300
 dalvik.vm.isa.arm64.features=default
 ro.minui.pixel_format=RGBX_8888
 ro.boot.dynamic_partitions=true
@@ -432,3 +428,7 @@ persist.vendor.sys.diag_mdlog.getlogs_size=629145600
 persist.vendor.radio.aosp_usr_pref_sel=true
 persist.vendor.radio.flexmap_type=none
 persist.vendor.radio.enable_temp_dds=true
+# Motorola SKU/hardware/carrier property imports from the stock 36-31 vendor.
+import /vendor/etc/motorola/props/sku.${ro.boot.sku_variant}.prop
+import /vendor/etc/motorola/props/hardware.sku.${ro.boot.hardware.sku}.prop
+import /vendor/etc/motorola/props/carrier.${ro.boot.carrier}.prop

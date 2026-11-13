@@ -202,10 +202,19 @@ const vendorVintfTop = listFiles(vendorVintfDir, f => path.dirname(f) === vendor
 const vendorFragments = listFiles(path.join(vendorVintfDir, 'manifest'), f => f.endsWith('.xml'));
 const systemExtVintfDir = path.join(vendorRoot, 'proprietary', 'system_ext', 'etc', 'vintf');
 const systemExtFragments = listFiles(systemExtVintfDir, f => f.endsWith('.xml'));
-const stockManifestText = readText(path.join(stockManifestDir, 'manifest.xml'));
-const stockManifestHalNames = [...stockManifestText.matchAll(/<name>([^<]+)<\/name>/g)].map(m => m[1]);
+// The stock vendor has no top-level manifest.xml. Its primary manifest is
+// manifest_volcano.xml and the rest of the HAL set is in the fragments under
+// <vendor>/etc/vintf/manifest/. Collect both when comparing HAL coverage.
+const stockManifestText = readText(path.join(stockManifestDir, 'manifest_volcano.xml'));
+const stockManifestFragments = listFiles(path.join(stockManifestDir, 'manifest'), f => f.endsWith('.xml'));
+const stockManifestHalNames = new Set();
+for (const text of [stockManifestText, ...stockManifestFragments.map(readText)]) {
+  for (const m of text.matchAll(/<name>([^<]+)<\/name>/g)) stockManifestHalNames.add(m[1]);
+}
+const vendorTopManifests = vendorVintfTop.filter(
+  f => /^manifest.*\.xml$/.test(path.basename(f)));
 const vendorHalNames = new Set();
-for (const file of [...vendorFragments, ...systemExtFragments]) {
+for (const file of [...vendorTopManifests, ...vendorFragments, ...systemExtFragments]) {
   for (const m of readText(file).matchAll(/<name>([^<]+)<\/name>/g)) vendorHalNames.add(m[1]);
 }
 
@@ -246,7 +255,7 @@ const summary = {
   vendorVintfTopLevelFiles: vendorVintfTop.length,
   vendorVintfFragments: vendorFragments.length,
   systemExtVintfFragments: systemExtFragments.length,
-  stockManifestHalNames: stockManifestHalNames.length,
+  stockManifestHalNames: stockManifestHalNames.size,
   vendorHalNames: vendorHalNames.size,
 };
 
@@ -273,7 +282,7 @@ const result = {
     topLevelFiles: vendorVintfTop.map(f => path.basename(f)),
     fragmentCount: vendorFragments.length,
     systemExtFragmentCount: systemExtFragments.length,
-    stockManifestHalNames,
+    stockManifestHalNames: [...stockManifestHalNames].sort(),
     vendorHalNames: [...vendorHalNames].sort(),
     missingTopLevelManifest: vendorVintfTop.length === 0,
   },

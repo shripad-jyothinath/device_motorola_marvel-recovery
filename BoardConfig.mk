@@ -16,7 +16,7 @@ TARGET_ARCH_VARIANT        := armv8-2a-dotprod
 TARGET_CPU_ABI             := arm64-v8a
 TARGET_CPU_VARIANT         := generic
 # Same SoC as amethyst (SM7635: 1x2.5GHz A720 + 3x2.4GHz A720 + 4x1.8GHz A520)
-TARGET_CPU_VARIANT_RUNTIME := kryo300
+TARGET_CPU_VARIANT_RUNTIME := kryo
 
 # Platform
 TARGET_BOOTLOADER_BOARD_NAME  := marvel
@@ -73,7 +73,8 @@ BOARD_AVB_ROLLBACK_INDEX := 9
 # Recovery image signing. Mirrors android_device_motorola_genevn - the closest
 # official tree in existence for this shape (Motorola + kernel-less recovery +
 # dedicated recovery partition + A/B + BOARD_AVB_ENABLE), see
-# docs/13 in the bringup repo. With BOARD_AVB_ENABLE := true and no key for the
+# the bring-up handoff in the private marvel-build-artifacts repo. With
+# BOARD_AVB_ENABLE := true and no key for the
 # recovery partition, the recoveryimage target has no AVB key to use.
 # NOTE: this does NOT make the image verify on marvel - stock vbmeta.img carries
 # its own hash descriptor for `recovery` (OEM key), so a self-built recovery

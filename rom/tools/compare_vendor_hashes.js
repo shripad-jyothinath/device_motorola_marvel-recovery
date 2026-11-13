@@ -33,14 +33,25 @@ function walk(dir, base, out) {
   }
 }
 
-const repoFiles = [];
-walk(path.join(vendorDir, 'proprietary', 'vendor'), path.join(vendorDir, 'proprietary', 'vendor'), repoFiles);
+// Stock ODM content lives at /vendor/odm inside the vendor image, while the
+// repo keeps it in proprietary/odm. Walk both mapped locations; the original
+// script only walked proprietary/vendor and therefore reported odm as missing.
+const repoEntries = [];
+function walkInto(dir, prefix) {
+  const files = [];
+  walk(dir, dir, files);
+  for (const rel of files) {
+    repoEntries.push({ rel: prefix + rel, full: path.join(dir, rel) });
+  }
+}
+walkInto(path.join(vendorDir, 'proprietary', 'vendor'), '');
+walkInto(path.join(vendorDir, 'proprietary', 'odm'), 'odm/');
+const repoFiles = repoEntries.map((entry) => entry.rel);
 
 const matches = [];
 const differences = [];
 const missingInStock = [];
-for (const rel of repoFiles) {
-  const full = path.join(vendorDir, 'proprietary', 'vendor', rel);
+for (const { rel, full } of repoEntries) {
   const hash = crypto.createHash('sha256').update(fs.readFileSync(full)).digest('hex');
   if (!stock.has(rel)) {
     missingInStock.push(rel);

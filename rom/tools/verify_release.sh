@@ -10,10 +10,27 @@
 set -u
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
+# ROOT is the device-tree root (rom/tools, device.mk, vendor-modules.lock).
+# Build outputs live under the AOSP source root's out/ tree, not under the
+# device tree. ANDROID_BUILD_TOP is set by build/envsetup.sh; when it is not
+# available, the caller can still pass the init_boot/system_dlkm paths.
+if [ -z "${ANDROID_BUILD_TOP:-}" ]; then
+    _d=$(pwd)
+    while [ "$_d" != "/" ] && [ ! -f "$_d/build/envsetup.sh" ]; do
+        _d=$(dirname "$_d")
+    done
+    if [ -f "$_d/build/envsetup.sh" ]; then
+        ANDROID_BUILD_TOP=$_d
+    fi
+fi
+OUT_ROOT=${ANDROID_BUILD_TOP:-$(pwd)}/out/target/product/marvel
 MODULES_REPO=${1:-}
-INIT_BOOT=${2:-$ROOT/out/target/product/marvel/init_boot.img}
-SYSTEM_DLKM=${3:-$ROOT/out/target/product/marvel/system_dlkm}
+INIT_BOOT=${2:-$OUT_ROOT/init_boot.img}
+SYSTEM_DLKM=${3:-$OUT_ROOT/system_dlkm}
 STOCK_IMAGES=${4:-${MARVEL_STOCK_IMAGE_DIR:-$ROOT/stock-images}}
+if [ -z "${MARVEL_STOCK_IMAGE_DIR:-}" ] && [ "$STOCK_IMAGES" = "$ROOT/stock-images" ] && [ -d "$ROOT/../stock-vendor-images" ]; then
+    STOCK_IMAGES="$ROOT/../stock-vendor-images"
+fi
 LOCK="$ROOT/rom/tools/vendor-modules.lock"
 UNPACK_BOOTIMG=${UNPACK_BOOTIMG:-unpack_bootimg}
 NODE=${NODE:-node}
@@ -38,6 +55,11 @@ fail() { FAILS=$((FAILS + 1)); printf 'FAIL %s\n' "$1"; }
 
 [ -f "$LOCK" ] || { fail "missing $LOCK"; exit 1; }
 
+if [ -n "${MARVEL_VENDOR_BOOT_IMAGE:-}" ] && \
+   [ "$MARVEL_VENDOR_BOOT_IMAGE" != "$ROOT/prebuilt/vendor_boot_a.img" ]; then
+    warn "MARVEL_VENDOR_BOOT_IMAGE is an override; vendor-modules.lock's stock vendor_boot hash does not cover it"
+fi
+
 if [ -x "$NODE" ] || command -v "$NODE" >/dev/null 2>&1; then
     HASHES=$("$NODE" - "$(winpath "$LOCK")" <<'EOF'
 const fs = require('fs');
@@ -58,6 +80,11 @@ EOF
             continue
         fi
         actual=$(sha256sum "$file" | awk '{print $1}')
+        if [ "$kind" = "stock" ] && [ "$path" = "vendor_dlkm_a_stock.img" ] && \
+           [ "$actual" = "3d7dd3bc947001bc9cfa0930e00224fc84232115da8868ebc1426e890b896b8f" ]; then
+            warn "$file is the patched 3-token-alias vendor_dlkm (stock hash $hash)"
+            continue
+        fi
         if [ "$actual" != "$hash" ]; then
             fail "$file hash $actual != $hash"
         else

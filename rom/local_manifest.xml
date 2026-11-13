@@ -2,8 +2,12 @@
 <!--
   ROM local manifest for the marvel bring-up.
 
-  The device tree branch is evox-a17. The vendor branch is optional when using
-  the stock vendor partition; it is wired to the cleaned rom-ready branch.
+  The device tree branch is evox-a17. The vendor project is optional when using
+  the stock vendor partition. The exact tree is pushed as stock-vendor-36-31
+  at a1075d8 (tag stock-vendor-36-31-build-20261113); it is byte-identical to
+  the stock vendor image except generated files and the documented build
+  adaptations. The old rom-ready branch is a donor tree and is not the verified
+  tree.
 -->
 <manifest>
   <remote name="marvel-github" fetch="https://github.com/" />
@@ -16,5 +20,5 @@
   <project name="shripad-jyothinath/android_vendor_motorola_avenger"
            path="vendor/motorola/marvel"
            remote="marvel-github"
-           revision="rom-ready" />
+           revision="a1075d83f8d2b3b7b0aa671c812a561559681dc2" />
 </manifest>
